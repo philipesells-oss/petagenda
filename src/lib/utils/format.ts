@@ -42,6 +42,15 @@ export function formatCurrency(value: number): string {
  * If the input doesn't contain enough digits, the original string is
  * returned so the UI still shows something useful (and bad data is visible).
  */
+/**
+ * Strip phone of all non-digit characters and leading country code `55`.
+ * Returns just the digits suitable for persistence.
+ */
+export function stripPhone(phone: string): string {
+  if (!phone) return ''
+  return phone.replace(/\D/g, '').replace(/^55/, '')
+}
+
 export function formatPhone(phone: string): string {
   if (!phone) return ''
   // Strip country code and any non-digit characters
@@ -96,6 +105,21 @@ export function formatDateTime(date: string | Date): string {
   // Intl outputs "17/04/2026 14:30" — replace the separator for readability.
   return DATETIME_BR.format(d).replace(', ', ' às ').replace(' ', ' às ')
 }
+
+/**
+ * Format a Brazilian CPF — "123.456.789-00".
+ */
+export function formatCPF(raw: string | null | undefined): string {
+  if (!raw) return ''
+  const d = String(raw).replace(/\D/g, '')
+  if (d.length !== 11) return raw
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`
+}
+
+// Aliases kept for clarity in new code — same as formatPhone/formatCurrency/formatDate.
+export const formatPhoneBR = formatPhone
+export const formatCurrencyBR = formatCurrency
+export const formatDateBR = formatDate
 
 /**
  * Format a Postgres TIME column ('HH:MM:SS' or 'HH:MM') as 'HH:MM'.
