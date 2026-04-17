@@ -1,0 +1,22 @@
+project:
+  name: PetAgenda
+  id: petagenda
+  type: saas
+  stack: nextjs-supabase-vercel
+  created_at: "2026-04-17"
+  workflow: greenfield-fullstack
+  phase: 1
+
+environment:
+  supabase_ref: qckasnpabjucioiemiot
+  vercel_project: petagenda
+  github_repo: philipesells-oss/petagenda
+
+phases:
+  0_bootstrap: completed
+  1_planning: in_progress
+  2_sharding: pending
+  3_development: pending
+
+current_epic: epic-1-mvp-foundation
+current_story: null
