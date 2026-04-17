@@ -171,7 +171,62 @@ export async function createAppointment(
   }
 
   revalidatePath('/agenda')
+
+  // Fire-and-forget: send WhatsApp confirmation (never fails the appointment)
+  void sendConfirmationMessage(
+    user.tenantId,
+    v.client_id,
+    data.id,
+    v.pet_id,
+    v.service_id,
+    v.date,
+    v.start_time,
+  ).catch(() => {})
+
   return { ok: true, data: { id: data.id } }
+}
+
+async function sendConfirmationMessage(
+  tenantId: string,
+  clientId: string,
+  appointmentId: string,
+  petId: string,
+  serviceId: string,
+  date: string,
+  startTime: string,
+) {
+  try {
+    const { createAdminClient } = await import('@/lib/supabase/admin')
+    const { sendWhatsappMessage } = await import('@/lib/whatsapp/send-message')
+    const admin = createAdminClient()
+
+    const [{ data: client }, { data: pet }, { data: service }, { data: templateRow }] =
+      await Promise.all([
+        admin.from('clients').select('phone, full_name').eq('id', clientId).maybeSingle<{ phone: string; full_name: string }>(),
+        admin.from('pets').select('name').eq('id', petId).maybeSingle<{ name: string }>(),
+        admin.from('services').select('name').eq('id', serviceId).maybeSingle<{ name: string }>(),
+        admin.from('message_templates').select('id').eq('is_default', true).eq('category', 'confirmation').eq('is_active', true).limit(1).single<{ id: string }>(),
+      ])
+
+    if (!client?.phone || !templateRow) return
+
+    await sendWhatsappMessage({
+      tenantId,
+      clientId,
+      appointmentId,
+      phone: client.phone,
+      templateId: templateRow.id,
+      vars: {
+        client_name: client.full_name,
+        pet_name: pet?.name ?? 'seu pet',
+        service_name: service?.name ?? 'serviço',
+        date: new Date(date + 'T00:00:00').toLocaleDateString('pt-BR'),
+        time: startTime.slice(0, 5),
+      },
+    })
+  } catch {
+    // best-effort, ignore errors
+  }
 }
 
 // ---------------------------------------------------------------------------
