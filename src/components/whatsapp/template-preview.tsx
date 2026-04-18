@@ -8,7 +8,7 @@ const EXAMPLE_VARS: Record<string, string> = {
   service_name: 'Banho e Tosa',
   date: '25/04/2026',
   time: '14:00',
-  shop_name: 'PetAgenda',
+  shop_name: 'PetFlow',
 }
 
 interface Props {

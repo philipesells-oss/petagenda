@@ -6,11 +6,12 @@ import {
   LayoutDashboardIcon,
   CalendarDaysIcon,
   UsersIcon,
-  MessageCircleIcon,
   SettingsIcon,
+  LogOutIcon,
 } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
+import { signOut } from '@/actions/auth'
 
 type NavItem = {
   href: string
@@ -23,7 +24,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboardIcon, exact: true },
   { href: '/agenda', label: 'Agenda', icon: CalendarDaysIcon },
   { href: '/clients', label: 'Clientes', icon: UsersIcon },
-  { href: '/whatsapp', label: 'WhatsApp', icon: MessageCircleIcon },
   { href: '/settings', label: 'Configurações', icon: SettingsIcon },
 ]
 
@@ -39,7 +39,7 @@ export function Sidebar() {
     <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-background md:flex">
       <div className="flex h-14 items-center gap-2 border-b border-border px-4 text-lg font-semibold">
         <span aria-hidden="true">🐾</span>
-        <span>PetAgenda</span>
+        <span>PetFlow</span>
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-3">
         {NAV_ITEMS.map((item) => {
@@ -61,6 +61,17 @@ export function Sidebar() {
             </Link>
           )
         })}
+        <div className="mt-auto pt-3">
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <LogOutIcon className="size-4" />
+              Sair
+            </button>
+          </form>
+        </div>
       </nav>
     </aside>
   )

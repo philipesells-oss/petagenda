@@ -180,18 +180,20 @@ export interface ServiceRow {
   color: string | null
   is_active: boolean
   sort_order: number
+  max_capacity: number
   created_at: string
   updated_at: string
 }
 export type ServiceInsert = Omit<
   ServiceRow,
-  'id' | 'created_at' | 'updated_at' | 'is_active' | 'sort_order'
+  'id' | 'created_at' | 'updated_at' | 'is_active' | 'sort_order' | 'max_capacity'
 > & {
   id?: string
   created_at?: string
   updated_at?: string
   is_active?: boolean
   sort_order?: number
+  max_capacity?: number
 }
 export type ServiceUpdate = Partial<ServiceInsert>
 

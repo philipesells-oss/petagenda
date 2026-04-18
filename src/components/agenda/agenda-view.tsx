@@ -180,122 +180,146 @@ export function AgendaView({
   const isClosedDay =
     !businessHours?.is_open || openMin == null || closeMin == null
 
+  const today = new Date().toISOString().slice(0, 10)
+
   return (
-    <div className="space-y-4">
-      {/* Header: navigation */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handlePrev}
-            aria-label="Dia anterior"
-          >
-            <ChevronLeftIcon className="size-4" />
-          </Button>
+    <div className="flex gap-4">
+      {/* Sidebar: mini calendar always visible on md+ */}
+      <aside className="hidden md:flex md:flex-col md:gap-3 md:w-[260px] md:shrink-0">
+        <Calendar
+          mode="single"
+          selected={parseIsoDate(date)}
+          onSelect={handleCalendarSelect}
+          className="rounded-xl border bg-card p-3 shadow-sm"
+        />
+        <Button className="w-full" onClick={() => openCreate()}>
+          <PlusIcon className="mr-1 size-4" /> Novo agendamento
+        </Button>
+      </aside>
 
-          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-            <PopoverTrigger
-              render={
-                <Button variant="outline" className="min-w-[180px]">
-                  {formatDate(date)}
-                </Button>
-              }
-            />
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={parseIsoDate(date)}
-                onSelect={handleCalendarSelect}
-                initialFocus
+      {/* Main area */}
+      <div className="flex-1 space-y-4 min-w-0">
+        {/* Header: navigation */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handlePrev}
+              aria-label="Dia anterior"
+            >
+              <ChevronLeftIcon className="size-4" />
+            </Button>
+
+            {/* Date button — opens popover on mobile (sidebar visible on md+) */}
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <PopoverTrigger
+                render={
+                  <Button variant="outline" className="min-w-[180px] md:pointer-events-none">
+                    {formatDate(date)}
+                  </Button>
+                }
               />
-            </PopoverContent>
-          </Popover>
+              <PopoverContent className="w-auto p-0 md:hidden" align="start">
+                <Calendar
+                  mode="single"
+                  selected={parseIsoDate(date)}
+                  onSelect={handleCalendarSelect}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
 
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleNext}
-            aria-label="Próximo dia"
-          >
-            <ChevronRightIcon className="size-4" />
-          </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleNext}
+              aria-label="Próximo dia"
+            >
+              <ChevronRightIcon className="size-4" />
+            </Button>
 
-          <Button variant="ghost" size="sm" onClick={handleToday}>
-            Hoje
+            <Button
+              variant={date === today ? 'default' : 'ghost'}
+              size="sm"
+              onClick={handleToday}
+            >
+              Hoje
+            </Button>
+          </div>
+
+          {/* New appointment button — mobile only (sidebar has it on md+) */}
+          <Button className="md:hidden" onClick={() => openCreate()}>
+            <PlusIcon className="mr-1 size-4" /> Novo agendamento
           </Button>
         </div>
 
-        <Button onClick={() => openCreate()}>
-          <PlusIcon className="mr-1 size-4" /> Novo agendamento
-        </Button>
-      </div>
+        {/* Grid */}
+        <div className="rounded-xl border bg-card">
+          {isClosedDay ? (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              O pet shop está fechado neste dia.
+            </div>
+          ) : (
+            <div className="divide-y">
+              {grid.map((slot) => {
+                const within = isWithinOpen(slot.minutes)
+                const slotItems = appointmentsByStart.get(slot.minutes) ?? []
 
-      {/* Grid */}
-      <div className="rounded-xl border bg-card">
-        {isClosedDay ? (
-          <div className="p-8 text-center text-sm text-muted-foreground">
-            O pet shop está fechado neste dia.
-          </div>
-        ) : (
-          <div className="divide-y">
-            {grid.map((slot) => {
-              const within = isWithinOpen(slot.minutes)
-              const slotItems = appointmentsByStart.get(slot.minutes) ?? []
-
-              return (
-                <div
-                  key={slot.time}
-                  className={cn(
-                    'flex gap-3 p-2',
-                    !within && 'bg-muted/40',
-                  )}
-                >
-                  <div className="w-14 shrink-0 pt-1.5 text-xs font-medium text-muted-foreground">
-                    {slot.time}
-                  </div>
-                  <div className="flex-1">
-                    {slotItems.length > 0 ? (
-                      <div className="space-y-1.5">
-                        {slotItems.map((item) => (
-                          <AppointmentCard
-                            key={item.appointment.id}
-                            id={item.appointment.id}
-                            startTime={item.appointment.start_time}
-                            endTime={item.appointment.end_time}
-                            clientName={item.clientName}
-                            petName={item.petName}
-                            serviceName={item.serviceName}
-                            serviceColor={item.serviceColor}
-                            status={item.appointment.status as AppointmentStatus}
-                            onClick={() => setDetailItem(item)}
-                          />
-                        ))}
-                      </div>
-                    ) : within ? (
-                      <button
-                        type="button"
-                        onClick={() => openCreate(slot.time)}
-                        className="flex w-full items-center justify-center rounded-lg border border-dashed py-2 text-xs text-muted-foreground hover:border-foreground/40 hover:bg-muted"
-                      >
-                        <PlusIcon className="mr-1 size-3.5" /> Agendar
-                      </button>
-                    ) : (
-                      <div className="flex h-8 items-center text-xs italic text-muted-foreground">
-                        {breakStart != null &&
-                        breakEnd != null &&
-                        slot.minutes >= breakStart &&
-                        slot.minutes < breakEnd
-                          ? 'Intervalo'
-                          : 'Fora do horário'}
-                      </div>
+                return (
+                  <div
+                    key={slot.time}
+                    className={cn(
+                      'flex gap-3 p-2',
+                      !within && 'bg-muted/40',
                     )}
+                  >
+                    <div className="w-14 shrink-0 pt-1.5 text-xs font-medium text-muted-foreground">
+                      {slot.time}
+                    </div>
+                    <div className="flex-1">
+                      {slotItems.length > 0 ? (
+                        <div className="space-y-1.5">
+                          {slotItems.map((item) => (
+                            <AppointmentCard
+                              key={item.appointment.id}
+                              id={item.appointment.id}
+                              startTime={item.appointment.start_time}
+                              endTime={item.appointment.end_time}
+                              clientName={item.clientName}
+                              petName={item.petName}
+                              serviceName={item.serviceName}
+                              serviceColor={item.serviceColor}
+                              status={item.appointment.status as AppointmentStatus}
+                              onClick={() => setDetailItem(item)}
+                            />
+                          ))}
+                        </div>
+                      ) : within ? (
+                        <button
+                          type="button"
+                          onClick={() => openCreate(slot.time)}
+                          className="flex w-full items-center justify-center rounded-lg border border-dashed py-2 text-xs text-muted-foreground hover:border-foreground/40 hover:bg-muted"
+                        >
+                          <PlusIcon className="mr-1 size-3.5" /> Agendar
+                        </button>
+                      ) : (
+                        <div className="flex h-8 items-center text-xs italic text-muted-foreground">
+                          {breakStart != null &&
+                          breakEnd != null &&
+                          slot.minutes >= breakStart &&
+                          slot.minutes < breakEnd
+                            ? 'Intervalo'
+                            : 'Fora do horário'}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
+                )
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Create dialog */}

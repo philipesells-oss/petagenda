@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, MessageCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser } from '@/lib/auth/get-current-user'
 import { buttonVariants } from '@/components/ui/button'
@@ -68,10 +68,20 @@ export default async function ClientProfilePage({
       <Card>
         <CardContent className="p-6 flex flex-wrap gap-6 items-start">
           <div className="flex-1 min-w-[220px]">
-            <h1 className="text-2xl font-bold">{client.full_name}</h1>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-2xl font-bold">{client.full_name}</h1>
+              {client.status !== 'active' && (
+                <Badge variant={client.status === 'blocked' ? 'destructive' : 'secondary'}>
+                  {client.status === 'inactive' ? 'Inativo' : 'Bloqueado'}
+                </Badge>
+              )}
+            </div>
             <p className="text-muted-foreground">{formatPhone(client.phone)}</p>
             {client.email && (
               <p className="text-sm text-muted-foreground">{client.email}</p>
+            )}
+            {client.notes && (
+              <p className="text-sm text-muted-foreground mt-1 italic">{client.notes}</p>
             )}
             {client.tags.length > 0 && (
               <div className="flex gap-1 flex-wrap mt-2">
@@ -99,7 +109,18 @@ export default async function ClientProfilePage({
               <p className="font-semibold">{client.whatsapp_opt_in ? 'Sim' : 'Não'}</p>
             </div>
           </div>
-          <EditClientDialog client={client} />
+          <div className="flex flex-col gap-2">
+            <Link
+              href={`https://wa.me/55${client.phone.replace(/\D/g, '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-md bg-[#25D366] px-3 py-2 text-sm font-medium text-white hover:bg-[#1ebe5d] transition-colors"
+            >
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp
+            </Link>
+            <EditClientDialog client={client} />
+          </div>
         </CardContent>
       </Card>
 
@@ -154,10 +175,32 @@ export default async function ClientProfilePage({
           )}
         </TabsContent>
 
-        <TabsContent value="messages">
-          <p className="text-muted-foreground text-center py-8">
-            Histórico de mensagens via WhatsApp estará disponível na Fase 2.
+        <TabsContent value="messages" className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Envie uma mensagem rápida para {client.full_name} pelo WhatsApp.
           </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              { label: 'Lembrete de agendamento', msg: `Olá ${client.full_name.split(' ')[0]}! 👋 Passando para lembrar do agendamento do seu pet aqui no nosso pet shop. Qualquer dúvida, é só responder!` },
+              { label: 'Promoção / oferta', msg: `Olá ${client.full_name.split(' ')[0]}! 🐾 Temos uma promoção especial esta semana. Que tal trazer seu pet para um banho e tosa? Entre em contato e agende já!` },
+              { label: 'Reativar cliente inativo', msg: `Olá ${client.full_name.split(' ')[0]}! Sentimos sua falta! 🐶 Faz um tempinho que não vemos seu pet por aqui. Que tal agendar uma visita? Temos novidades te esperando!` },
+              { label: 'Mensagem personalizada', msg: `Olá ${client.full_name.split(' ')[0]}! ` },
+            ].map(({ label, msg }) => (
+              <Link
+                key={label}
+                href={`https://wa.me/55${client.phone.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-lg border p-4 hover:bg-muted transition-colors"
+              >
+                <MessageCircle className="h-5 w-5 shrink-0 text-[#25D366]" />
+                <div>
+                  <p className="text-sm font-medium">{label}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-1">{msg}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

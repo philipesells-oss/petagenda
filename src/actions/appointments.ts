@@ -263,6 +263,7 @@ export async function updateAppointmentStatus(
   if (error) return { ok: false, error: error.message }
 
   revalidatePath('/agenda')
+  revalidatePath('/')
   return { ok: true, data: null }
 }
 

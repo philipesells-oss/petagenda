@@ -4,7 +4,7 @@ import { Suspense, useState, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Loader2Icon } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,17 +13,9 @@ import { signIn } from '@/actions/auth'
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<LoginFallback />}>
+    <Suspense fallback={<div className="flex min-h-[280px] items-center justify-center"><Loader2Icon className="size-5 animate-spin text-muted-foreground" /></div>}>
       <LoginForm />
     </Suspense>
-  )
-}
-
-function LoginFallback() {
-  return (
-    <div className="flex min-h-[280px] items-center justify-center">
-      <Loader2Icon className="size-5 animate-spin text-muted-foreground" />
-    </div>
   )
 }
 
@@ -32,6 +24,7 @@ function LoginForm() {
   const params = useSearchParams()
   const [isPending, startTransition] = useTransition()
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+  const [showPassword, setShowPassword] = useState(false)
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -55,11 +48,9 @@ function LoginForm() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1 text-center">
+      <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">Entrar</h1>
-        <p className="text-sm text-muted-foreground">
-          Acesse sua conta PetAgenda
-        </p>
+        <p className="text-sm text-muted-foreground">Acesse sua conta PetFlow</p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
@@ -73,46 +64,45 @@ function LoginForm() {
             required
             aria-invalid={Boolean(fieldErrors.email)}
           />
-          {fieldErrors.email && (
-            <p className="text-xs text-destructive">{fieldErrors.email[0]}</p>
-          )}
+          {fieldErrors.email && <p className="text-xs text-destructive">{fieldErrors.email[0]}</p>}
         </div>
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Senha</Label>
-            <Link
-              href="/forgot-password"
-              className="text-xs text-muted-foreground hover:text-foreground"
-            >
+            <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-foreground">
               Esqueci minha senha
             </Link>
           </div>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            aria-invalid={Boolean(fieldErrors.password)}
-          />
-          {fieldErrors.password && (
-            <p className="text-xs text-destructive">{fieldErrors.password[0]}</p>
-          )}
+          <div className="relative">
+            <Input
+              id="password"
+              name="password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              required
+              className="pr-10"
+              aria-invalid={Boolean(fieldErrors.password)}
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+            >
+              {showPassword ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
+            </button>
+          </div>
+          {fieldErrors.password && <p className="text-xs text-destructive">{fieldErrors.password[0]}</p>}
         </div>
 
         <Button type="submit" size="lg" disabled={isPending} className="w-full">
-          {isPending ? (
-            <>
-              <Loader2Icon className="animate-spin" /> Entrando…
-            </>
-          ) : (
-            'Entrar'
-          )}
+          {isPending ? <><Loader2Icon className="animate-spin" /> Entrando…</> : 'Entrar'}
         </Button>
       </form>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-sm text-muted-foreground">
         Não tem conta?{' '}
         <Link href="/signup" className="font-medium text-foreground hover:underline">
           Criar conta

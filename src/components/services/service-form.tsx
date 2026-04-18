@@ -47,7 +47,7 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
   const [usePriceBySize, setUsePriceBySize] = useState(
     !!service?.price_by_size,
   )
-  const [color, setColor] = useState<string>(service?.color ?? COLORS[0])
+  const [color, setColor] = useState<string | null>(service?.color ?? null)
 
   const pbs = (service?.price_by_size ?? {}) as {
     small?: number
@@ -58,7 +58,7 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
 
   function handleSubmit(formData: FormData) {
     // inject current color selection
-    formData.set('color', color)
+    if (color) formData.set('color', color); else formData.delete('color')
     if (!usePriceBySize) {
       formData.delete('price_small')
       formData.delete('price_medium')
@@ -192,6 +192,15 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
       <div className="space-y-2">
         <Label>Cor</Label>
         <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setColor(null)}
+            className={`h-8 w-8 rounded-full border-2 transition flex items-center justify-center text-xs text-muted-foreground bg-muted ${
+              !color ? 'border-foreground' : 'border-transparent'
+            }`}
+            aria-label="Sem cor"
+            title="Sem cor"
+          >✕</button>
           {COLORS.map((c) => (
             <button
               key={c}
@@ -205,6 +214,27 @@ export function ServiceForm({ service, onSuccess, onCancel }: ServiceFormProps) 
             />
           ))}
         </div>
+      </div>
+
+      <div className="space-y-2 rounded-lg border p-3">
+        <div>
+          <Label htmlFor="max_capacity" className="text-sm font-medium">
+            Vagas simultâneas
+          </Label>
+          <p className="text-xs text-muted-foreground">
+            Quantos pets podem ser atendidos ao mesmo tempo neste serviço.
+          </p>
+        </div>
+        <Input
+          id="max_capacity"
+          name="max_capacity"
+          type="number"
+          min={1}
+          max={20}
+          required
+          defaultValue={service?.max_capacity ?? 1}
+          className="w-24"
+        />
       </div>
 
       <div className="flex justify-end gap-2 pt-2">
