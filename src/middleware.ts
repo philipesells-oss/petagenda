@@ -75,39 +75,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // Case 3: authenticated with canceled plan → force to billing
-  // Skip the check if already on the billing route (prevents redirect loop)
-  // or if the plan row hasn't been provisioned yet (fresh signup).
-  //
-  // NOTE: this is a round-trip per request — acceptable for MVP. Post-MVP,
-  // cache `plan_status` in the auth JWT's app_metadata and read from the
-  // user session instead of hitting the DB here.
-  if (user && pathname !== BILLING_ROUTE) {
-    type TenantLinkRow = {
-      tenant:
-        | { plan_status: string | null }
-        | { plan_status: string | null }[]
-        | null
-    }
-
-    const { data } = await supabase
-      .from('users')
-      .select('tenant:tenants(plan_status)')
-      .eq('id', user.id)
-      .maybeSingle<TenantLinkRow>()
-
-    // PostgREST may return the FK join as a single object or an array
-    // depending on cardinality inference — normalize both shapes.
-    const link = data?.tenant
-    const planStatus = Array.isArray(link)
-      ? link[0]?.plan_status
-      : link?.plan_status
-
-    if (planStatus === 'canceled') {
-      return NextResponse.redirect(new URL(BILLING_ROUTE, request.url))
-    }
-  }
-
   return response
 }
 

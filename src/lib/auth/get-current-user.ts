@@ -6,10 +6,11 @@
  * re-querying the DB.
  */
 
+import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import type { AuthUser, UserRow, TenantRow } from '@/types'
 
-export async function getCurrentUser(): Promise<AuthUser | null> {
+export const getCurrentUser = cache(async (): Promise<AuthUser | null> => {
   const supabase = await createClient()
 
   const {
@@ -51,4 +52,4 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       whatsappConnected: tenant.whatsapp_connected,
     },
   }
-}
+})

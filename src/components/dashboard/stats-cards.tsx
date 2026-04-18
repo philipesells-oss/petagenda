@@ -108,6 +108,14 @@ export function StatsCards({
                 <Icon className="h-5 w-5" />
               </div>
             </div>
+            {s.label === 'Clientes inativos' && inactiveClients > 0 && (
+              <Link
+                href="/clients?status=inactive"
+                className="mt-3 flex items-center gap-1.5 text-xs font-medium text-amber-600 hover:underline"
+              >
+                <SendIcon className="size-3" /> Enviar mensagem de reativação
+              </Link>
+            )}
           </Card>
         )
       })}

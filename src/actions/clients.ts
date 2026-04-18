@@ -17,7 +17,7 @@ const clientSchema = z.object({
     .string()
     .trim()
     .transform(stripPhone)
-    .refine((v) => v.length >= 10 && v.length <= 11, 'Telefone inválido'),
+    .refine((v) => v.length >= 8 && v.length <= 13, 'Telefone inválido'),
   email: z
     .preprocess(
       (v) => (typeof v === 'string' && v.trim() !== '' ? v.trim().toLowerCase() : null),
@@ -43,7 +43,7 @@ const petSchema = z.object({
     z.string().nullable(),
   ),
   size: z.preprocess(
-    (v) => (v === '' || v === null ? null : v),
+    (v) => (v === '' || v === null || v === undefined ? null : v),
     z.enum(['small', 'medium', 'large', 'giant']).nullable(),
   ),
   weight: z.preprocess(
@@ -55,7 +55,7 @@ const petSchema = z.object({
     z.string().nullable(),
   ),
   gender: z.preprocess(
-    (v) => (v === '' || v === null ? null : v),
+    (v) => (v === '' || v === null || v === undefined ? null : v),
     z.enum(['male', 'female']).nullable(),
   ),
   coat_type: z.preprocess(

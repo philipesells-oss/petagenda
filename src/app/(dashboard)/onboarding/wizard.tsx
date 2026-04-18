@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import { PlusIcon, Trash2Icon } from 'lucide-react'
 import { completeOnboarding } from './actions'
 
 // ---------------------------------------------------------------------------
@@ -82,8 +83,7 @@ export function OnboardingWizard({ tenantId }: { tenantId: string }) {
         return
       }
       toast.success('Configuração concluída!')
-      router.push('/')
-      router.refresh()
+      window.location.replace('/')
     })
   }
 
@@ -254,6 +254,14 @@ function ServicesStep({
     onChange(services.map((s, i) => (i === idx ? { ...s, ...patch } : s)))
   }
 
+  function remove(idx: number) {
+    onChange(services.filter((_, i) => i !== idx))
+  }
+
+  function addService() {
+    onChange([...services, { name: '', durationMinutes: 60, price: 0 }])
+  }
+
   return (
     <section className="space-y-4">
       <div className="space-y-1">
@@ -267,44 +275,64 @@ function ServicesStep({
         {services.map((s, idx) => (
           <div
             key={idx}
-            className="grid gap-2 rounded-lg border border-border p-3 sm:grid-cols-[1fr,120px,120px]"
+            className="rounded-lg border border-border p-3"
           >
-            <div className="space-y-1">
-              <Label>Nome</Label>
-              <Input
-                value={s.name}
-                onChange={(e) => update(idx, { name: e.target.value })}
-              />
+            <div className="grid gap-2 sm:grid-cols-[1fr,120px,120px]">
+              <div className="space-y-1">
+                <Label>Nome</Label>
+                <Input
+                  value={s.name}
+                  onChange={(e) => update(idx, { name: e.target.value })}
+                  placeholder="Ex: Banho, Tosa..."
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Duração (min)</Label>
+                <Input
+                  type="number"
+                  min={5}
+                  step={5}
+                  value={s.durationMinutes}
+                  onChange={(e) =>
+                    update(idx, {
+                      durationMinutes: Math.max(5, Number(e.target.value) || 0),
+                    })
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <Label>Preço (R$)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  step={1}
+                  value={s.price}
+                  onChange={(e) =>
+                    update(idx, { price: Math.max(0, Number(e.target.value) || 0) })
+                  }
+                />
+              </div>
             </div>
-            <div className="space-y-1">
-              <Label>Duração (min)</Label>
-              <Input
-                type="number"
-                min={5}
-                step={5}
-                value={s.durationMinutes}
-                onChange={(e) =>
-                  update(idx, {
-                    durationMinutes: Math.max(5, Number(e.target.value) || 0),
-                  })
-                }
-              />
-            </div>
-            <div className="space-y-1">
-              <Label>Preço (R$)</Label>
-              <Input
-                type="number"
-                min={0}
-                step={1}
-                value={s.price}
-                onChange={(e) =>
-                  update(idx, { price: Math.max(0, Number(e.target.value) || 0) })
-                }
-              />
-            </div>
+            {services.length > 1 && (
+              <div className="mt-2 flex justify-end">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive"
+                  onClick={() => remove(idx)}
+                >
+                  <Trash2Icon className="mr-1 size-3.5" /> Remover
+                </Button>
+              </div>
+            )}
           </div>
         ))}
       </div>
+
+      <Button type="button" variant="outline" size="sm" onClick={addService}>
+        <PlusIcon className="mr-1 size-4" /> Adicionar serviço
+      </Button>
     </section>
   )
 }

@@ -43,6 +43,7 @@ const serviceSchema = z.object({
   price: z.number().nonnegative(),
   price_by_size: priceBySizeSchema.nullable(),
   color: z.string().nullable().optional(),
+  max_capacity: z.number().int().min(1).max(20).default(1),
 })
 
 export type ServiceFormValues = z.infer<typeof serviceSchema>
@@ -74,6 +75,7 @@ function extractValues(formData: FormData): ServiceFormValues {
     price: parseNumber(formData.get('price')),
     price_by_size: hasAny ? pbs : null,
     color: (formData.get('color') as string) || null,
+    max_capacity: parseNumber(formData.get('max_capacity')) || 1,
   }
 }
 
@@ -105,6 +107,7 @@ export async function createService(
     price: parsed.data.price,
     price_by_size: parsed.data.price_by_size ?? null,
     color: parsed.data.color ?? null,
+    max_capacity: parsed.data.max_capacity,
   }
   const { data, error } = await supabase
     .from('services')
@@ -148,6 +151,7 @@ export async function updateService(
     price: parsed.data.price,
     price_by_size: parsed.data.price_by_size ?? null,
     color: parsed.data.color ?? null,
+    max_capacity: parsed.data.max_capacity,
   }
   const { error } = await supabase
     .from('services')
