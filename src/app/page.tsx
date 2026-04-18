@@ -196,6 +196,7 @@ export default function LandingPage() {
                 'Faturamento diário e dashboard de KPIs',
                 'Acesso pelo celular, tablet ou computador',
                 'Suporte humano em português, de verdade',
+                '🛡️ Garantia de 7 dias ou seu dinheiro de volta',
               ].map((b) => (
                 <li key={b} className="flex items-start gap-3 text-sm">
                   <CheckIcon className="mt-0.5 size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
@@ -207,6 +208,26 @@ export default function LandingPage() {
               label="Quero começar por R$29,90/mês"
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
             />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Garantia ───────────────────────────────────────────── */}
+      <section className="px-4 py-10 bg-white dark:bg-gray-950">
+        <div className="mx-auto max-w-xl">
+          <div className="flex items-start gap-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 px-6 py-6 dark:border-emerald-800 dark:bg-emerald-950/40">
+            <span className="text-4xl shrink-0">🛡️</span>
+            <div>
+              <p className="font-bold text-gray-900 dark:text-white text-lg mb-1">
+                Garantia de 7 dias — risco zero
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                Se em 7 dias você não ficar satisfeito, devolvemos 100% do valor pago. Sem perguntas,
+                sem burocracia. É o seu direito garantido pelo{' '}
+                <strong>Código de Defesa do Consumidor, Art. 49</strong> — e a gente cumpre com
+                prazer.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -234,6 +255,10 @@ export default function LandingPage() {
               {
                 q: 'Funciona pra pet shop pequeno, com 1 ou 2 funcionários?',
                 a: 'Foi feito pra isso. O PetFlow foi desenhado pro dono que atende no balcão e precisa de algo simples, rápido e que não atrapalhe o dia.',
+              },
+              {
+                q: 'E se eu não gostar? Tem garantia?',
+                a: 'Sim. Você tem 7 dias de garantia total. Se não ficar satisfeito por qualquer motivo, devolvemos 100% do valor pago — sem perguntas e sem burocracia. É seu direito pelo Código de Defesa do Consumidor (Art. 49) e a gente cumpre com prazer.',
               },
             ].map((item) => (
               <details
@@ -263,6 +288,9 @@ export default function LandingPage() {
           <CheckoutButton
             className="bg-white text-emerald-700 hover:bg-emerald-50 px-8 shadow-lg"
           />
+          <p className="mt-4 text-sm text-emerald-200">
+            🛡️ Garantia de 7 dias — não gostou, devolvemos tudo. Sem perguntas.
+          </p>
         </div>
       </section>
 
