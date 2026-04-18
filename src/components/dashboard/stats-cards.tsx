@@ -1,4 +1,5 @@
-import { Calendar, DollarSign, TrendingDown, TrendingUp, Users, UserX } from 'lucide-react'
+import Link from 'next/link'
+import { Calendar, DollarSign, Send as SendIcon, TrendingDown, TrendingUp, Users, UserX } from 'lucide-react'
 
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
