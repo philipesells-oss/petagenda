@@ -5,11 +5,11 @@ import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-function randomPassword(len = 12): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#'
-  return Array.from({ length: len }, () =>
-    chars[Math.floor(Math.random() * chars.length)],
-  ).join('')
+function secureRandomPassword(len = 20): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&*'
+  const arr = new Uint8Array(len)
+  crypto.getRandomValues(arr)
+  return Array.from(arr, (b) => chars[b % chars.length]).join('')
 }
 
 export async function POST(req: Request) {
@@ -40,17 +40,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'No email in session' }, { status: 400 })
   }
 
-  const tempPassword = randomPassword()
   const adminClient = createAdminClient()
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://getpetflow.com'
 
-  // Create Supabase auth user (triggers handle_new_user → tenant + user rows)
+  // Create Supabase auth user (triggers handle_new_user → tenant + user rows).
+  // Internal password is never revealed — access is via magic link only.
   const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
     email,
-    password: tempPassword,
+    password: secureRandomPassword(),
     email_confirm: true,
     user_metadata: {
       full_name: session.customer_details?.name ?? email.split('@')[0],
       shop_name: 'Meu Pet Shop',
+      force_password_change: true,
     },
   })
 
@@ -61,7 +63,7 @@ export async function POST(req: Request) {
 
   const userId = authData.user.id
 
-  // Mark user to force password change on first login
+  // Mark user in DB to force password change on first login
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (adminClient.from('users') as any)
     .update({ force_password_change: true })
@@ -88,8 +90,20 @@ export async function POST(req: Request) {
     }
   }
 
-  // Send welcome email with temporary credentials
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.petflow.com.br'
+  // Generate a magic link so the user never receives a plain-text password.
+  const { data: linkData, error: linkError } = await adminClient.auth.admin.generateLink({
+    type: 'magiclink',
+    email,
+    options: { redirectTo: `${appUrl}/first-access` },
+  })
+
+  if (linkError || !linkData?.properties?.action_link) {
+    console.error('[webhook] generateLink error:', linkError)
+    // Fall back gracefully — user can use "forgot password" to gain access.
+  }
+
+  const accessLink = linkData?.properties?.action_link ?? `${appUrl}/forgot-password`
+
   await resend.emails.send({
     from: 'PetFlow <noreply@petflow.com.br>',
     to: email,
@@ -101,16 +115,15 @@ export async function POST(req: Request) {
 <body style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; color: #1a1a1a;">
   <h2 style="color: #059669; margin-bottom: 4px;">Bem-vindo ao PetFlow! 🐾</h2>
   <p>Seu pagamento foi confirmado e sua conta está pronta para uso.</p>
-  <p style="margin-top: 24px; font-weight: 600;">Suas credenciais de acesso:</p>
-  <div style="background: #f3f4f6; border-radius: 8px; padding: 16px; margin: 12px 0;">
-    <p style="margin: 4px 0;"><strong>E-mail:</strong> ${email}</p>
-    <p style="margin: 4px 0;"><strong>Senha temporária:</strong> <code style="background:#e5e7eb;padding:2px 6px;border-radius:4px;">${tempPassword}</code></p>
-  </div>
-  <p style="color: #dc2626; font-size: 14px;">⚠️ Por segurança, você será solicitado a criar uma nova senha no primeiro acesso.</p>
-  <a href="${appUrl}/login?welcome=1"
-     style="display:inline-block;margin-top:20px;background:#059669;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">
-    Acessar o PetFlow
+  <p style="margin-top: 24px;">Clique no botão abaixo para criar sua senha e acessar o sistema:</p>
+  <a href="${accessLink}"
+     style="display:inline-block;margin-top:16px;background:#059669;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:16px;">
+    Criar senha e acessar o PetFlow
   </a>
+  <p style="margin-top: 20px; font-size: 13px; color: #6b7280;">
+    Este link é válido por 24 horas. Caso expire, use a opção
+    <a href="${appUrl}/forgot-password" style="color:#059669;">Esqueci minha senha</a>.
+  </p>
   <hr style="margin: 32px 0; border-color: #e5e7eb;">
   <p style="font-size: 12px; color: #6b7280;">Se você não criou uma conta, ignore este e-mail.</p>
 </body>

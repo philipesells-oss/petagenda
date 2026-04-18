@@ -16,10 +16,9 @@ import type { Database } from '@/types/database'
 
 const PUBLIC_ROUTES = ['/login', '/signup', '/forgot-password']
 const BILLING_ROUTE = '/settings/billing'
+const FIRST_ACCESS_ROUTE = '/first-access'
 
 function isPublicRoute(pathname: string): boolean {
-  // Root is public (landing page); everything else must match exactly or as a
-  // prefix for nested public pages (e.g. /login/callback).
   if (pathname === '/') return true
   return PUBLIC_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
@@ -73,6 +72,14 @@ export async function middleware(request: NextRequest) {
   // Case 2: authenticated on /login, /signup, /forgot-password → redirect to /dashboard
   if (user && PUBLIC_ROUTES.some((route) => pathname === route)) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  // Case 3: authenticated but must set password on first access (Stripe onboarding flow).
+  // Flag is stored in user_metadata to avoid a DB round-trip on every request.
+  if (user && user.user_metadata?.force_password_change === true) {
+    if (pathname !== FIRST_ACCESS_ROUTE) {
+      return NextResponse.redirect(new URL(FIRST_ACCESS_ROUTE, request.url))
+    }
   }
 
   return response

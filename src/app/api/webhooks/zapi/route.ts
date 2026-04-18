@@ -11,6 +11,15 @@ interface ZapiWebhookPayload {
 }
 
 export async function POST(req: NextRequest) {
+  // Validate Z-API client token to reject unauthenticated callers.
+  const clientToken = process.env.ZAPI_CLIENT_TOKEN
+  if (clientToken && clientToken !== 'SEU_TOKEN_ZAPI') {
+    const incoming = req.headers.get('client-token') ?? req.headers.get('Client-Token') ?? ''
+    if (incoming !== clientToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+  }
+
   let body: ZapiWebhookPayload
   try {
     body = await req.json() as ZapiWebhookPayload

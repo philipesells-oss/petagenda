@@ -147,10 +147,16 @@ export async function updatePassword(formData: FormData): Promise<ActionResult<n
   }
 
   const supabase = await createClient()
-  const { error: pwError } = await supabase.auth.updateUser({ password })
+
+  // Update password and clear the force_password_change flag in user_metadata
+  // in a single call so the JWT reflects the change immediately.
+  const { error: pwError } = await supabase.auth.updateUser({
+    password,
+    data: { force_password_change: false },
+  })
   if (pwError) return { ok: false, error: pwError.message }
 
-  // Clear force_password_change flag
+  // Mirror the flag in the DB users table for consistency
   const { data: { user } } = await supabase.auth.getUser()
   if (user) {
     const admin = createAdminClient()
