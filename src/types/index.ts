@@ -72,6 +72,7 @@ export interface AuthUser {
   phone: string | null
   avatarUrl: string | null
   isActive: boolean
+  forcePasswordChange: boolean
 
   // Tenant summary (from public.tenants)
   tenant: {

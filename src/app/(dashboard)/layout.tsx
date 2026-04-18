@@ -19,6 +19,7 @@ export default async function DashboardLayout({
 }) {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
+  if (user.forcePasswordChange) redirect('/first-access')
 
   return (
     <div className="flex min-h-screen bg-muted/30">

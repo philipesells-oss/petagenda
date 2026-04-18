@@ -20,7 +20,7 @@ type NavItem = {
 }
 
 export const NAV_ITEMS: readonly NavItem[] = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboardIcon, exact: true },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboardIcon, exact: true },
   { href: '/agenda', label: 'Agenda', icon: CalendarDaysIcon },
   { href: '/clientes', label: 'Clientes', icon: UsersIcon },
   { href: '/whatsapp', label: 'WhatsApp', icon: MessageCircleIcon },

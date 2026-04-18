@@ -14,6 +14,7 @@ import { z } from 'zod'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { ActionResult } from '@/types'
 
 // ---------------------------------------------------------------------------
@@ -132,6 +133,32 @@ export async function signOut(): Promise<never> {
   const supabase = await createClient()
   await supabase.auth.signOut()
   redirect('/login')
+}
+
+export async function updatePassword(formData: FormData): Promise<ActionResult<null>> {
+  const password = formData.get('password')
+  const confirm = formData.get('confirm')
+
+  if (typeof password !== 'string' || password.length < 8) {
+    return { ok: false, error: 'Senha deve ter pelo menos 8 caracteres.' }
+  }
+  if (password !== confirm) {
+    return { ok: false, error: 'As senhas não coincidem.' }
+  }
+
+  const supabase = await createClient()
+  const { error: pwError } = await supabase.auth.updateUser({ password })
+  if (pwError) return { ok: false, error: pwError.message }
+
+  // Clear force_password_change flag
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) {
+    const admin = createAdminClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (admin.from('users') as any).update({ force_password_change: false }).eq('id', user.id)
+  }
+
+  return { ok: true, data: null }
 }
 
 export async function resetPassword(formData: FormData): Promise<ActionResult<{ email: string }>> {

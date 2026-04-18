@@ -70,9 +70,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Case 2: authenticated on /login, /signup, /forgot-password → redirect to /
+  // Case 2: authenticated on /login, /signup, /forgot-password → redirect to /dashboard
   if (user && PUBLIC_ROUTES.some((route) => pathname === route)) {
-    return NextResponse.redirect(new URL('/', request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // Case 3: authenticated with canceled plan → force to billing

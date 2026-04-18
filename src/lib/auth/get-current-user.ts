@@ -20,9 +20,9 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
 
   const { data, error } = await supabase
     .from('users')
-    .select('*, tenant:tenants(*)')
+    .select('*, force_password_change, tenant:tenants(*)')
     .eq('id', authUser.id)
-    .maybeSingle<UserRow & { tenant: TenantRow | TenantRow[] | null }>()
+    .maybeSingle<UserRow & { force_password_change: boolean; tenant: TenantRow | TenantRow[] | null }>()
 
   if (error || !data) return null
 
@@ -38,6 +38,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     phone: data.phone,
     avatarUrl: data.avatar_url,
     isActive: data.is_active,
+    forcePasswordChange: data.force_password_change ?? false,
     tenant: {
       id: tenant.id,
       name: tenant.name,
