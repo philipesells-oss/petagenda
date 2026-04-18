@@ -69,10 +69,10 @@ export async function getAvailableSlots(
   // 2. Service duration + capacity (max_capacity added in migration 008; fallback to 1)
   const { data: svc } = await supabase
     .from('services')
-    .select('duration_minutes')
+    .select('duration_minutes, max_capacity')
     .eq('tenant_id', tenantId)
     .eq('id', serviceId)
-    .maybeSingle<{ duration_minutes: number; max_capacity?: number }>()
+    .maybeSingle<{ duration_minutes: number; max_capacity: number }>()
 
   const durationMin = svc?.duration_minutes ?? 30
   const maxCapacity = svc?.max_capacity ?? 1

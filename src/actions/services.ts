@@ -107,6 +107,7 @@ export async function createService(
     price: parsed.data.price,
     price_by_size: parsed.data.price_by_size ?? null,
     color: parsed.data.color ?? null,
+    max_capacity: parsed.data.max_capacity,
   }
   const { data, error } = await supabase
     .from('services')
@@ -150,6 +151,7 @@ export async function updateService(
     price: parsed.data.price,
     price_by_size: parsed.data.price_by_size ?? null,
     color: parsed.data.color ?? null,
+    max_capacity: parsed.data.max_capacity,
   }
   const { error } = await supabase
     .from('services')
