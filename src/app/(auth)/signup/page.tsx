@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
+import { useTransition } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Loader2Icon } from 'lucide-react'
@@ -9,60 +8,47 @@ import { Loader2Icon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { signUp } from '@/actions/auth'
 
 export default function SignupPage() {
-  const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const form = new FormData(e.currentTarget)
+    const email = (
+      e.currentTarget.elements.namedItem('email') as HTMLInputElement
+    ).value.trim()
 
     startTransition(async () => {
-      setFieldErrors({})
-      const result = await signUp(form)
-      if (!result.ok) {
-        setFieldErrors(result.fieldErrors ?? {})
-        toast.error(result.error)
-        return
-      }
-      toast.success('Conta criada! Vamos configurar seu pet shop.')
-      router.push('/onboarding')
-      router.refresh()
-    })
-  }
+      try {
+        const res = await fetch('/api/stripe/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        })
 
-  function errorFor(field: string) {
-    return fieldErrors[field]?.[0]
+        if (!res.ok) {
+          toast.error('Erro ao iniciar checkout. Tente novamente.')
+          return
+        }
+
+        const { url } = await res.json()
+        if (url) window.location.href = url
+      } catch {
+        toast.error('Erro de conexão. Tente novamente.')
+      }
+    })
   }
 
   return (
     <div className="space-y-6">
       <div className="space-y-1 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Criar conta</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Começar agora</h1>
         <p className="text-sm text-muted-foreground">
-          Comece gratuitamente — sem cartão de crédito
+          Teste grátis por 7 dias — cancele quando quiser
         </p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="fullName">Nome completo</Label>
-          <Input
-            id="fullName"
-            name="fullName"
-            type="text"
-            autoComplete="name"
-            required
-            aria-invalid={Boolean(errorFor('fullName'))}
-          />
-          {errorFor('fullName') && (
-            <p className="text-xs text-destructive">{errorFor('fullName')}</p>
-          )}
-        </div>
-
         <div className="space-y-1.5">
           <Label htmlFor="email">E-mail</Label>
           <Input
@@ -70,70 +56,18 @@ export default function SignupPage() {
             name="email"
             type="email"
             autoComplete="email"
+            placeholder="seu@email.com"
             required
-            aria-invalid={Boolean(errorFor('email'))}
           />
-          {errorFor('email') && (
-            <p className="text-xs text-destructive">{errorFor('email')}</p>
-          )}
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="password">Senha</Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            aria-invalid={Boolean(errorFor('password'))}
-          />
-          {errorFor('password') ? (
-            <p className="text-xs text-destructive">{errorFor('password')}</p>
-          ) : (
-            <p className="text-xs text-muted-foreground">Mínimo 8 caracteres</p>
-          )}
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="shopName">Nome do pet shop</Label>
-          <Input
-            id="shopName"
-            name="shopName"
-            type="text"
-            autoComplete="organization"
-            required
-            aria-invalid={Boolean(errorFor('shopName'))}
-          />
-          {errorFor('shopName') && (
-            <p className="text-xs text-destructive">{errorFor('shopName')}</p>
-          )}
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="phone">Telefone</Label>
-          <Input
-            id="phone"
-            name="phone"
-            type="tel"
-            autoComplete="tel"
-            placeholder="(11) 99999-9999"
-            required
-            aria-invalid={Boolean(errorFor('phone'))}
-          />
-          {errorFor('phone') && (
-            <p className="text-xs text-destructive">{errorFor('phone')}</p>
-          )}
         </div>
 
         <Button type="submit" size="lg" disabled={isPending} className="w-full">
           {isPending ? (
             <>
-              <Loader2Icon className="animate-spin" /> Criando conta…
+              <Loader2Icon className="animate-spin" /> Redirecionando…
             </>
           ) : (
-            'Criar conta'
+            'Assinar PetAgenda'
           )}
         </Button>
       </form>

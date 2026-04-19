@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
   BarChart,
   Bar,
@@ -11,16 +12,23 @@ import {
 } from 'recharts'
 
 import { Card } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 export interface RevenueChartDay {
   day: string
   revenue: number
 }
 
-interface RevenueChartProps {
+export interface PeriodData {
   data: RevenueChartDay[]
   totalRevenue: number
   trendPct: number
+}
+
+interface RevenueChartProps {
+  period7: PeriodData
+  period15: PeriodData
+  period30: PeriodData
 }
 
 const currencyShort = new Intl.NumberFormat('pt-BR', {
@@ -55,38 +63,69 @@ function CustomTooltip({
   )
 }
 
-export function RevenueChart({ data, totalRevenue, trendPct }: RevenueChartProps) {
+type Period = 7 | 15 | 30
+
+export function RevenueChart({ period7, period15, period30 }: RevenueChartProps) {
+  const [period, setPeriod] = useState<Period>(7)
+
+  const current = period === 7 ? period7 : period === 15 ? period15 : period30
+  const { data, totalRevenue, trendPct } = current
   const hasData = data.some((d) => d.revenue > 0)
   const trendUp = trendPct >= 0
 
   return (
     <Card className="p-4 space-y-3">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <p className="text-xs font-medium text-muted-foreground">
-            Faturamento — últimos 7 dias
+            Faturamento — últimos {period} dias
           </p>
           <p className="text-2xl font-semibold tracking-tight mt-0.5">
             {currencyFull.format(totalRevenue)}
           </p>
         </div>
-        {trendPct !== 0 && (
-          <span
-            className={`shrink-0 text-xs font-medium px-2 py-1 rounded-full ${
-              trendUp
-                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                : 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300'
-            }`}
+        <div className="flex items-center gap-2 flex-wrap">
+          {trendPct !== 0 && (
+            <span
+              className={`shrink-0 text-xs font-medium px-2 py-1 rounded-full ${
+                trendUp
+                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                  : 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300'
+              }`}
+            >
+              {trendUp ? '+' : ''}
+              {trendPct.toFixed(0)}% vs período anterior
+            </span>
+          )}
+          <div
+            role="tablist"
+            aria-label="Período do gráfico"
+            className="inline-flex items-center gap-1 rounded-lg border bg-card p-0.5 text-xs"
           >
-            {trendUp ? '+' : ''}
-            {trendPct.toFixed(0)}% vs semana anterior
-          </span>
-        )}
+            {([7, 15, 30] as Period[]).map((p) => (
+              <button
+                key={p}
+                type="button"
+                role="tab"
+                aria-selected={period === p}
+                onClick={() => setPeriod(p)}
+                className={cn(
+                  'rounded-md px-2.5 py-1 font-medium transition-colors',
+                  period === p
+                    ? 'bg-muted text-foreground'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {p}d
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {!hasData ? (
         <div className="flex items-center justify-center h-40 text-sm text-muted-foreground">
-          Nenhum faturamento registrado nos últimos 7 dias.
+          Nenhum faturamento registrado nos últimos {period} dias.
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={160}>

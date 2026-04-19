@@ -14,7 +14,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
 
-const PUBLIC_ROUTES = ['/login', '/signup', '/forgot-password']
+const PUBLIC_ROUTES = ['/login', '/signup', '/forgot-password', '/first-access']
 const BILLING_ROUTE = '/settings/billing'
 const FIRST_ACCESS_ROUTE = '/first-access'
 
@@ -69,8 +69,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Case 2: authenticated on /login, /signup, /forgot-password → redirect to /dashboard
-  if (user && PUBLIC_ROUTES.some((route) => pathname === route)) {
+  // Case 2: authenticated on auth pages → redirect to /dashboard
+  // Exception: /first-access stays accessible so force_password_change flow works
+  if (
+    user &&
+    pathname !== FIRST_ACCESS_ROUTE &&
+    PUBLIC_ROUTES.some((route) => pathname === route)
+  ) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
@@ -86,5 +91,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|public).*)'],
+  matcher: ['/((?!api|auth|_next/static|_next/image|favicon.ico|public).*)'],
 }

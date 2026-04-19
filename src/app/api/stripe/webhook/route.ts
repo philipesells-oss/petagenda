@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { Resend } from 'resend'
+import { sendCAPIEvent } from '@/lib/meta/capi'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -90,6 +91,15 @@ export async function POST(req: Request) {
     }
   }
 
+  // Fire server-side Purchase event to Meta Conversions API
+  await sendCAPIEvent({
+    eventName: 'Purchase',
+    email,
+    value: 29.90,
+    currency: 'BRL',
+    eventSourceUrl: `${appUrl}/login?welcome=1`,
+  })
+
   // Generate a magic link so the user never receives a plain-text password.
   const { data: linkData, error: linkError } = await adminClient.auth.admin.generateLink({
     type: 'magiclink',
@@ -105,27 +115,34 @@ export async function POST(req: Request) {
   const accessLink = linkData?.properties?.action_link ?? `${appUrl}/forgot-password`
 
   await resend.emails.send({
-    from: 'PetFlow <noreply@petflow.com.br>',
+    from: 'PetFlow <noreply@contato.getpetflow.com>',
     to: email,
     subject: 'Seu acesso ao PetFlow está pronto 🐾',
-    html: `
-<!DOCTYPE html>
+    html: `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
-<body style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; color: #1a1a1a;">
-  <h2 style="color: #059669; margin-bottom: 4px;">Bem-vindo ao PetFlow! 🐾</h2>
-  <p>Seu pagamento foi confirmado e sua conta está pronta para uso.</p>
-  <p style="margin-top: 24px;">Clique no botão abaixo para criar sua senha e acessar o sistema:</p>
-  <a href="${accessLink}"
-     style="display:inline-block;margin-top:16px;background:#059669;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:16px;">
-    Criar senha e acessar o PetFlow
-  </a>
-  <p style="margin-top: 20px; font-size: 13px; color: #6b7280;">
-    Este link é válido por 24 horas. Caso expire, use a opção
-    <a href="${appUrl}/forgot-password" style="color:#059669;">Esqueci minha senha</a>.
-  </p>
-  <hr style="margin: 32px 0; border-color: #e5e7eb;">
-  <p style="font-size: 12px; color: #6b7280;">Se você não criou uma conta, ignore este e-mail.</p>
+<body style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 0; color: #1a1a1a;">
+  <div style="background: #f0fdf4; padding: 24px; text-align: center; border-bottom: 2px solid #d1fae5;">
+    <span style="font-size: 28px; font-weight: 800; color: #059669; letter-spacing: -0.5px;">🐾 PetFlow</span>
+  </div>
+  <div style="padding: 32px 24px;">
+    <h2 style="color: #059669; margin-top: 0; margin-bottom: 8px;">Bem-vindo ao PetFlow! 🐾</h2>
+    <p style="margin-top: 0;">Seu pagamento foi confirmado e sua conta está pronta para uso.</p>
+    <p style="margin-top: 24px;">Clique no botão abaixo para criar sua senha e acessar o sistema:</p>
+    <a href="${accessLink}"
+       style="display:inline-block;margin-top:8px;background:#059669;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:16px;">
+      Criar senha e acessar o PetFlow
+    </a>
+    <p style="margin-top: 20px; font-size: 13px; color: #6b7280;">
+      Este link é válido por 24 horas. Caso expire, use a opção
+      <a href="${appUrl}/forgot-password" style="color:#059669;">Esqueci minha senha</a>.
+    </p>
+    <hr style="margin: 32px 0; border-color: #e5e7eb;">
+    <p style="font-size: 12px; color: #6b7280; margin: 0;">Se você não criou uma conta, ignore este e-mail.</p>
+  </div>
+  <div style="background: #f9fafb; padding: 16px; text-align: center; border-top: 1px solid #e5e7eb;">
+    <p style="font-size: 12px; color: #9ca3af; margin: 0;">© ${new Date().getFullYear()} PetFlow · Todos os direitos reservados</p>
+  </div>
 </body>
 </html>`,
   })

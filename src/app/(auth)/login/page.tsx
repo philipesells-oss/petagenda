@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, useTransition } from 'react'
+import { Suspense, useEffect, useState, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -25,6 +25,16 @@ function LoginForm() {
   const [isPending, startTransition] = useTransition()
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
   const [showPassword, setShowPassword] = useState(false)
+
+  useEffect(() => {
+    if (params.get('welcome') === '1') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const fbq = (window as any).fbq
+      if (typeof fbq === 'function') {
+        fbq('track', 'Purchase', { value: 29.90, currency: 'BRL' })
+      }
+    }
+  }, [params])
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

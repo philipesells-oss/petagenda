@@ -11,13 +11,19 @@ interface ZapiWebhookPayload {
 }
 
 export async function POST(req: NextRequest) {
-  // Validate Z-API client token to reject unauthenticated callers.
+  // Validate Z-API client token. Skip only if token is genuinely not configured
+  // (WhatsApp integration not yet enabled). Never skip for placeholder values.
   const clientToken = process.env.ZAPI_CLIENT_TOKEN
-  if (clientToken && clientToken !== 'SEU_TOKEN_ZAPI') {
+  const zapiConfigured = clientToken && clientToken !== 'SEU_TOKEN_ZAPI'
+  if (zapiConfigured) {
     const incoming = req.headers.get('client-token') ?? req.headers.get('Client-Token') ?? ''
     if (incoming !== clientToken) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+  } else if (clientToken === 'SEU_TOKEN_ZAPI') {
+    // Placeholder detected — reject all requests until a real token is configured
+    console.error('[webhook/zapi] ZAPI_CLIENT_TOKEN is placeholder — rejecting request')
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   let body: ZapiWebhookPayload

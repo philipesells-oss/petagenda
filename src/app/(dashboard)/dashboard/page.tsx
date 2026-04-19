@@ -8,10 +8,7 @@ import {
   TodayAppointments,
   type AppointmentRowView,
 } from '@/components/dashboard/today-appointments'
-import {
-  RevenueChart,
-  type RevenueChartDay,
-} from '@/components/dashboard/revenue-chart'
+import { RevenueChart } from '@/components/dashboard/revenue-chart'
 import type { AppointmentStatus } from '@/types'
 
 const PT_DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -28,9 +25,9 @@ export default async function DashboardHome() {
   const today = new Date().toISOString().slice(0, 10) // 'YYYY-MM-DD'
   const tenantId = user.tenantId
 
-  const thirteenDaysAgo = new Date()
-  thirteenDaysAgo.setDate(thirteenDaysAgo.getDate() - 13)
-  const thirteenDaysAgoStr = thirteenDaysAgo.toISOString().slice(0, 10)
+  const sixtyDaysAgo = new Date()
+  sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 59)
+  const sixtyDaysAgoStr = sixtyDaysAgo.toISOString().slice(0, 10)
 
   const sevenDaysAgo = new Date()
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
@@ -90,7 +87,7 @@ export default async function DashboardHome() {
       .select('date, price')
       .eq('tenant_id', tenantId)
       .eq('status', 'completed')
-      .gte('date', thirteenDaysAgoStr),
+      .gte('date', sixtyDaysAgoStr),
     supabase
       .from('appointments')
       .select('id', { count: 'exact', head: true })
@@ -112,29 +109,30 @@ export default async function DashboardHome() {
     revenueByDate.set(row.date, (revenueByDate.get(row.date) ?? 0) + (row.price ?? 0))
   }
 
-  // Chart: last 7 days + trend vs prior 7 days
-  const chartData: RevenueChartDay[] = []
-  let currentWeekRevenue = 0
-  let priorWeekRevenue = 0
-
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    const dateStr = d.toISOString().slice(0, 10)
-    const dayRevenue = revenueByDate.get(dateStr) ?? 0
-    chartData.push({ day: PT_DAYS[d.getDay()], revenue: dayRevenue })
-    currentWeekRevenue += dayRevenue
+  function buildPeriodData(days: number) {
+    const data: { day: string; revenue: number }[] = []
+    let current = 0
+    let prior = 0
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      const dateStr = d.toISOString().slice(0, 10)
+      const rev = revenueByDate.get(dateStr) ?? 0
+      data.push({ day: PT_DAYS[d.getDay()], revenue: rev })
+      current += rev
+    }
+    for (let i = days * 2 - 1; i >= days; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      prior += revenueByDate.get(d.toISOString().slice(0, 10)) ?? 0
+    }
+    const trendPct = prior === 0 ? 0 : ((current - prior) / prior) * 100
+    return { data, totalRevenue: current, trendPct }
   }
-  for (let i = 13; i >= 7; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    priorWeekRevenue += revenueByDate.get(d.toISOString().slice(0, 10)) ?? 0
-  }
 
-  const revenueTrendPct =
-    priorWeekRevenue === 0
-      ? 0
-      : ((currentWeekRevenue - priorWeekRevenue) / priorWeekRevenue) * 100
+  const period7 = buildPeriodData(7)
+  const period15 = buildPeriodData(15)
+  const period30 = buildPeriodData(30)
 
   // Appointments trend: today vs same day last week
   const lastWeekCount = lastWeekAppointmentsResult.count ?? 0
@@ -213,16 +211,16 @@ export default async function DashboardHome() {
             : undefined
         }
         revenueTrend={
-          todayRevenue > 0 && priorWeekRevenue > 0
-            ? { pct: ((todayRevenue - (revenueByDate.get(sevenDaysAgoStr) ?? 0)) / Math.max(revenueByDate.get(sevenDaysAgoStr) ?? 1, 1)) * 100, label: 'vs semana passada' }
+          todayRevenue > 0 && period7.trendPct !== 0
+            ? { pct: period7.trendPct, label: 'vs semana passada' }
             : undefined
         }
       />
 
       <RevenueChart
-        data={chartData}
-        totalRevenue={currentWeekRevenue}
-        trendPct={revenueTrendPct}
+        period7={period7}
+        period15={period15}
+        period30={period30}
       />
 
       <TodayAppointments items={appointments} />

@@ -13,9 +13,12 @@
 import { z } from 'zod'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
+import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { ActionResult } from '@/types'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 // ---------------------------------------------------------------------------
 // Validation schemas
@@ -171,16 +174,47 @@ export async function resetPassword(formData: FormData): Promise<ActionResult<{ 
   const parsed = resetSchema.safeParse({ email: formData.get('email') })
   if (!parsed.success) return formatZodError(parsed.error)
 
-  const supabase = await createClient()
+  const { email } = parsed.data
   const origin = await getOrigin()
-  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: `${origin}/login`,
+  const admin = createAdminClient()
+
+  // Generate recovery link server-side so we control the email content (Portuguese)
+  const { data: linkData } = await admin.auth.admin.generateLink({
+    type: 'recovery',
+    email,
+    options: { redirectTo: `${origin}/auth/callback?next=/first-access` },
   })
 
-  if (error) {
-    // Intentionally swallow detailed errors to avoid user enumeration.
-    return { ok: true, data: { email: parsed.data.email } }
+  // Always return ok to avoid user enumeration — send email only if user exists
+  if (linkData?.properties?.action_link) {
+    const resetLink = linkData.properties.action_link
+    await resend.emails.send({
+      from: 'PetFlow <noreply@contato.getpetflow.com>',
+      to: email,
+      subject: 'Redefinir senha — PetFlow 🐾',
+      html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; color: #1a1a1a;">
+  <div style="text-align:center; margin-bottom: 24px;">
+    <span style="font-size: 28px; font-weight: 800; color: #059669; letter-spacing: -0.5px;">🐾 PetFlow</span>
+  </div>
+  <h2 style="color: #111827; margin-bottom: 4px;">Redefinir sua senha</h2>
+  <p>Recebemos uma solicitação para redefinir a senha da sua conta PetFlow.</p>
+  <p style="margin-top: 16px;">Clique no botão abaixo para criar uma nova senha:</p>
+  <a href="${resetLink}"
+     style="display:inline-block;margin-top:16px;background:#059669;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:16px;">
+    Criar nova senha
+  </a>
+  <p style="margin-top: 20px; font-size: 13px; color: #6b7280;">
+    Este link é válido por 24 horas. Se você não solicitou a redefinição, pode ignorar este e-mail com segurança.
+  </p>
+  <hr style="margin: 32px 0; border-color: #e5e7eb;">
+  <p style="font-size: 12px; color: #6b7280; text-align: center;">© ${new Date().getFullYear()} PetFlow · Todos os direitos reservados</p>
+</body>
+</html>`,
+    })
   }
 
-  return { ok: true, data: { email: parsed.data.email } }
+  return { ok: true, data: { email } }
 }
