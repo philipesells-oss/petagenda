@@ -67,7 +67,7 @@ export default function SignupPage() {
               <Loader2Icon className="animate-spin" /> Redirecionando…
             </>
           ) : (
-            'Assinar PetAgenda'
+            'Assinar PetFlow'
           )}
         </Button>
       </form>

@@ -181,7 +181,7 @@ export default async function DashboardHome() {
               Configuração do pet shop pendente
             </p>
             <p className="text-xs text-amber-800 dark:text-amber-200">
-              Leva menos de 2 minutos e libera todos os recursos da PetAgenda.
+              Leva menos de 2 minutos e libera todos os recursos do PetFlow.
             </p>
           </div>
           <Button
@@ -196,7 +196,7 @@ export default async function DashboardHome() {
           Olá, {user.fullName.split(' ')[0]} 🐾
         </h1>
         <p className="text-sm text-muted-foreground">
-          Bem-vindo à PetAgenda. Aqui está o resumo do seu dia.
+          Bem-vindo ao PetFlow. Aqui está o resumo do seu dia.
         </p>
       </header>
 
