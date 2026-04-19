@@ -112,7 +112,7 @@ export default function LandingPage() {
               { situation: 'Agendar um banho', before: 'WhatsApp + caderno + torcer pra não conflitar', after: 'Atendente abre o sistema, escolhe horário livre e confirma' },
               { situation: 'Lembrar o histórico do pet', before: 'Pergunta tudo de novo a cada visita', after: 'Ficha completa com raça, alergias e todos os banhos anteriores' },
               { situation: 'Saber o faturamento do dia', before: 'Soma no caderno ou na maquininha no final do dia', after: 'Dashboard em tempo real, atualizado a cada serviço concluído' },
-              { situation: 'Saber quais serviços mais vendem', before: 'Achismo ou planilha desatualizada', after: 'Relatório automático por serviço, período e funcionário' },
+              { situation: 'Saber quais serviços mais vendem', before: 'Achismo ou planilha desatualizada', after: 'Gráfico de faturamento por período, atualizado a cada serviço concluído' },
               { situation: 'Clientes que sumiram', before: 'Não sabe quem parou de vir', after: 'Lista de inativos com data da última visita' },
             ].map((row, i) => (
               <div key={row.situation} className={`grid grid-cols-3 border-b border-gray-100 last:border-0 dark:border-gray-800 ${i % 2 === 1 ? 'bg-gray-50/50 dark:bg-gray-900/20' : ''}`}>
@@ -195,7 +195,7 @@ export default function LandingPage() {
                 'Faturamento diário e dashboard de KPIs',
                 'Acesso pelo celular, tablet ou computador',
                 'Suporte humano em português, de verdade',
-                'Seus dados exportáveis a qualquer momento',
+                'Seus dados em servidores seguros — sempre disponíveis',
                 '🛡️ Garantia de 7 dias ou seu dinheiro de volta',
               ].map((b) => (
                 <li key={b} className="flex items-start gap-3 text-sm">
@@ -253,7 +253,7 @@ export default function LandingPage() {
             {[
               { q: 'Preciso instalar alguma coisa?', a: 'Não. O PetFlow funciona direto no navegador do celular, tablet ou computador. Basta fazer login e usar.' },
               { q: 'Tem fidelidade ou multa pra cancelar?', a: 'Nenhuma. Você paga mês a mês e cancela quando quiser, sem burocracia.' },
-              { q: 'E se eu cancelar — perco meus dados?', a: 'Não. Antes de cancelar você exporta tudo: clientes, pets, histórico de agendamentos. Seus dados são seus, sempre. Nunca te deixamos refém do sistema.' },
+              { q: 'E se eu cancelar — perco meus dados?', a: 'Não. Seus dados ficam seguros nos nossos servidores e nossa equipe te ajuda a extrair tudo antes do cancelamento. Clientes, pets, histórico — tudo seu, sempre.' },
               { q: 'Consigo migrar minha agenda atual?', a: 'Sim. A gente te ajuda a cadastrar seus clientes e pets na primeira semana, mesmo que esteja tudo no caderno ou no WhatsApp.' },
               { q: 'Funciona pra pet shop pequeno, com 1 ou 2 funcionários?', a: 'Foi feito pra isso. O PetFlow foi desenhado pro dono que atende no balcão e precisa de algo simples, rápido e que não atrapalhe o dia.' },
               { q: 'E se eu não gostar? Tem garantia?', a: 'Sim. Você tem 7 dias de garantia total. Se não ficar satisfeito por qualquer motivo, devolvemos 100% do valor pago — sem perguntas e sem burocracia. É seu direito pelo Código de Defesa do Consumidor (Art. 49) e a gente cumpre com prazer.' },

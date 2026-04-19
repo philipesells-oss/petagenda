@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { stripe, PLAN } from '@/lib/stripe'
 
 export async function POST(req: Request) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://getpetflow.com'
 
   let email: string | undefined
   try {
