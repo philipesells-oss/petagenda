@@ -127,7 +127,7 @@ export async function signIn(formData: FormData): Promise<ActionResult<{ next: s
   const next =
     typeof nextRaw === 'string' && nextRaw.startsWith('/') && !nextRaw.startsWith('//')
       ? nextRaw
-      : '/'
+      : '/dashboard'
 
   return { ok: true, data: { next } }
 }
