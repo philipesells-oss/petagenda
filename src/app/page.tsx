@@ -25,7 +25,7 @@ export default function LandingPage() {
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50 px-4 py-20 text-center dark:from-emerald-950/30 dark:via-gray-950 dark:to-teal-950/20 md:py-28">
         <div className="mx-auto max-w-3xl">
           <span className="mb-4 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-            R$29,90/mês · Sem fidelidade
+            🏆 R$29,90/mês · O mais barato do mercado · Sem fidelidade
           </span>
           <h1 className="mb-5 text-4xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
             Seu pet shop merece{' '}
@@ -34,11 +34,11 @@ export default function LandingPage() {
           </h1>
           <p className="mx-auto mb-8 max-w-xl text-lg text-gray-600 dark:text-gray-400">
             Agenda inteligente, clientes organizados e caixa no controle.
-            Tudo num só lugar, simples de usar no balcão ou no celular.
+            Tudo num só lugar — configura em menos de uma tarde, sem treinamento.
           </p>
           <CheckoutButton className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30" />
           <p className="mt-3 text-xs text-gray-500 dark:text-gray-500">
-            Cancele quando quiser · Sem taxa de adesão
+            Cancele quando quiser · Sem contrato · Sem implantação de R$1.000
           </p>
         </div>
       </section>
@@ -181,7 +181,8 @@ export default function LandingPage() {
       {/* ── Preço ──────────────────────────────────────────────── */}
       <section className="px-4 py-16" id="preco">
         <div className="mx-auto max-w-md">
-          <h2 className="mb-8 text-center text-2xl font-bold md:text-3xl">Um plano. Tudo incluído.</h2>
+          <h2 className="mb-2 text-center text-2xl font-bold md:text-3xl">Um plano. Tudo incluído.</h2>
+          <p className="mb-8 text-center text-sm text-gray-500 dark:text-gray-400">Outros sistemas cobram R$279/mês + R$1.000 de implantação. Aqui é R$29,90 e pronto.</p>
           <div className="rounded-3xl border-2 border-emerald-500 p-8 shadow-xl shadow-emerald-100 dark:shadow-emerald-900/20">
             <div className="mb-6 text-center">
               <p className="text-5xl font-bold text-gray-900 dark:text-white">R$29<span className="text-2xl">,90</span></p>
