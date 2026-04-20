@@ -16,6 +16,7 @@ export interface AppointmentCardProps {
   petName: string
   serviceName: string
   serviceColor?: string | null
+  employeeName?: string | null
   status: AppointmentStatus
   onClick?: () => void
 }
@@ -48,6 +49,7 @@ export function AppointmentCard(props: AppointmentCardProps) {
     petName,
     serviceName,
     serviceColor,
+    employeeName,
     status,
     onClick,
   } = props
@@ -71,6 +73,11 @@ export function AppointmentCard(props: AppointmentCardProps) {
           <p className="truncate text-xs text-muted-foreground">
             {petName} · {serviceName}
           </p>
+          {employeeName && (
+            <p className="truncate text-[11px] text-muted-foreground/80">
+              👤 {employeeName}
+            </p>
+          )}
         </div>
         <span className="shrink-0 text-[10px] text-muted-foreground">
           {formatTime(startTime)}–{formatTime(endTime)}

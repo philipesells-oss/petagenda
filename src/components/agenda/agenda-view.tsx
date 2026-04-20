@@ -7,7 +7,7 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from 'lucide-react'
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, UsersIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -96,13 +96,34 @@ export function AgendaView({
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
   const [detailItem, setDetailItem] = useState<AgendaViewItem | null>(null)
   const [calendarOpen, setCalendarOpen] = useState(false)
+  const [filterEmployee, setFilterEmployee] = useState<string>('all')
 
   const grid = useMemo(() => buildDayGrid(7, 20, 30), [])
+
+  // Unique employees present in today's agenda
+  const employeeOptions = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const item of items) {
+      const id = item.appointment.assigned_to
+      if (id && item.employeeName) map.set(id, item.employeeName)
+    }
+    return [...map.entries()].map(([id, name]) => ({ id, name }))
+  }, [items])
+
+  const hasUnassigned = items.some((i) => !i.appointment.assigned_to)
+  const showFilter = employeeOptions.length > 0 && (employeeOptions.length > 1 || hasUnassigned)
+
+  // Apply employee filter client-side
+  const filteredItems = useMemo(() => {
+    if (filterEmployee === 'all') return items
+    if (filterEmployee === 'unassigned') return items.filter((i) => !i.appointment.assigned_to)
+    return items.filter((i) => i.appointment.assigned_to === filterEmployee)
+  }, [items, filterEmployee])
 
   // Precompute which slot minute range each appointment spans
   const appointmentsByStart = useMemo(() => {
     const map = new Map<number, AgendaViewItem[]>()
-    for (const item of items) {
+    for (const item of filteredItems) {
       const startMin = timeToMinutes(item.appointment.start_time)
       // Round down to the nearest 30-min grid slot
       const slotMin = Math.floor(startMin / 30) * 30
@@ -111,7 +132,7 @@ export function AgendaView({
       map.set(slotMin, list)
     }
     return map
-  }, [items])
+  }, [filteredItems])
 
   // Business hours range (minutes)
   const openMin = businessHours?.open_time
@@ -254,6 +275,37 @@ export function AgendaView({
           </Button>
         </div>
 
+        {/* Employee filter tabs */}
+        {showFilter && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            <UsersIcon className="size-4 shrink-0 text-muted-foreground" />
+            {[
+              { id: 'all', name: `Todos (${items.length})` },
+              ...employeeOptions.map((e) => ({
+                id: e.id,
+                name: `${e.name.split(' ')[0]} (${items.filter((i) => i.appointment.assigned_to === e.id).length})`,
+              })),
+              ...(hasUnassigned
+                ? [{ id: 'unassigned', name: `Sem profissional (${items.filter((i) => !i.appointment.assigned_to).length})` }]
+                : []),
+            ].map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setFilterEmployee(opt.id)}
+                className={cn(
+                  'shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                  filterEmployee === opt.id
+                    ? 'border-emerald-500 bg-emerald-500 text-white'
+                    : 'border-border bg-background text-muted-foreground hover:border-foreground/40 hover:text-foreground',
+                )}
+              >
+                {opt.name}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Grid */}
         <div className="rounded-xl border bg-card">
           {isClosedDay ? (
@@ -290,6 +342,7 @@ export function AgendaView({
                               petName={item.petName}
                               serviceName={item.serviceName}
                               serviceColor={item.serviceColor}
+                              employeeName={item.employeeName}
                               status={item.appointment.status as AppointmentStatus}
                               onClick={() => setDetailItem(item)}
                             />

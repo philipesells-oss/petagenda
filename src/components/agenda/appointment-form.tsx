@@ -24,6 +24,7 @@ import {
   updateAppointment,
   getAvailableSlots,
 } from '@/actions/appointments'
+import { getServicesByEmployeeAction } from '@/actions/team'
 import { createClientAction, createPetAction } from '@/actions/clients'
 import type {
   AppointmentRow,
@@ -162,6 +163,38 @@ export function AppointmentForm(props: AppointmentFormProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantId, clientId])
+
+  // ---------------- Filter services by selected employee --------------------
+  useEffect(() => {
+    if (!assignedTo) {
+      // No employee selected — reload all services
+      const supabase = createClient()
+      supabase
+        .from('services')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('is_active', true)
+        .order('name')
+        .then(({ data }) => {
+          setServices((data ?? []) as ServiceRow[])
+        })
+      return
+    }
+    let cancelled = false
+    ;(async () => {
+      const res = await getServicesByEmployeeAction(assignedTo)
+      if (cancelled) return
+      if (res.ok) {
+        setServices(res.data as ServiceRow[])
+        // Clear selected service if it's no longer available
+        if (serviceId && !res.data.some((s) => s.id === serviceId)) {
+          setServiceId('')
+        }
+      }
+    })()
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignedTo, tenantId])
 
   // ---------------- Available slots (client-side computed on pick) ----------
   useEffect(() => {

@@ -1,14 +1,12 @@
-import Link from 'next/link'
-
 import { getCurrentUser } from '@/lib/auth/get-current-user'
 import { createClient } from '@/lib/supabase/server'
-import { Button } from '@/components/ui/button'
 import { StatsCards } from '@/components/dashboard/stats-cards'
 import {
   TodayAppointments,
   type AppointmentRowView,
 } from '@/components/dashboard/today-appointments'
 import { RevenueChart } from '@/components/dashboard/revenue-chart'
+import { Launchpad } from '@/components/dashboard/launchpad'
 import type { AppointmentStatus } from '@/types'
 
 const PT_DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -43,6 +41,8 @@ export default async function DashboardHome() {
     appointmentsResult,
     revenueHistoryResult,
     lastWeekAppointmentsResult,
+    teamMembersResult,
+    anyAppointmentResult,
   ] = await Promise.all([
     supabase
       .from('business_hours')
@@ -93,10 +93,23 @@ export default async function DashboardHome() {
       .select('id', { count: 'exact', head: true })
       .eq('tenant_id', tenantId)
       .eq('date', sevenDaysAgoStr),
+    supabase
+      .from('users')
+      .select('id', { count: 'exact', head: true })
+      .eq('tenant_id', tenantId)
+      .in('role', ['employee', 'admin'])
+      .eq('is_active', true),
+    supabase
+      .from('appointments')
+      .select('id', { count: 'exact', head: true })
+      .eq('tenant_id', tenantId)
+      .limit(1),
   ])
 
-  const onboardingComplete =
-    (hoursResult.count ?? 0) > 0 && (servicesOnboardResult.count ?? 0) > 0
+  const hasHours = (hoursResult.count ?? 0) > 0
+  const hasServices = (servicesOnboardResult.count ?? 0) > 0
+  const hasTeam = (teamMembersResult.count ?? 0) > 0
+  const hasFirstAppointment = (anyAppointmentResult.count ?? 0) > 0
 
   const todayRevenue = (completedTodayResult.data ?? []).reduce(
     (acc: number, row: { price: number | null }) => acc + (row.price ?? 0),
@@ -174,22 +187,12 @@ export default async function DashboardHome() {
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 p-4 md:p-6">
-      {!onboardingComplete && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-amber-900 dark:bg-amber-950">
-          <div>
-            <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
-              Configuração do pet shop pendente
-            </p>
-            <p className="text-xs text-amber-800 dark:text-amber-200">
-              Leva menos de 2 minutos e libera todos os recursos do PetFlow.
-            </p>
-          </div>
-          <Button
-            size="sm"
-            render={<Link href="/onboarding">Completar configuração</Link>}
-          />
-        </div>
-      )}
+      <Launchpad
+        hasHours={hasHours}
+        hasServices={hasServices}
+        hasTeam={hasTeam}
+        hasFirstAppointment={hasFirstAppointment}
+      />
 
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">

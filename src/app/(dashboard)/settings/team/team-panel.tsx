@@ -2,12 +2,13 @@
 
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { PlusIcon, UserCheckIcon, UserXIcon } from 'lucide-react'
+import { PencilIcon, PlusIcon, UserCheckIcon, UserXIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { createEmployeeAction, deactivateEmployeeAction } from '@/actions/team'
+import { EditEmployeeDialog } from '@/components/settings/edit-employee-dialog'
 import type { UserRole } from '@/types'
 
 interface Member {
@@ -26,9 +27,11 @@ const ROLE_LABEL: Record<UserRole, string> = {
 export function TeamPanel({
   members,
   callerRole,
+  allServices,
 }: {
   members: Member[]
   callerRole: UserRole
+  allServices: { id: string; name: string }[]
 }) {
   const [showForm, setShowForm] = useState(false)
   const [name, setName] = useState('')
@@ -36,6 +39,7 @@ export function TeamPanel({
   const [password, setPassword] = useState('')
   const [role, setRole] = useState<'employee'|'admin'>('employee')
   const [pending, startTransition] = useTransition()
+  const [editTarget, setEditTarget] = useState<Member | null>(null)
 
   const canManage = callerRole === 'owner' || callerRole === 'admin'
 
@@ -46,12 +50,15 @@ export function TeamPanel({
     fd.set('email', email)
     fd.set('password', password)
     fd.set('role', role)
+    const createdName = name
     startTransition(async () => {
       const res = await createEmployeeAction(fd)
       if (!res.ok) { toast.error(res.error); return }
-      toast.success('Funcionário criado com sucesso!')
+      toast.success('Funcionário criado! Configure o horário de trabalho.')
       setName(''); setEmail(''); setPassword('')
       setShowForm(false)
+      // Auto-open edit dialog for the new employee
+      setEditTarget({ id: res.data.id, full_name: createdName, role: 'employee', is_active: true })
     })
   }
 
@@ -86,15 +93,26 @@ export function TeamPanel({
               </div>
             </div>
             {canManage && m.role === 'employee' && m.is_active && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-destructive hover:text-destructive"
-                disabled={pending}
-                onClick={() => handleDeactivate(m.id)}
-              >
-                <UserXIcon className="size-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  title="Editar funcionário"
+                  disabled={pending}
+                  onClick={() => setEditTarget(m)}
+                >
+                  <PencilIcon className="size-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive"
+                  disabled={pending}
+                  onClick={() => handleDeactivate(m.id)}
+                >
+                  <UserXIcon className="size-4" />
+                </Button>
+              </div>
             )}
           </div>
         ))}
@@ -177,6 +195,15 @@ export function TeamPanel({
             </form>
           )}
         </>
+      )}
+
+      {editTarget && (
+        <EditEmployeeDialog
+          employee={{ id: editTarget.id, full_name: editTarget.full_name, role: editTarget.role as 'employee' | 'admin' }}
+          allServices={allServices}
+          open={!!editTarget}
+          onOpenChange={(open) => { if (!open) setEditTarget(null) }}
+        />
       )}
     </div>
   )

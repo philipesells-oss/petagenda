@@ -11,13 +11,22 @@ export default async function TeamPage() {
   if (!user) redirect('/login')
 
   const supabase = await createClient()
-  const { data } = await supabase
-    .from('users')
-    .select('id, full_name, role, is_active')
-    .eq('tenant_id', user.tenantId)
-    .order('full_name')
+  const [{ data }, { data: servicesData }] = await Promise.all([
+    supabase
+      .from('users')
+      .select('id, full_name, role, is_active')
+      .eq('tenant_id', user.tenantId)
+      .order('full_name'),
+    supabase
+      .from('services')
+      .select('id, name')
+      .eq('tenant_id', user.tenantId)
+      .eq('is_active', true)
+      .order('name'),
+  ])
 
   const members = (data ?? []) as Pick<UserRow, 'id' | 'full_name' | 'role' | 'is_active'>[]
+  const allServices = (servicesData ?? []) as { id: string; name: string }[]
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 p-4 md:p-6">
@@ -27,7 +36,7 @@ export default async function TeamPage() {
           Gerencie os funcionários do seu pet shop.
         </p>
       </header>
-      <TeamPanel members={members} callerRole={user.role} />
+      <TeamPanel members={members} callerRole={user.role} allServices={allServices} />
     </div>
   )
 }
