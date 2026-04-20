@@ -38,7 +38,7 @@ export default function LandingPage() {
           </p>
           <CheckoutButton className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30" />
           <p className="mt-3 text-xs text-gray-500 dark:text-gray-500">
-            Cancele quando quiser · Sem contrato · Sem implantação de R$1.000
+            7 dias de garantia · Cancele quando quiser · Suporte humano em português
           </p>
         </div>
       </section>
@@ -182,7 +182,7 @@ export default function LandingPage() {
       <section className="px-4 py-16" id="preco">
         <div className="mx-auto max-w-md">
           <h2 className="mb-2 text-center text-2xl font-bold md:text-3xl">Um plano. Tudo incluído.</h2>
-          <p className="mb-8 text-center text-sm text-gray-500 dark:text-gray-400">Outros sistemas cobram R$279/mês + R$1.000 de implantação. Aqui é R$29,90 e pronto.</p>
+          <p className="mb-8 text-center text-sm text-gray-500 dark:text-gray-400">Menos do que R$1 por dia. Sem pegadinha, sem surpresa na fatura.</p>
           <div className="rounded-3xl border-2 border-emerald-500 p-8 shadow-xl shadow-emerald-100 dark:shadow-emerald-900/20">
             <div className="mb-6 text-center">
               <p className="text-5xl font-bold text-gray-900 dark:text-white">R$29<span className="text-2xl">,90</span></p>
