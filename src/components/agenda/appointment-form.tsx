@@ -24,7 +24,7 @@ import {
   updateAppointment,
   getAvailableSlots,
 } from '@/actions/appointments'
-import { getServicesByEmployeeAction } from '@/actions/team'
+import { getServicesByEmployeeAction, getEmployeesByServiceAction } from '@/actions/team'
 import { createClientAction, createPetAction } from '@/actions/clients'
 import type {
   AppointmentRow,
@@ -58,6 +58,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
   const [pets, setPets] = useState<PetRow[]>([])
   const [services, setServices] = useState<ServiceRow[]>([])
   const [users, setUsers] = useState<Pick<UserRow, 'id' | 'full_name'>[]>([])
+  const [allUsers, setAllUsers] = useState<Pick<UserRow, 'id' | 'full_name'>[]>([])
   const [slots, setSlots] = useState<TimeSlot[]>([])
 
   const [clientId, setClientId] = useState<string>(initial?.client_id ?? '')
@@ -123,9 +124,9 @@ export function AppointmentForm(props: AppointmentFormProps) {
       if (cancelled) return
       setClients((clientsRes.data ?? []) as ClientRow[])
       setServices((servicesRes.data ?? []) as ServiceRow[])
-      setUsers(
-        (usersRes.data ?? []) as Pick<UserRow, 'id' | 'full_name'>[],
-      )
+      const usersData = (usersRes.data ?? []) as Pick<UserRow, 'id' | 'full_name'>[]
+      setUsers(usersData)
+      setAllUsers(usersData)
     })()
     return () => {
       cancelled = true
@@ -195,6 +196,29 @@ export function AppointmentForm(props: AppointmentFormProps) {
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assignedTo, tenantId])
+
+  // ---------------- Filter employees by selected service --------------------
+  useEffect(() => {
+    if (!serviceId) {
+      // No service selected — restore all employees
+      setUsers(allUsers)
+      return
+    }
+    let cancelled = false
+    ;(async () => {
+      const res = await getEmployeesByServiceAction(serviceId)
+      if (cancelled) return
+      if (res.ok) {
+        setUsers(res.data as Pick<UserRow, 'id' | 'full_name'>[])
+        // Clear selected employee if they can no longer perform this service
+        if (assignedTo && !res.data.some((u) => u.id === assignedTo)) {
+          setAssignedTo('')
+        }
+      }
+    })()
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serviceId])
 
   // ---------------- Available slots (client-side computed on pick) ----------
   useEffect(() => {

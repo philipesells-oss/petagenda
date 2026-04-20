@@ -245,6 +245,58 @@ export async function saveEmployeeServicesAction(
   return { ok: true, data: undefined }
 }
 
+// ── Get employees by service (for appointment form) ───────────────────────
+// Returns all active employees who either:
+//   (a) have the serviceId in employee_services, OR
+//   (b) have NO rows in employee_services at all (can do everything)
+
+export async function getEmployeesByServiceAction(
+  serviceId: string,
+): Promise<ActionResult<{ id: string; full_name: string }[]>> {
+  const caller = await getCurrentUser()
+  if (!caller) return { ok: false, error: 'Não autenticado' }
+
+  const admin = createAdminClient()
+
+  // Fetch all active employees for this tenant
+  const { data: allEmployees, error: empError } = await admin
+    .from('users')
+    .select('id, full_name')
+    .eq('tenant_id', caller.tenantId)
+    .eq('is_active', true)
+    .order('full_name')
+
+  if (empError) return { ok: false, error: empError.message }
+  if (!allEmployees || allEmployees.length === 0) return { ok: true, data: [] }
+
+  // Fetch all employee_services rows for this tenant
+  const { data: allEmpServices, error: esError } = await admin
+    .from('employee_services')
+    .select('user_id, service_id')
+    .eq('tenant_id', caller.tenantId)
+
+  if (esError) return { ok: false, error: esError.message }
+
+  // Build a set of user_ids that have any employee_services entries
+  const employeesWithRestrictions = new Set(
+    (allEmpServices ?? []).map((r: { user_id: string; service_id: string }) => r.user_id),
+  )
+
+  // Build a set of user_ids that have THIS specific service
+  const employeesWithThisService = new Set(
+    (allEmpServices ?? [])
+      .filter((r: { user_id: string; service_id: string }) => r.service_id === serviceId)
+      .map((r: { user_id: string; service_id: string }) => r.user_id),
+  )
+
+  const filtered = (allEmployees as { id: string; full_name: string }[]).filter((u) => {
+    // (a) has this service explicitly, OR (b) has no restrictions at all
+    return employeesWithThisService.has(u.id) || !employeesWithRestrictions.has(u.id)
+  })
+
+  return { ok: true, data: filtered }
+}
+
 // ── Get services by employee (for appointment form) ────────────────────────
 // If employee has employee_services rows → return those services
 // Else return all tenant services
