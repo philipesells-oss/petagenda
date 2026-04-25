@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { signIn } from '@/actions/auth'
+import { MailCheckIcon } from 'lucide-react'
 
 export default function LoginPage() {
   return (
@@ -56,8 +57,31 @@ function LoginForm() {
     })
   }
 
+  const isWelcome = params.get('welcome') === '1'
+  const isInvalidLink = params.get('error') === 'link_invalido'
+
   return (
     <div className="space-y-6">
+      {isWelcome && (
+        <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/40">
+          <MailCheckIcon className="mt-0.5 size-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+          <div>
+            <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Pagamento confirmado! 🎉</p>
+            <p className="mt-0.5 text-xs text-emerald-700 dark:text-emerald-400">
+              Em instantes você receberá um e-mail com o link para criar sua senha e acessar o PetFlow.
+              Verifique também a caixa de spam.
+            </p>
+          </div>
+        </div>
+      )}
+      {isInvalidLink && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/40">
+          <p className="text-sm font-semibold text-red-700 dark:text-red-400">Link expirado ou inválido</p>
+          <p className="mt-0.5 text-xs text-red-600 dark:text-red-500">
+            Use a opção &quot;Esqueci minha senha&quot; abaixo para receber um novo link de acesso.
+          </p>
+        </div>
+      )}
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">Entrar</h1>
         <p className="text-sm text-muted-foreground">Acesse sua conta PetFlow</p>

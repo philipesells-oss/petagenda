@@ -25,7 +25,7 @@ export default function LandingPage() {
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50 px-4 py-20 text-center dark:from-emerald-950/30 dark:via-gray-950 dark:to-teal-950/20 md:py-28">
         <div className="mx-auto max-w-3xl">
           <span className="mb-4 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-            🏆 R$29,90/mês · O mais barato do mercado · Sem fidelidade
+            🆕 Agenda por profissional já disponível · R$29,90/mês · Sem fidelidade
           </span>
           <h1 className="mb-5 text-4xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
             Seu pet shop merece{' '}
@@ -33,8 +33,8 @@ export default function LandingPage() {
             <TypingHeadline />
           </h1>
           <p className="mx-auto mb-8 max-w-xl text-lg text-gray-600 dark:text-gray-400">
-            Agenda inteligente, clientes organizados e caixa no controle.
-            Tudo num só lugar — configura em menos de uma tarde, sem treinamento.
+            Cada profissional tem seu horário, seus serviços e sua agenda — o cliente agenda direto com quem faz.
+            Menos confusão, menos conflito, mais dinheiro no caixa.
           </p>
           <CheckoutButton className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30" />
           <p className="mt-3 text-xs text-gray-500 dark:text-gray-500">
@@ -96,7 +96,8 @@ export default function LandingPage() {
           <p className="mb-10 text-center text-sm text-gray-500 dark:text-gray-400">
             Veja o que muda quando você sai do improviso e entra no PetFlow.
           </p>
-          <div className="overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700">
+          <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+          <div className="min-w-[540px] overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700">
             {/* Header */}
             <div className="grid grid-cols-3 border-b border-gray-200 dark:border-gray-700">
               <div className="p-4 text-sm font-semibold text-gray-600 dark:text-gray-400">Situação</div>
@@ -114,6 +115,7 @@ export default function LandingPage() {
               { situation: 'Saber o faturamento do dia', before: 'Soma no caderno ou na maquininha no final do dia', after: 'Dashboard em tempo real, atualizado a cada serviço concluído' },
               { situation: 'Saber quais serviços mais vendem', before: 'Achismo ou planilha desatualizada', after: 'Gráfico de faturamento por período, atualizado a cada serviço concluído' },
               { situation: 'Clientes que sumiram', before: 'Não sabe quem parou de vir', after: 'Lista de inativos com data da última visita' },
+              { situation: 'Agenda por profissional', before: 'Um único horário pra todo mundo — conflito na certa', after: 'Cada profissional com sua grade, seus serviços e sua disponibilidade' },
             ].map((row, i) => (
               <div key={row.situation} className={`grid grid-cols-3 border-b border-gray-100 last:border-0 dark:border-gray-800 ${i % 2 === 1 ? 'bg-gray-50/50 dark:bg-gray-900/20' : ''}`}>
                 <div className="p-4 text-sm font-medium text-gray-700 dark:text-gray-300">{row.situation}</div>
@@ -121,6 +123,7 @@ export default function LandingPage() {
                 <div className="p-4 text-center text-sm text-emerald-700 dark:text-emerald-400">{row.after}</div>
               </div>
             ))}
+          </div>
           </div>
         </div>
       </section>
@@ -136,6 +139,8 @@ export default function LandingPage() {
               { emoji: '🐶', title: 'Ficha do cliente e do pet', body: 'Raça, pelagem, manias, vacinas. Tudo na mão quando o tutor cruzar a porta.' },
               { emoji: '✂️', title: 'Catálogo de serviços', body: 'Cadastre banho, tosa, hidratação e pacotes com preço certinho — sem calcular na ponta do lápis.' },
               { emoji: '📊', title: 'Faturamento e KPIs do dia', body: 'Veja quanto entrou, quais serviços venderam mais e quem são seus melhores clientes.' },
+              { emoji: '👩‍💼', title: 'Cada profissional, seus serviços', body: 'Defina quais serviços cada funcionário realiza. O atendente agenda sem erro — zero overbooking, zero serviço no profissional errado.' },
+              { emoji: '🕐', title: 'Horário individual por profissional', body: 'Configure entrada, saída e folgas separado pra cada membro da equipe. O sistema bloqueia automaticamente quem não está disponível.' },
             ].map((f) => (
               <div key={f.title} className="flex gap-4 rounded-2xl border border-gray-100 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
                 <span className="text-3xl">{f.emoji}</span>
@@ -153,28 +158,39 @@ export default function LandingPage() {
       <PlatformShowcase />
 
       {/* ── Depoimentos ────────────────────────────────────────── */}
-      <section className="bg-emerald-50 px-4 py-16 dark:bg-emerald-950/20">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="mb-10 text-center text-2xl font-bold md:text-3xl">
+      <section className="bg-emerald-50 py-16 dark:bg-emerald-950/20 overflow-hidden">
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="mb-2 text-center text-2xl font-bold md:text-3xl">
             Donos de pet shop que já saíram do caderninho
           </h2>
-          <div className="grid gap-6 md:grid-cols-2">
-            {[
-              { name: 'Carla Meneses', city: 'Belo Horizonte, MG', text: 'Eu anotava tudo num caderno e vivia perdendo horário. No primeiro mês com o PetFlow, parei de marcar banhos em cima um do outro e ainda descobri que minha tosa higiênica era o serviço que mais dava dinheiro. Pago os R$29,90 sem pensar.' },
-              { name: 'Rogério Tavares', city: 'Campinas, SP', text: 'Meu pet shop é pequeno, somos eu e mais duas meninas. Achei que sistema ia ser complicado, mas em uma tarde já tava com tudo cadastrado. O que mais gosto é abrir o celular de manhã e ver a agenda do dia inteirinha, sem bagunça no WhatsApp.' },
-            ].map((t) => (
-              <div key={t.name} className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
-                <div className="mb-3 flex gap-0.5">
-                  {Array.from({ length: 5 }).map((_, i) => <StarIcon key={i} className="size-4 fill-amber-400 text-amber-400" />)}
-                </div>
-                <p className="mb-4 text-sm leading-relaxed text-gray-700 dark:text-gray-300">"{t.text}"</p>
-                <div>
-                  <p className="text-sm font-semibold">{t.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{t.city}</p>
-                </div>
+          <p className="mb-8 text-center text-sm text-gray-500 dark:text-gray-400">Deslize para ver mais →</p>
+        </div>
+        {/* Scroll-snap carousel — full bleed so cards peek at edges */}
+        <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 px-4 md:px-[max(1rem,calc((100vw-56rem)/2))]"
+             style={{ scrollbarWidth: 'none' }}>
+          {[
+            { name: 'Carla Meneses', city: 'Belo Horizonte, MG', text: 'Eu anotava tudo num caderno e vivia perdendo horário. No primeiro mês com o PetFlow, parei de marcar banhos em cima um do outro e ainda descobri que minha tosa higiênica era o serviço que mais dava dinheiro. Pago os R$29,90 sem pensar.' },
+            { name: 'Rogério Tavares', city: 'Campinas, SP', text: 'Meu pet shop é pequeno, somos eu e mais duas meninas. Achei que sistema ia ser complicado, mas em uma tarde já tava com tudo cadastrado. O que mais gosto é abrir o celular de manhã e ver a agenda do dia inteirinha, sem bagunça no WhatsApp.' },
+            { name: 'Juliana Martins', city: 'Pet Space · Campinas, SP', text: 'A gente tinha 3 tosadoras e uma agenda só pra todo mundo. Virava bagunça toda semana. Com o PetFlow cada uma tem o próprio horário e os próprios serviços — o atendente já sabe exatamente quem faz o quê. Reduziu reclamação e o caixa melhorou porque paramos de perder agendamento por confusão.' },
+          ].map((t) => (
+            <div key={t.name}
+              className="snap-start shrink-0 w-[85vw] max-w-sm md:w-80 rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+              <div className="mb-3 flex gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => <StarIcon key={i} className="size-4 fill-amber-400 text-amber-400" />)}
               </div>
-            ))}
-          </div>
+              <p className="mb-4 text-sm leading-relaxed text-gray-700 dark:text-gray-300">"{t.text}"</p>
+              <div>
+                <p className="text-sm font-semibold">{t.name}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t.city}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Dot indicators (CSS only) */}
+        <div className="mt-4 flex justify-center gap-2">
+          {[0,1,2].map((i) => (
+            <span key={i} className="inline-block h-2 w-2 rounded-full bg-emerald-300 dark:bg-emerald-700" />
+          ))}
         </div>
       </section>
 
@@ -182,7 +198,7 @@ export default function LandingPage() {
       <section className="px-4 py-16" id="preco">
         <div className="mx-auto max-w-md">
           <h2 className="mb-2 text-center text-2xl font-bold md:text-3xl">Um plano. Tudo incluído.</h2>
-          <p className="mb-8 text-center text-sm text-gray-500 dark:text-gray-400">Menos do que R$1 por dia. Sem pegadinha, sem surpresa na fatura.</p>
+          <p className="mb-8 text-center text-sm text-gray-500 dark:text-gray-400">Valor único · Tudo incluso · Sem pegadinha, sem surpresa na fatura.</p>
           <div className="rounded-3xl border-2 border-emerald-500 p-8 shadow-xl shadow-emerald-100 dark:shadow-emerald-900/20">
             <div className="mb-6 text-center">
               <p className="text-5xl font-bold text-gray-900 dark:text-white">R$29<span className="text-2xl">,90</span></p>
@@ -194,6 +210,7 @@ export default function LandingPage() {
                 'Clientes e pets com ficha completa e histórico',
                 'Catálogo de serviços e pacotes ilimitados',
                 'Faturamento diário e dashboard de KPIs',
+                'Agenda individual por profissional com serviços e horários próprios',
                 'Acesso pelo celular, tablet ou computador',
                 'Suporte humano em português, de verdade',
                 'Seus dados em servidores seguros — sempre disponíveis',
@@ -275,7 +292,7 @@ export default function LandingPage() {
             Seu próximo banho pode já sair organizado.
           </h2>
           <p className="mb-8 text-emerald-100">
-            Menos de R$1 por dia pra trocar o caderninho por um pet shop profissional.
+            R$29,90/mês pra ter agenda, equipe e caixa organizados num só lugar.
             Ative agora e comece a usar hoje mesmo.
           </p>
           <CheckoutButton className="bg-white text-emerald-700 hover:bg-emerald-50 px-8 shadow-lg" />

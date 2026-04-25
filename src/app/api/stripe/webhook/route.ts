@@ -104,7 +104,7 @@ export async function POST(req: Request) {
   const { data: linkData, error: linkError } = await adminClient.auth.admin.generateLink({
     type: 'magiclink',
     email,
-    options: { redirectTo: `${appUrl}/first-access` },
+    options: { redirectTo: `${appUrl}/auth/callback?next=/first-access` },
   })
 
   if (linkError || !linkData?.properties?.action_link) {
