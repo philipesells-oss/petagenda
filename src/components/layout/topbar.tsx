@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { LanguageSwitcher } from './language-switcher'
 
 interface TopbarProps {
   shopName: string
@@ -23,19 +24,23 @@ function initials(name: string) {
 export function Topbar({ shopName, userName, userEmail: _userEmail }: TopbarProps) {
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-background px-4">
-      <span className="text-sm font-semibold truncate max-w-[60vw]">{shopName}</span>
+      <span className="text-sm font-semibold truncate max-w-[50vw]">{shopName}</span>
 
-      <Link
-        href="/settings/profile"
-        aria-label="Minha conta"
-        className="rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      >
-        <Avatar className="size-9">
-          <AvatarFallback className="text-xs font-semibold">
-            {initials(userName)}
-          </AvatarFallback>
-        </Avatar>
-      </Link>
+      <div className="flex items-center gap-2">
+        <LanguageSwitcher />
+
+        <Link
+          href="/settings/profile"
+          aria-label="Minha conta"
+          className="rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <Avatar className="size-9">
+            <AvatarFallback className="text-xs font-semibold">
+              {initials(userName)}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
+      </div>
     </header>
   )
 }
