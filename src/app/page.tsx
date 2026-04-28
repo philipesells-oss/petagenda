@@ -308,7 +308,18 @@ const COPY = {
 export default async function LandingPage() {
   const hdrs = await headers()
   const { locale, currency } = detectLocale(hdrs)
-  const c = COPY[locale]
+  const base = COPY[locale]
+  // en locale serves both EUR (Europe non-PT) and USD (rest of world) — patch price strings
+  const c = (locale === 'en' && currency === 'EUR')
+    ? {
+        ...base,
+        badge: '🆕 Per-staff scheduling available · €19.90/mo · Cancel anytime',
+        priceDisplay: '€19,90',
+        pricePeriod: '/month · Cancel anytime',
+        ctaLabel: 'Start now — €19.90/month',
+        ctaFinalSub: '€19.90/month to keep your schedule, team, and cash flow in one place. Activate now and start using it today.',
+      }
+    : { ...base }
 
   return (
     <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
@@ -340,7 +351,7 @@ export default async function LandingPage() {
           <p className="mx-auto mb-8 max-w-xl text-lg text-gray-600 dark:text-gray-400">
             {c.heroSub}
           </p>
-          <CheckoutButton className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30" currency={currency} />
+          <CheckoutButton label={c.ctaLabel} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30" currency={currency} />
           <p className="mt-3 text-xs text-gray-500 dark:text-gray-500">
             {c.heroGuarantee}
           </p>
