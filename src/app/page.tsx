@@ -449,7 +449,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── Plataforma por dentro ───────────────────────────────── */}
-      <PlatformShowcase />
+      <PlatformShowcase locale={locale} />
 
       {/* ── Depoimentos ────────────────────────────────────────── */}
       <section className="bg-emerald-50 py-16 dark:bg-emerald-950/20 overflow-hidden">
@@ -565,7 +565,7 @@ export default async function LandingPage() {
           <p className="mb-8 text-emerald-100">
             {c.ctaFinalSub}
           </p>
-          <CheckoutButton className="bg-white text-emerald-700 hover:bg-emerald-50 px-8 shadow-lg" currency={currency} />
+          <CheckoutButton label={c.ctaLabel} className="bg-white text-emerald-700 hover:bg-emerald-50 px-8 shadow-lg" currency={currency} />
           <p className="mt-4 text-sm text-emerald-200">
             {c.ctaFinalGuarantee}
           </p>
