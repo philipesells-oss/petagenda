@@ -1,10 +1,32 @@
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import { CheckIcon, StarIcon, ShieldCheckIcon, SmartphoneIcon, ClockIcon, TrendingUpIcon } from 'lucide-react'
 import { CheckoutButton } from '@/components/landing/checkout-button'
 import { TypingHeadline } from '@/components/landing/typing-headline'
 import { PlatformShowcase } from '@/components/landing/platform-showcase'
+import type { PlanCurrency } from '@/lib/stripe'
 
-export default function LandingPage() {
+const EU_COUNTRIES = new Set([
+  'AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI',
+  'FR','GR','HR','HU','IE','IT','LT','LU','LV','MT',
+  'NL','PL','PT','RO','SE','SI','SK',
+])
+
+function detectCurrency(country: string | null): PlanCurrency {
+  if (!country) return 'BRL'
+  if (EU_COUNTRIES.has(country)) return 'EUR'
+  return 'BRL'
+}
+
+export default async function LandingPage() {
+  const hdrs = await headers()
+  const country = hdrs.get('x-vercel-ip-country')
+  const currency = detectCurrency(country)
+  const isEUR = currency === 'EUR'
+
+  const price = isEUR ? '€19,90' : 'R$29,90'
+  const priceLabel = isEUR ? '€19,90/mês' : 'R$29,90/mês'
+
   return (
     <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
 
@@ -16,7 +38,7 @@ export default function LandingPage() {
             <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">
               Entrar
             </Link>
-            <CheckoutButton label="Assinar agora" size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" />
+            <CheckoutButton label="Assinar agora" size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" currency={currency} />
           </div>
         </div>
       </header>
@@ -25,7 +47,7 @@ export default function LandingPage() {
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50 px-4 py-20 text-center dark:from-emerald-950/30 dark:via-gray-950 dark:to-teal-950/20 md:py-28">
         <div className="mx-auto max-w-3xl">
           <span className="mb-4 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-            🆕 Para pet shops e clínicas vet · R$29,90/mês · Ative hoje
+            🆕 Para pet shops e clínicas vet · {priceLabel} · Ative hoje
           </span>
           <h1 className="mb-5 text-4xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
             Todo negócio pet merece{' '}
@@ -36,7 +58,7 @@ export default function LandingPage() {
             Para pet shops e clínicas veterinárias que ainda gerenciam no caderninho ou no WhatsApp.
             O PetFlow organiza agenda, clientes e faturamento — em menos de uma tarde.
           </p>
-          <CheckoutButton className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30" />
+          <CheckoutButton className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30" currency={currency} />
           <p className="mt-3 text-xs text-gray-500 dark:text-gray-500">
             7 dias de garantia · Cancele quando quiser · Suporte humano em português
           </p>
@@ -201,7 +223,7 @@ export default function LandingPage() {
           <p className="mb-8 text-center text-sm text-gray-500 dark:text-gray-400">Valor único · Tudo incluso · Sem pegadinha, sem surpresa na fatura.</p>
           <div className="rounded-3xl border-2 border-emerald-500 p-8 shadow-xl shadow-emerald-100 dark:shadow-emerald-900/20">
             <div className="mb-6 text-center">
-              <p className="text-5xl font-bold text-gray-900 dark:text-white">R$29<span className="text-2xl">,90</span></p>
+              <p className="text-5xl font-bold text-gray-900 dark:text-white">{isEUR ? '€19' : 'R$29'}<span className="text-2xl">{isEUR ? ',90' : ',90'}</span></p>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">/mês · Cancele quando quiser</p>
             </div>
             <ul className="mb-8 space-y-3">
@@ -222,7 +244,7 @@ export default function LandingPage() {
                 </li>
               ))}
             </ul>
-            <CheckoutButton label="Quero começar por R$29,90/mês" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" />
+            <CheckoutButton label={`Quero começar por ${priceLabel}`} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" currency={currency} />
           </div>
         </div>
       </section>
@@ -292,10 +314,10 @@ export default function LandingPage() {
             Seu próximo atendimento pode já sair organizado.
           </h2>
           <p className="mb-8 text-emerald-100">
-            R$29,90/mês pra ter agenda, equipe e caixa organizados num só lugar — pet shop ou clínica vet.
+            {priceLabel} pra ter agenda, equipe e caixa organizados num só lugar — pet shop ou clínica vet.
             Ative agora e comece a usar hoje mesmo.
           </p>
-          <CheckoutButton className="bg-white text-emerald-700 hover:bg-emerald-50 px-8 shadow-lg" />
+          <CheckoutButton className="bg-white text-emerald-700 hover:bg-emerald-50 px-8 shadow-lg" currency={currency} />
           <p className="mt-4 text-sm text-emerald-200">
             🛡️ Garantia de 7 dias — não gostou, devolvemos tudo. Sem perguntas.
           </p>
