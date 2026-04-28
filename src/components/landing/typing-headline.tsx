@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-const PHRASES = [
+const DEFAULT_PHRASES = [
   'sair do caderninho.',
   'ser mais lucrativo.',
   'organizar cada consulta.',
@@ -14,7 +14,11 @@ const DELETE_SPEED = 35
 const PAUSE_AFTER_TYPE = 2000
 const PAUSE_AFTER_DELETE = 400
 
-export function TypingHeadline() {
+interface Props {
+  phrases?: string[]
+}
+
+export function TypingHeadline({ phrases = DEFAULT_PHRASES }: Props) {
   const [displayed, setDisplayed] = useState('')
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -28,7 +32,7 @@ export function TypingHeadline() {
 
   // Typing logic
   useEffect(() => {
-    const current = PHRASES[phraseIndex]
+    const current = phrases[phraseIndex]
 
     if (!isDeleting && displayed === current) {
       const id = setTimeout(() => setIsDeleting(true), PAUSE_AFTER_TYPE)
@@ -38,7 +42,7 @@ export function TypingHeadline() {
     if (isDeleting && displayed === '') {
       const id = setTimeout(() => {
         setIsDeleting(false)
-        setPhraseIndex((i) => (i + 1) % PHRASES.length)
+        setPhraseIndex((i) => (i + 1) % phrases.length)
       }, PAUSE_AFTER_DELETE)
       return () => clearTimeout(id)
     }
@@ -50,7 +54,7 @@ export function TypingHeadline() {
       )
     }, speed)
     return () => clearTimeout(id)
-  }, [displayed, isDeleting, phraseIndex])
+  }, [displayed, isDeleting, phraseIndex, phrases])
 
   return (
     <span className="text-emerald-600 dark:text-emerald-400 whitespace-nowrap">

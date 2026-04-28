@@ -1,32 +1,42 @@
 import { NextResponse } from 'next/server'
-import { stripe, PLANS, type PlanCurrency } from '@/lib/stripe'
+import { stripe, getPriceIdForCurrency, type SupportedCurrency } from '@/lib/stripe'
 
+const STRIPE_LOCALE: Record<SupportedCurrency, 'pt-BR' | 'pt' | 'en'> = {
+  BRL: 'pt-BR',
+  EUR: 'pt',
+  USD: 'en',
+}
 
 export async function POST(req: Request) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://getpetflow.com'
+
+  let email: string | undefined
+  let requestedCurrency: SupportedCurrency = 'BRL'
   try {
     const appUrl = 'https://getpetflow.com'
 
     const body = await req.json().catch(() => ({}))
-    const email: string | undefined = typeof body.email === 'string' ? body.email.trim() : undefined
-    const currency: PlanCurrency = (body.currency as PlanCurrency) ?? 'BRL'
-    const plan = PLANS[currency] ?? PLANS.BRL
-
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      line_items: [{ price: plan.priceId, quantity: 1 }],
-      ...(email ? { customer_email: email } : {}),
-      success_url: `${appUrl}/login?welcome=1`,
-      cancel_url: `${appUrl}/`,
-      locale: plan.stripeLocale,
-      billing_address_collection: 'auto',
-      metadata: { source: 'landing_page', currency },
-    })
-
-    return NextResponse.json({ url: session.url })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Stripe error'
-    console.error('[checkout]', message)
-    return NextResponse.json({ error: message }, { status: 500 })
+    email = typeof body.email === 'string' ? body.email.trim() : undefined
+    if (body.currency === 'EUR' || body.currency === 'USD' || body.currency === 'BRL') {
+      requestedCurrency = body.currency as SupportedCurrency
+    }
+  } catch {
+    // email and currency are optional
   }
+
+  const { priceId, currency } = getPriceIdForCurrency(requestedCurrency)
+
+  const session = await stripe.checkout.sessions.create({
+    mode: 'subscription',
+    payment_method_types: ['card'],
+    line_items: [{ price: priceId, quantity: 1 }],
+    ...(email ? { customer_email: email } : {}),
+    success_url: `${appUrl}/login?welcome=1`,
+    cancel_url: `${appUrl}/`,
+    locale: STRIPE_LOCALE[currency],
+    billing_address_collection: 'auto',
+    metadata: { source: 'landing_page', requested_currency: requestedCurrency },
+  })
+
+  return NextResponse.json({ url: session.url })
 }

@@ -3,13 +3,13 @@
 import { useState } from 'react'
 import { Loader2Icon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import type { PlanCurrency } from '@/lib/stripe'
+import type { SupportedCurrency } from '@/lib/stripe'
 
 interface Props {
   label?: string
   size?: 'default' | 'lg' | 'sm'
   className?: string
-  currency?: PlanCurrency
+  currency?: SupportedCurrency
 }
 
 export function CheckoutButton({

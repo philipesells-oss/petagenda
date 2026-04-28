@@ -180,8 +180,9 @@ export default async function ClientProfilePage({
 
         <TabsContent value="messages">
           <ClientMessagesTab
-            clientFirstName={client.full_name.split(' ')[0] ?? client.full_name}
+            clientFullName={client.full_name}
             clientPhone={client.phone}
+            petName={petList[0]?.name ?? null}
           />
         </TabsContent>
       </Tabs>

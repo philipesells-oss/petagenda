@@ -1,8 +1,21 @@
 'use client'
 
 import Link from 'next/link'
+import { LogOutIcon, UserIcon } from 'lucide-react'
+
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { LanguageSwitcher } from './language-switcher'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { signOut } from '@/actions/auth'
+import { LanguageSwitcher } from '@/components/layout/language-switcher'
+import { useLanguage } from '@/lib/i18n/language-context'
 
 interface TopbarProps {
   shopName: string
@@ -21,25 +34,57 @@ function initials(name: string) {
     .toUpperCase()
 }
 
-export function Topbar({ shopName, userName, userEmail: _userEmail }: TopbarProps) {
+export function Topbar({ shopName, userName, userEmail }: TopbarProps) {
+  const { t } = useLanguage()
+
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-background px-4">
       <span className="text-sm font-semibold truncate max-w-[50vw]">{shopName}</span>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <LanguageSwitcher />
 
-        <Link
-          href="/settings/profile"
-          aria-label="Minha conta"
-          className="rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        >
-          <Avatar className="size-9">
-            <AvatarFallback className="text-xs font-semibold">
-              {initials(userName)}
-            </AvatarFallback>
-          </Avatar>
-        </Link>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="ghost" size="icon" aria-label={t('topbar.account')}>
+                <Avatar className="size-8">
+                  <AvatarFallback>{initials(userName) || 'U'}</AvatarFallback>
+                </Avatar>
+              </Button>
+            }
+          />
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium">{userName}</span>
+                {userEmail && (
+                  <span className="text-xs text-muted-foreground truncate">{userEmail}</span>
+                )}
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              render={
+                <Link href="/settings/profile" className="w-full">
+                  <UserIcon className="size-4" />
+                  {t('topbar.account')}
+                </Link>
+              }
+            />
+            <DropdownMenuSeparator />
+            <form action={signOut}>
+              <DropdownMenuItem
+                render={
+                  <button type="submit" className="w-full">
+                    <LogOutIcon className="size-4" />
+                    {t('topbar.signOut')}
+                  </button>
+                }
+              />
+            </form>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   )

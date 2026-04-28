@@ -10,40 +10,50 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   httpClient: Stripe.createFetchHttpClient(),
 })
 
-export type PlanCurrency = 'BRL' | 'EUR' | 'USD'
+export type SupportedCurrency = 'BRL' | 'EUR' | 'USD'
 
-export const PLANS: Record<PlanCurrency, {
+const BRL_PRICE_ID = 'price_1TNeYfGtK644c9ETLEaiGSxA'
+
+/**
+ * Resolves the Stripe Price ID for the requested currency.
+ * Falls back to BRL when EUR/USD env vars are not configured yet.
+ *
+ * TODO: adicionar STRIPE_PRICE_EUR e STRIPE_PRICE_USD no Vercel + Stripe Dashboard
+ */
+export function getPriceIdForCurrency(currency: SupportedCurrency): {
   priceId: string
-  amount: number
-  currency: string
-  label: string
-  symbol: string
-  stripeLocale: Stripe.Checkout.SessionCreateParams['locale']
-}> = {
-  BRL: {
-    priceId: (process.env.STRIPE_PRICE_BRL ?? 'price_1TNeYfGtK644c9ETLEaiGSxA').trim(),
-    amount: 2990,
-    currency: 'brl',
-    label: 'R$29,90',
-    symbol: 'R$',
-    stripeLocale: 'pt-BR',
-  },
-  EUR: {
-    priceId: (process.env.STRIPE_PRICE_EUR ?? 'price_1TRAR8GtK644c9ETXZGJFYnV').trim(),
-    amount: 1990,
-    currency: 'eur',
-    label: '€19,90',
-    symbol: '€',
-    stripeLocale: 'pt',
-  },
-  USD: {
-    priceId: (process.env.STRIPE_PRICE_USD ?? 'price_1TRARCGtK644c9ETiqsdneBT').trim(),
-    amount: 1990,
-    currency: 'usd',
-    label: '$19.90',
-    symbol: '$',
-    stripeLocale: 'en',
-  },
+  currency: SupportedCurrency
+  fallback: boolean
+} {
+  if (currency === 'EUR') {
+    const eurId = process.env.STRIPE_PRICE_EUR
+    if (eurId) return { priceId: eurId, currency: 'EUR', fallback: false }
+    console.warn(
+      '[stripe] STRIPE_PRICE_EUR not configured — falling back to BRL price. ' +
+        'Configure a EUR price in Stripe Dashboard and set STRIPE_PRICE_EUR on Vercel.',
+    )
+    return { priceId: BRL_PRICE_ID, currency: 'BRL', fallback: true }
+  }
+
+  if (currency === 'USD') {
+    const usdId = process.env.STRIPE_PRICE_USD
+    if (usdId) return { priceId: usdId, currency: 'USD', fallback: false }
+    console.warn(
+      '[stripe] STRIPE_PRICE_USD not configured — falling back to BRL price. ' +
+        'Configure a USD price in Stripe Dashboard and set STRIPE_PRICE_USD on Vercel.',
+    )
+    return { priceId: BRL_PRICE_ID, currency: 'BRL', fallback: true }
+  }
+
+  return { priceId: BRL_PRICE_ID, currency: 'BRL', fallback: false }
+}
+
+export const PLAN = {
+  name: 'PetFlow — Plano Único',
+  priceId: BRL_PRICE_ID,
+  amount: 2990,
+  currency: 'brl',
+  interval: 'month' as const,
 }
 
 // backward-compat alias
