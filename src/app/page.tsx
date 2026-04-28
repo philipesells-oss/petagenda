@@ -14,8 +14,10 @@ const EU_COUNTRIES = new Set([
 
 function detectCurrency(country: string | null): PlanCurrency {
   if (!country) return 'BRL'
+  if (country === 'BR') return 'BRL'
   if (EU_COUNTRIES.has(country)) return 'EUR'
-  return 'BRL'
+  // US, CA, AU, GB, NZ, SG and rest of world → USD
+  return 'USD'
 }
 
 export default async function LandingPage() {
@@ -23,9 +25,9 @@ export default async function LandingPage() {
   const country = hdrs.get('x-vercel-ip-country')
   const currency = detectCurrency(country)
   const isEUR = currency === 'EUR'
+  const isUSD = currency === 'USD'
 
-  const price = isEUR ? '€19,90' : 'R$29,90'
-  const priceLabel = isEUR ? '€19,90/mês' : 'R$29,90/mês'
+  const priceLabel = isEUR ? '€19,90/mês' : isUSD ? '$19.90/mo' : 'R$29,90/mês'
 
   return (
     <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
@@ -223,8 +225,12 @@ export default async function LandingPage() {
           <p className="mb-8 text-center text-sm text-gray-500 dark:text-gray-400">Valor único · Tudo incluso · Sem pegadinha, sem surpresa na fatura.</p>
           <div className="rounded-3xl border-2 border-emerald-500 p-8 shadow-xl shadow-emerald-100 dark:shadow-emerald-900/20">
             <div className="mb-6 text-center">
-              <p className="text-5xl font-bold text-gray-900 dark:text-white">{isEUR ? '€19' : 'R$29'}<span className="text-2xl">{isEUR ? ',90' : ',90'}</span></p>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">/mês · Cancele quando quiser</p>
+              <p className="text-5xl font-bold text-gray-900 dark:text-white">
+                {isEUR ? '€19' : isUSD ? '$19' : 'R$29'}<span className="text-2xl">{isUSD ? '.90' : ',90'}</span>
+              </p>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                {isUSD ? '/mo · Cancel anytime' : '/mês · Cancele quando quiser'}
+              </p>
             </div>
             <ul className="mb-8 space-y-3">
               {[

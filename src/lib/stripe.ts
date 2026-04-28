@@ -20,7 +20,7 @@ export const PLANS: Record<PlanCurrency, {
   stripeLocale: Stripe.Checkout.SessionCreateParams['locale']
 }> = {
   BRL: {
-    priceId: process.env.STRIPE_PRICE_BRL ?? 'price_1TNeYfGtK644c9ETLEaiGSxA',
+    priceId: (process.env.STRIPE_PRICE_BRL ?? 'price_1TNeYfGtK644c9ETLEaiGSxA').trim(),
     amount: 2990,
     currency: 'brl',
     label: 'R$29,90',
@@ -28,7 +28,7 @@ export const PLANS: Record<PlanCurrency, {
     stripeLocale: 'pt-BR',
   },
   EUR: {
-    priceId: process.env.STRIPE_PRICE_EUR ?? 'price_1TRAR8GtK644c9ETXZGJFYnV',
+    priceId: (process.env.STRIPE_PRICE_EUR ?? 'price_1TRAR8GtK644c9ETXZGJFYnV').trim(),
     amount: 1990,
     currency: 'eur',
     label: '€19,90',
@@ -36,7 +36,7 @@ export const PLANS: Record<PlanCurrency, {
     stripeLocale: 'pt',
   },
   USD: {
-    priceId: process.env.STRIPE_PRICE_USD ?? 'price_1TRARCGtK644c9ETiqsdneBT',
+    priceId: (process.env.STRIPE_PRICE_USD ?? 'price_1TRARCGtK644c9ETiqsdneBT').trim(),
     amount: 1990,
     currency: 'usd',
     label: '$19.90',
