@@ -11,41 +11,24 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 })
 
 export type SupportedCurrency = 'BRL' | 'EUR' | 'USD'
+/** @deprecated use SupportedCurrency */
+export type PlanCurrency = SupportedCurrency
 
 const BRL_PRICE_ID = 'price_1TNeYfGtK644c9ETLEaiGSxA'
 
-/**
- * Resolves the Stripe Price ID for the requested currency.
- * Falls back to BRL when EUR/USD env vars are not configured yet.
- *
- * TODO: adicionar STRIPE_PRICE_EUR e STRIPE_PRICE_USD no Vercel + Stripe Dashboard
- */
 export function getPriceIdForCurrency(currency: SupportedCurrency): {
   priceId: string
   currency: SupportedCurrency
-  fallback: boolean
 } {
   if (currency === 'EUR') {
-    const eurId = process.env.STRIPE_PRICE_EUR
-    if (eurId) return { priceId: eurId, currency: 'EUR', fallback: false }
-    console.warn(
-      '[stripe] STRIPE_PRICE_EUR not configured — falling back to BRL price. ' +
-        'Configure a EUR price in Stripe Dashboard and set STRIPE_PRICE_EUR on Vercel.',
-    )
-    return { priceId: BRL_PRICE_ID, currency: 'BRL', fallback: true }
+    const id = (process.env.STRIPE_PRICE_EUR ?? '').trim()
+    if (id) return { priceId: id, currency: 'EUR' }
   }
-
   if (currency === 'USD') {
-    const usdId = process.env.STRIPE_PRICE_USD
-    if (usdId) return { priceId: usdId, currency: 'USD', fallback: false }
-    console.warn(
-      '[stripe] STRIPE_PRICE_USD not configured — falling back to BRL price. ' +
-        'Configure a USD price in Stripe Dashboard and set STRIPE_PRICE_USD on Vercel.',
-    )
-    return { priceId: BRL_PRICE_ID, currency: 'BRL', fallback: true }
+    const id = (process.env.STRIPE_PRICE_USD ?? '').trim()
+    if (id) return { priceId: id, currency: 'USD' }
   }
-
-  return { priceId: BRL_PRICE_ID, currency: 'BRL', fallback: false }
+  return { priceId: BRL_PRICE_ID, currency: 'BRL' }
 }
 
 export const PLAN = {
@@ -55,6 +38,3 @@ export const PLAN = {
   currency: 'brl',
   interval: 'month' as const,
 }
-
-// backward-compat alias
-export const PLAN = PLANS.BRL

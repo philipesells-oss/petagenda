@@ -1,6 +1,5 @@
 import { headers } from 'next/headers'
 import Link from 'next/link'
-import { headers } from 'next/headers'
 import { CheckIcon, StarIcon, ShieldCheckIcon, SmartphoneIcon, ClockIcon, TrendingUpIcon } from 'lucide-react'
 import { CheckoutButton } from '@/components/landing/checkout-button'
 import { TypingHeadline } from '@/components/landing/typing-headline'
