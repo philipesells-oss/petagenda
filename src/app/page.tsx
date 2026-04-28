@@ -25,16 +25,16 @@ export default function LandingPage() {
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50 px-4 py-20 text-center dark:from-emerald-950/30 dark:via-gray-950 dark:to-teal-950/20 md:py-28">
         <div className="mx-auto max-w-3xl">
           <span className="mb-4 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-            🆕 Agenda por profissional já disponível · R$29,90/mês · Sem fidelidade
+            🆕 Para pet shops e clínicas vet · R$29,90/mês · Ative hoje
           </span>
           <h1 className="mb-5 text-4xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
-            Seu pet shop merece{' '}
+            Todo negócio pet merece{' '}
             <br className="hidden sm:block" />
             <TypingHeadline />
           </h1>
           <p className="mx-auto mb-8 max-w-xl text-lg text-gray-600 dark:text-gray-400">
-            Cada profissional tem seu horário, seus serviços e sua agenda — o cliente agenda direto com quem faz.
-            Menos confusão, menos conflito, mais dinheiro no caixa.
+            Para pet shops e clínicas veterinárias que ainda gerenciam no caderninho ou no WhatsApp.
+            O PetFlow organiza agenda, clientes e faturamento — em menos de uma tarde.
           </p>
           <CheckoutButton className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30" />
           <p className="mt-3 text-xs text-gray-500 dark:text-gray-500">
@@ -73,8 +73,8 @@ export default function LandingPage() {
           <h2 className="mb-10 text-center text-2xl font-bold md:text-3xl">Você se identifica?</h2>
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              { emoji: '📱', title: 'Agenda bagunçada no WhatsApp', body: 'Você perde horários, esquece confirmações e ainda atende dois banhos no mesmo horário.' },
-              { emoji: '😕', title: 'Cliente volta e ninguém lembra do pet', body: 'Sem histórico, você pergunta tudo de novo — e passa a impressão de amador.' },
+              { emoji: '📱', title: 'Agenda bagunçada no WhatsApp', body: 'Você perde horários, esquece confirmações e ainda marca dois atendimentos no mesmo horário.' },
+              { emoji: '😕', title: 'Cliente volta e ninguém lembra do paciente', body: 'Sem histórico, você pergunta tudo de novo — e passa a impressão de amador, seja no banho ou na consulta.' },
               { emoji: '💸', title: 'No fim do dia, não sabe quanto entrou', body: 'Caderno rasurado, maquininha de um lado, Pix do outro. O caixa vira adivinhação.' },
             ].map((item) => (
               <div key={item.title} className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
@@ -110,8 +110,8 @@ export default function LandingPage() {
             </div>
             {/* Rows */}
             {[
-              { situation: 'Agendar um banho', before: 'WhatsApp + caderno + torcer pra não conflitar', after: 'Atendente abre o sistema, escolhe horário livre e confirma' },
-              { situation: 'Lembrar o histórico do pet', before: 'Pergunta tudo de novo a cada visita', after: 'Ficha completa com raça, alergias e todos os banhos anteriores' },
+              { situation: 'Agendar banho, tosa ou consulta', before: 'WhatsApp + caderno + torcer pra não conflitar', after: 'Abre o sistema, escolhe o profissional e o horário livre, confirma' },
+              { situation: 'Lembrar o histórico do paciente', before: 'Pergunta tudo de novo a cada visita', after: 'Ficha completa com raça, alergias, vacinas e todos os atendimentos anteriores' },
               { situation: 'Saber o faturamento do dia', before: 'Soma no caderno ou na maquininha no final do dia', after: 'Dashboard em tempo real, atualizado a cada serviço concluído' },
               { situation: 'Saber quais serviços mais vendem', before: 'Achismo ou planilha desatualizada', after: 'Gráfico de faturamento por período, atualizado a cada serviço concluído' },
               { situation: 'Clientes que sumiram', before: 'Não sabe quem parou de vir', after: 'Lista de inativos com data da última visita' },
@@ -131,15 +131,15 @@ export default function LandingPage() {
       {/* ── Features ───────────────────────────────────────────── */}
       <section className="bg-gray-50 px-4 py-16 dark:bg-gray-900/40">
         <div className="mx-auto max-w-4xl">
-          <h2 className="mb-3 text-center text-2xl font-bold md:text-3xl">Tudo que seu pet shop precisa</h2>
+          <h2 className="mb-3 text-center text-2xl font-bold md:text-3xl">Tudo que pet shops e clínicas precisam</h2>
           <p className="mb-10 text-center text-gray-500 dark:text-gray-400">Em menos de uma tarde você configura e já começa a usar.</p>
           <div className="grid gap-6 md:grid-cols-2">
             {[
-              { emoji: '📅', title: 'Agenda inteligente', body: 'Marque banho, tosa e consulta sem conflito de horário — e confirme com o tutor em 2 toques.' },
-              { emoji: '🐶', title: 'Ficha do cliente e do pet', body: 'Raça, pelagem, manias, vacinas. Tudo na mão quando o tutor cruzar a porta.' },
-              { emoji: '✂️', title: 'Catálogo de serviços', body: 'Cadastre banho, tosa, hidratação e pacotes com preço certinho — sem calcular na ponta do lápis.' },
-              { emoji: '📊', title: 'Faturamento e KPIs do dia', body: 'Veja quanto entrou, quais serviços venderam mais e quem são seus melhores clientes.' },
-              { emoji: '👩‍💼', title: 'Cada profissional, seus serviços', body: 'Defina quais serviços cada funcionário realiza. O atendente agenda sem erro — zero overbooking, zero serviço no profissional errado.' },
+              { emoji: '📅', title: 'Agenda inteligente', body: 'Marque banho, tosa, consulta ou qualquer serviço sem conflito de horário — e confirme com o tutor em 2 toques.' },
+              { emoji: '🐾', title: 'Ficha completa do cliente e do paciente', body: 'Raça, pelagem, manias, vacinas, alergias. Tudo na mão quando o tutor cruzar a porta — pet shop ou clínica.' },
+              { emoji: '✂️', title: 'Catálogo de serviços', body: 'Cadastre banho, tosa, consulta, hidratação — qualquer serviço com preço e duração certinhos, sem calcular na ponta do lápis.' },
+              { emoji: '📊', title: 'Faturamento e KPIs do dia', body: 'Veja quanto entrou, quais serviços venderam mais e quem são seus melhores clientes. Dashboard em tempo real.' },
+              { emoji: '👩‍💼', title: 'Cada profissional, seus serviços', body: 'Tosador, groomer, veterinário — cada um com seus serviços e sua grade. Zero overbooking, zero atendimento no profissional errado.' },
               { emoji: '🕐', title: 'Horário individual por profissional', body: 'Configure entrada, saída e folgas separado pra cada membro da equipe. O sistema bloqueia automaticamente quem não está disponível.' },
             ].map((f) => (
               <div key={f.title} className="flex gap-4 rounded-2xl border border-gray-100 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
@@ -207,7 +207,7 @@ export default function LandingPage() {
             <ul className="mb-8 space-y-3">
               {[
                 'Agenda inteligente sem conflito de horários',
-                'Clientes e pets com ficha completa e histórico',
+                'Tutores e pacientes com ficha completa e histórico de atendimentos',
                 'Catálogo de serviços e pacotes ilimitados',
                 'Faturamento diário e dashboard de KPIs',
                 'Agenda individual por profissional com serviços e horários próprios',
@@ -273,7 +273,7 @@ export default function LandingPage() {
               { q: 'Tem fidelidade ou multa pra cancelar?', a: 'Nenhuma. Você paga mês a mês e cancela quando quiser, sem burocracia.' },
               { q: 'E se eu cancelar — perco meus dados?', a: 'Não. Seus dados ficam seguros nos nossos servidores e nossa equipe te ajuda a extrair tudo antes do cancelamento. Clientes, pets, histórico — tudo seu, sempre.' },
               { q: 'Consigo migrar minha agenda atual?', a: 'Sim. A gente te ajuda a cadastrar seus clientes e pets na primeira semana, mesmo que esteja tudo no caderno ou no WhatsApp.' },
-              { q: 'Funciona pra pet shop pequeno, com 1 ou 2 funcionários?', a: 'Foi feito pra isso. O PetFlow foi desenhado pro dono que atende no balcão e precisa de algo simples, rápido e que não atrapalhe o dia.' },
+              { q: 'Funciona pra pet shop ou clínica veterinária pequena?', a: 'Foi feito pra isso. O PetFlow foi desenhado pro dono ou médico-veterinário que atende no balcão e precisa de algo simples, rápido e que não atrapalhe o dia — com 1 ou 10 profissionais.' },
               { q: 'E se eu não gostar? Tem garantia?', a: 'Sim. Você tem 7 dias de garantia total. Se não ficar satisfeito por qualquer motivo, devolvemos 100% do valor pago — sem perguntas e sem burocracia. É seu direito pelo Código de Defesa do Consumidor (Art. 49) e a gente cumpre com prazer.' },
             ].map((item) => (
               <details key={item.q} className="group rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
@@ -289,10 +289,10 @@ export default function LandingPage() {
       <section className="bg-emerald-600 px-4 py-20 text-center dark:bg-emerald-800">
         <div className="mx-auto max-w-2xl">
           <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
-            Seu próximo banho pode já sair organizado.
+            Seu próximo atendimento pode já sair organizado.
           </h2>
           <p className="mb-8 text-emerald-100">
-            R$29,90/mês pra ter agenda, equipe e caixa organizados num só lugar.
+            R$29,90/mês pra ter agenda, equipe e caixa organizados num só lugar — pet shop ou clínica vet.
             Ative agora e comece a usar hoje mesmo.
           </p>
           <CheckoutButton className="bg-white text-emerald-700 hover:bg-emerald-50 px-8 shadow-lg" />

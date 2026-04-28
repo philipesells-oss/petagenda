@@ -99,6 +99,15 @@ export function MobileBottomNav() {
           </Link>
         )
       })}
+      <form action={signOut}>
+        <button
+          type="submit"
+          className="flex flex-col items-center gap-0.5 rounded-lg px-2 py-1.5 text-[10px] font-medium text-muted-foreground transition-colors"
+        >
+          <LogOutIcon className="size-5" />
+          Sair
+        </button>
+      </form>
     </nav>
   )
 }

@@ -1,18 +1,7 @@
 'use client'
 
-import { LogOutIcon, UserIcon } from 'lucide-react'
-
+import Link from 'next/link'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { signOut } from '@/actions/auth'
 
 interface TopbarProps {
   shopName: string
@@ -21,6 +10,7 @@ interface TopbarProps {
 }
 
 function initials(name: string) {
+  if (!name) return 'U'
   return name
     .split(/\s+/)
     .slice(0, 2)
@@ -30,50 +20,22 @@ function initials(name: string) {
     .toUpperCase()
 }
 
-export function Topbar({ shopName, userName, userEmail }: TopbarProps) {
+export function Topbar({ shopName, userName, userEmail: _userEmail }: TopbarProps) {
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-background px-4">
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-semibold truncate max-w-[60vw]">{shopName}</span>
-      </div>
+      <span className="text-sm font-semibold truncate max-w-[60vw]">{shopName}</span>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button variant="ghost" size="icon" aria-label="Menu do usuário">
-              <Avatar className="size-8">
-                <AvatarFallback>{initials(userName) || 'U'}</AvatarFallback>
-              </Avatar>
-            </Button>
-          }
-        />
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{userName}</span>
-              {userEmail && (
-                <span className="text-xs text-muted-foreground truncate">{userEmail}</span>
-              )}
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <UserIcon className="size-4" />
-            Minha conta
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <form action={signOut}>
-            <DropdownMenuItem
-              render={
-                <button type="submit" className="w-full">
-                  <LogOutIcon className="size-4" />
-                  Sair
-                </button>
-              }
-            />
-          </form>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Link
+        href="/settings/profile"
+        aria-label="Minha conta"
+        className="rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        <Avatar className="size-9">
+          <AvatarFallback className="text-xs font-semibold">
+            {initials(userName)}
+          </AvatarFallback>
+        </Avatar>
+      </Link>
     </header>
   )
 }

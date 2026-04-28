@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 const PHRASES = [
   'sair do caderninho.',
   'ser mais lucrativo.',
+  'organizar cada consulta.',
   'impressionar clientes.',
 ]
 
