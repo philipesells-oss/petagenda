@@ -26,6 +26,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/lib/utils/format'
 import { buildDayGrid, timeToMinutes } from '@/lib/agenda/grid'
+import { useLanguage } from '@/lib/i18n'
 import { AppointmentCard } from './appointment-card'
 import { AppointmentForm } from './appointment-form'
 import { AppointmentDetail } from './appointment-detail'
@@ -90,6 +91,7 @@ export function AgendaView({
   businessHours,
 }: AgendaViewProps) {
   const router = useRouter()
+  const { t } = useLanguage()
   const [, startNav] = useTransition()
 
   const [createOpen, setCreateOpen] = useState(false)
@@ -214,7 +216,7 @@ export function AgendaView({
           className="rounded-xl border bg-card p-3 shadow-sm"
         />
         <Button className="w-full" onClick={() => openCreate()}>
-          <PlusIcon className="mr-1 size-4" /> Novo agendamento
+          <PlusIcon className="mr-1 size-4" /> {t.agenda.newAppointment}
         </Button>
       </aside>
 
@@ -265,13 +267,13 @@ export function AgendaView({
               size="sm"
               onClick={handleToday}
             >
-              Hoje
+              {t.agenda.today}
             </Button>
           </div>
 
           {/* New appointment button — mobile only (sidebar has it on md+) */}
           <Button className="md:hidden" onClick={() => openCreate()}>
-            <PlusIcon className="mr-1 size-4" /> Novo agendamento
+            <PlusIcon className="mr-1 size-4" /> {t.agenda.newAppointment}
           </Button>
         </div>
 
@@ -280,7 +282,7 @@ export function AgendaView({
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
             <UsersIcon className="size-4 shrink-0 text-muted-foreground" />
             {[
-              { id: 'all', name: `Todos (${items.length})` },
+              { id: 'all', name: `${t.agenda.all} (${items.length})` },
               ...employeeOptions.map((e) => ({
                 id: e.id,
                 name: `${e.name.split(' ')[0]} (${items.filter((i) => i.appointment.assigned_to === e.id).length})`,
@@ -354,7 +356,7 @@ export function AgendaView({
                           onClick={() => openCreate(slot.time)}
                           className="flex w-full items-center justify-center rounded-lg border border-dashed py-2 text-xs text-muted-foreground hover:border-foreground/40 hover:bg-muted"
                         >
-                          <PlusIcon className="mr-1 size-3.5" /> Agendar
+                          <PlusIcon className="mr-1 size-3.5" /> {t.agenda.scheduleSlot}
                         </button>
                       ) : (
                         <div className="flex h-8 items-center text-xs italic text-muted-foreground">
@@ -363,7 +365,7 @@ export function AgendaView({
                           slot.minutes >= breakStart &&
                           slot.minutes < breakEnd
                             ? 'Intervalo'
-                            : 'Fora do horário'}
+                            : t.agenda.outsideHours}
                         </div>
                       )}
                     </div>
@@ -379,9 +381,9 @@ export function AgendaView({
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Novo agendamento</DialogTitle>
+            <DialogTitle>{t.agenda.form.title}</DialogTitle>
             <DialogDescription>
-              Preencha os dados para agendar um serviço.
+              {t.agenda.form.subtitle}
             </DialogDescription>
           </DialogHeader>
           <AppointmentForm
@@ -403,9 +405,9 @@ export function AgendaView({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Detalhes do agendamento</DialogTitle>
+            <DialogTitle>{t.agenda.detail.title}</DialogTitle>
             <DialogDescription>
-              Veja os dados completos e gerencie o status.
+              {t.agenda.subtitle}
             </DialogDescription>
           </DialogHeader>
           {detailItem && (

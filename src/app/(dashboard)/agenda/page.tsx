@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 
 import { getCurrentUser } from '@/lib/auth/get-current-user'
 import { createClient } from '@/lib/supabase/server'
+import { getT } from '@/lib/server-i18n'
 import { dayOfWeek } from '@/lib/agenda/grid'
 import {
   AgendaView,
@@ -21,6 +22,8 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 export default async function AgendaPage({ searchParams }: PageProps) {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
+
+  const t = await getT()
 
   const sp = await searchParams
   const raw = typeof sp.date === 'string' ? sp.date : ''
@@ -101,9 +104,9 @@ export default async function AgendaPage({ searchParams }: PageProps) {
   return (
     <div className="mx-auto w-full max-w-6xl space-y-4 p-4 md:p-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Agenda</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t.agenda.title}</h1>
         <p className="text-sm text-muted-foreground">
-          Visualize e gerencie os agendamentos do dia.
+          {t.agenda.subtitle}
         </p>
       </header>
 

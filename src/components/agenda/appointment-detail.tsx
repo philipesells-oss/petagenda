@@ -12,7 +12,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { updateAppointmentStatus } from '@/actions/appointments'
 import { formatCurrency, formatTime } from '@/lib/utils/format'
 import { cn } from '@/lib/utils'
-import { STATUS_LABEL, STATUS_STYLE } from './appointment-card'
+import { useLanguage } from '@/lib/i18n'
+import { STATUS_STYLE } from './appointment-card'
 import type { AppointmentRow, AppointmentStatus } from '@/types'
 
 export interface AppointmentDetailProps {
@@ -36,9 +37,19 @@ export function AppointmentDetail(props: AppointmentDetailProps) {
     onClose,
   } = props
 
+  const { t } = useLanguage()
   const [pending, startTransition] = useTransition()
   const [showCancelBox, setShowCancelBox] = useState(false)
   const [cancelReason, setCancelReason] = useState('')
+
+  const STATUS_LABEL: Record<AppointmentStatus, string> = {
+    scheduled: t.agenda.status.scheduled,
+    confirmed: t.agenda.status.confirmed,
+    in_progress: t.agenda.status.inProgress,
+    completed: t.agenda.status.completed,
+    canceled: t.agenda.status.cancelled,
+    no_show: t.agenda.status.noShow,
+  }
 
   function change(status: AppointmentStatus, reason?: string) {
     startTransition(async () => {
@@ -47,7 +58,7 @@ export function AppointmentDetail(props: AppointmentDetailProps) {
         toast.error(res.error)
         return
       }
-      toast.success('Status atualizado')
+      toast.success(t.agenda.detail.title)
       onChanged?.()
     })
   }
@@ -72,20 +83,20 @@ export function AppointmentDetail(props: AppointmentDetailProps) {
             {STATUS_LABEL[status]}
           </span>
         </div>
-        <p className="text-sm text-muted-foreground">Pet: {petName}</p>
+        <p className="text-sm text-muted-foreground">{t.common.pet}: {petName}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 text-sm">
-        <Field label="Serviço" value={serviceName} />
+        <Field label={t.common.service} value={serviceName} />
         <Field
-          label="Horário"
+          label={t.agenda.form.time}
           value={`${formatTime(appointment.start_time)} – ${formatTime(appointment.end_time)}`}
         />
-        <Field label="Data" value={appointment.date} />
-        <Field label="Preço" value={formatCurrency(appointment.price)} />
+        <Field label={t.agenda.form.date} value={appointment.date} />
+        <Field label={t.agenda.detail.price} value={formatCurrency(appointment.price)} />
         <Field
-          label="Funcionário"
-          value={employeeName ?? 'Qualquer um'}
+          label={t.agenda.detail.employee}
+          value={employeeName ?? t.agenda.detail.unassigned}
         />
         <Field
           label="Origem"
@@ -103,7 +114,7 @@ export function AppointmentDetail(props: AppointmentDetailProps) {
 
       {appointment.notes && (
         <div className="rounded-lg border p-3">
-          <p className="text-xs font-medium text-muted-foreground">Notas</p>
+          <p className="text-xs font-medium text-muted-foreground">{t.agenda.detail.notes}</p>
           <p className="whitespace-pre-wrap text-sm">{appointment.notes}</p>
         </div>
       )}
@@ -123,14 +134,14 @@ export function AppointmentDetail(props: AppointmentDetailProps) {
       {status === 'scheduled' && (
         <ActionRow pending={pending}>
           <Button onClick={() => change('confirmed')} disabled={pending}>
-            Confirmar
+            {t.agenda.detail.confirmAction}
           </Button>
           <Button
             variant="outline"
             onClick={() => setShowCancelBox((v) => !v)}
             disabled={pending}
           >
-            Cancelar
+            {t.agenda.detail.cancelAction}
           </Button>
         </ActionRow>
       )}
@@ -138,14 +149,14 @@ export function AppointmentDetail(props: AppointmentDetailProps) {
       {status === 'confirmed' && (
         <ActionRow pending={pending}>
           <Button onClick={() => change('in_progress')} disabled={pending}>
-            Iniciar serviço
+            {t.agenda.detail.startAction}
           </Button>
           <Button
             variant="outline"
             onClick={() => setShowCancelBox((v) => !v)}
             disabled={pending}
           >
-            Cancelar
+            {t.agenda.detail.cancelAction}
           </Button>
         </ActionRow>
       )}
@@ -153,14 +164,14 @@ export function AppointmentDetail(props: AppointmentDetailProps) {
       {status === 'in_progress' && (
         <ActionRow pending={pending}>
           <Button onClick={() => change('completed')} disabled={pending}>
-            Concluir
+            {t.agenda.detail.completeAction}
           </Button>
           <Button
             variant="outline"
             onClick={() => change('no_show')}
             disabled={pending}
           >
-            Não compareceu
+            {t.agenda.detail.noShowAction}
           </Button>
         </ActionRow>
       )}
@@ -180,7 +191,7 @@ export function AppointmentDetail(props: AppointmentDetailProps) {
               size="sm"
               onClick={() => setShowCancelBox(false)}
             >
-              Voltar
+              {t.common.back}
             </Button>
             <Button
               type="button"
@@ -189,7 +200,7 @@ export function AppointmentDetail(props: AppointmentDetailProps) {
               onClick={handleCancelSubmit}
               disabled={pending}
             >
-              Confirmar cancelamento
+              {t.agenda.detail.confirmAction} {t.agenda.detail.cancelAction.toLowerCase()}
             </Button>
           </div>
         </div>
@@ -200,7 +211,7 @@ export function AppointmentDetail(props: AppointmentDetailProps) {
         status === 'no_show') && (
         <div className="flex justify-end">
           <Button variant="outline" onClick={onClose}>
-            Fechar
+            {t.common.back}
           </Button>
         </div>
       )}

@@ -26,6 +26,7 @@ import {
 } from '@/actions/appointments'
 import { getServicesByEmployeeAction, getEmployeesByServiceAction } from '@/actions/team'
 import { createClientAction, createPetAction } from '@/actions/clients'
+import { useLanguage } from '@/lib/i18n'
 import type {
   AppointmentRow,
   ClientRow,
@@ -53,6 +54,8 @@ export function AppointmentForm(props: AppointmentFormProps) {
   const { tenantId, date, initial, defaultStartTime, onSuccess, onCancel } =
     props
   const isEdit = !!initial
+
+  const { t } = useLanguage()
 
   const [clients, setClients] = useState<ClientRow[]>([])
   const [pets, setPets] = useState<PetRow[]>([])
@@ -394,9 +397,9 @@ export function AppointmentForm(props: AppointmentFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Client combobox (native datalist-style, simple & reliable) */}
+      {/* Client combobox */}
       <div className="space-y-2">
-        <Label htmlFor="client_search">Cliente *</Label>
+        <Label htmlFor="client_search">{t.agenda.form.client} *</Label>
         {selectedClient ? (
           <div className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
             <div>
@@ -421,7 +424,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
           <>
             <Input
               id="client_search"
-              placeholder="Buscar por nome ou telefone…"
+              placeholder={t.agenda.form.searchClient}
               value={clientQuery}
               onChange={(e) => setClientQuery(e.target.value)}
               autoComplete="off"
@@ -465,7 +468,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
                 <p className="font-medium">Cadastro rápido</p>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label className="text-xs">Nome *</Label>
+                    <Label className="text-xs">{t.common.name} *</Label>
                     <Input
                       placeholder="Nome completo"
                       value={quickName}
@@ -473,7 +476,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">Telefone *</Label>
+                    <Label className="text-xs">{t.common.phone} *</Label>
                     <Input
                       placeholder="(11) 99999-9999"
                       value={quickPhone}
@@ -545,7 +548,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
                     size="sm"
                     onClick={() => setShowQuickCreate(false)}
                   >
-                    Cancelar
+                    {t.common.cancel}
                   </Button>
                   <Button
                     type="button"
@@ -553,7 +556,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
                     disabled={quickPending}
                     onClick={handleQuickCreate}
                   >
-                    {quickPending ? 'Salvando…' : 'Cadastrar'}
+                    {quickPending ? t.agenda.form.saving : 'Cadastrar'}
                   </Button>
                 </div>
               </div>
@@ -565,14 +568,14 @@ export function AppointmentForm(props: AppointmentFormProps) {
       {/* Pet (filtered by client) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="pet_id">Pet *</Label>
+          <Label htmlFor="pet_id">{t.agenda.form.pet} *</Label>
           {clientId && (
             <button
               type="button"
               className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
               onClick={() => setShowAddPet((v) => !v)}
             >
-              {showAddPet ? 'Cancelar' : '+ Adicionar pet'}
+              {showAddPet ? t.common.cancel : `+ ${t.clientDetail.addPet}`}
             </button>
           )}
         </div>
@@ -588,7 +591,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
                 {petId
                   ? (pets.find((p) => p.id === petId)?.name ?? 'Selecione o pet')
                   : !clientId
-                  ? 'Escolha o cliente primeiro'
+                  ? t.agenda.form.selectClientFirst
                   : pets.length === 0
                   ? 'Nenhum pet — clique em + Adicionar pet'
                   : 'Selecione o pet'}
@@ -609,7 +612,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
             <p className="font-medium">Novo pet</p>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <Label className="text-xs">Nome *</Label>
+                <Label className="text-xs">{t.common.name} *</Label>
                 <Input placeholder="Ex: Bella" value={addPetName} onChange={(e) => setAddPetName(e.target.value)} />
               </div>
               <div className="space-y-1">
@@ -641,7 +644,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
             </div>
             <div className="flex justify-end">
               <Button type="button" size="sm" disabled={addPetPending} onClick={handleAddPet}>
-                {addPetPending ? 'Salvando…' : 'Salvar pet'}
+                {addPetPending ? t.agenda.form.saving : 'Salvar pet'}
               </Button>
             </div>
           </div>
@@ -650,11 +653,11 @@ export function AppointmentForm(props: AppointmentFormProps) {
 
       {/* Service */}
       <div className="space-y-2">
-        <Label htmlFor="service_id">Serviço *</Label>
+        <Label htmlFor="service_id">{t.agenda.form.service} *</Label>
         <Select value={serviceId} onValueChange={(v) => setServiceId(v ?? '')}>
           <SelectTrigger id="service_id">
             <span className={serviceId ? '' : 'text-muted-foreground'}>
-              {serviceId ? (services.find(s => s.id === serviceId)?.name ?? serviceId) : 'Selecione o serviço'}
+              {serviceId ? (services.find(s => s.id === serviceId)?.name ?? serviceId) : t.agenda.form.selectService}
             </span>
           </SelectTrigger>
           <SelectContent>
@@ -669,18 +672,18 @@ export function AppointmentForm(props: AppointmentFormProps) {
 
       {/* Employee */}
       <div className="space-y-2">
-        <Label htmlFor="assigned_to">Funcionário</Label>
+        <Label htmlFor="assigned_to">{t.agenda.form.employee}</Label>
         <Select
           value={assignedTo || '__any__'}
           onValueChange={(v) => setAssignedTo(v === '__any__' || v == null ? '' : v)}
         >
           <SelectTrigger id="assigned_to">
             <span className={assignedTo ? '' : 'text-muted-foreground'}>
-              {assignedTo ? (users.find(u => u.id === assignedTo)?.full_name ?? assignedTo) : 'Qualquer um'}
+              {assignedTo ? (users.find(u => u.id === assignedTo)?.full_name ?? assignedTo) : t.agenda.form.anyEmployee}
             </span>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__any__">Qualquer um</SelectItem>
+            <SelectItem value="__any__">{t.agenda.form.anyEmployee}</SelectItem>
             {users.map((u) => (
               <SelectItem key={u.id} value={u.id}>
                 {u.full_name}
@@ -692,7 +695,7 @@ export function AppointmentForm(props: AppointmentFormProps) {
 
       {/* Start time (only available slots) */}
       <div className="space-y-2">
-        <Label htmlFor="start_time">Horário *</Label>
+        <Label htmlFor="start_time">{t.agenda.form.time} *</Label>
         <Select
           value={startTime}
           onValueChange={(v) => setStartTime(v ?? '')}
@@ -700,25 +703,25 @@ export function AppointmentForm(props: AppointmentFormProps) {
         >
           <SelectTrigger id="start_time">
             <SelectValue
-              placeholder={serviceId ? 'Selecione o horário' : 'Escolha o serviço primeiro'}
+              placeholder={serviceId ? 'Selecione o horário' : t.agenda.form.selectService}
             />
           </SelectTrigger>
           <SelectContent>
             {slots.map((s) => (
               <SelectItem key={s.time} value={s.time} disabled={!s.available}>
-                {s.time} {!s.available ? '(indisponível)' : ''}
+                {s.time} {!s.available ? `(${t.agenda.unavailable})` : ''}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
         <p className="text-xs text-muted-foreground">
-          Data: <strong>{date}</strong>
+          {t.agenda.form.date}: <strong>{date}</strong>
         </p>
       </div>
 
       {/* Price */}
       <div className="space-y-2">
-        <Label htmlFor="price">Preço (R$)</Label>
+        <Label htmlFor="price">{t.agenda.form.price}</Label>
         <Input
           id="price"
           type="number"
@@ -731,24 +734,24 @@ export function AppointmentForm(props: AppointmentFormProps) {
 
       {/* Notes */}
       <div className="space-y-2">
-        <Label htmlFor="notes">Notas</Label>
+        <Label htmlFor="notes">{t.agenda.form.notes}</Label>
         <Textarea
           id="notes"
           rows={3}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Observações do agendamento"
+          placeholder={t.agenda.form.notesPlaceholder}
         />
       </div>
 
       <div className="flex justify-end gap-2 pt-2">
         {onCancel && (
           <Button type="button" variant="outline" onClick={onCancel}>
-            Cancelar
+            {t.agenda.form.cancel}
           </Button>
         )}
         <Button type="submit" disabled={pending}>
-          {pending ? 'Salvando…' : isEdit ? 'Salvar' : 'Agendar'}
+          {pending ? t.agenda.form.saving : isEdit ? t.common.save : t.agenda.form.submit}
         </Button>
       </div>
     </form>

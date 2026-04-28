@@ -4,6 +4,7 @@ import { MessageCircleIcon, LayoutTemplateIcon, ClipboardListIcon } from 'lucide
 
 import { getCurrentUser } from '@/lib/auth/get-current-user'
 import { createClient } from '@/lib/supabase/server'
+import { getT } from '@/lib/server-i18n'
 import { SetupForm } from '@/components/whatsapp/setup-form'
 import { ConnectionStatus } from '@/components/whatsapp/connection-status'
 import { QrCodeCard } from '@/components/whatsapp/qr-code-card'
@@ -18,6 +19,7 @@ export default async function WhatsappPage() {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
+  const t = await getT()
   const supabase = await createClient()
   const { data: config } = await supabase
     .from('whatsapp_config')
@@ -32,9 +34,9 @@ export default async function WhatsappPage() {
       <div className="flex items-center gap-3">
         <MessageCircleIcon className="size-6 text-green-500" />
         <div>
-          <h1 className="text-xl font-semibold">WhatsApp</h1>
+          <h1 className="text-xl font-semibold">{t.whatsapp.title}</h1>
           <p className="text-sm text-muted-foreground">
-            Conecte seu número e automatize mensagens
+            {t.whatsapp.subtitle}
           </p>
         </div>
       </div>
@@ -43,11 +45,11 @@ export default async function WhatsappPage() {
       <div className="flex flex-wrap gap-2">
         <Link href="/whatsapp/templates" className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}>
           <LayoutTemplateIcon className="mr-1.5 size-4" />
-          Templates
+          {t.whatsapp.templates}
         </Link>
         <Link href="/whatsapp/logs" className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}>
           <ClipboardListIcon className="mr-1.5 size-4" />
-          Histórico
+          {t.whatsapp.logs}
         </Link>
       </div>
 

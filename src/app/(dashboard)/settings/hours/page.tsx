@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser } from '@/lib/auth/get-current-user'
+import { getT } from '@/lib/server-i18n'
 import { HoursForm } from '@/components/settings/hours-form'
 import type { BusinessHourRow } from '@/types'
 import type { BusinessHourInput } from '@/actions/settings'
@@ -11,6 +12,7 @@ export default async function HoursSettingsPage() {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
+  const t = await getT()
   const supabase = await createClient()
   const { data } = await supabase
     .from('business_hours')
@@ -30,9 +32,9 @@ export default async function HoursSettingsPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Horário de Funcionamento</h1>
+        <h1 className="text-2xl font-bold">{t.settings.hoursTitle}</h1>
         <p className="text-muted-foreground text-sm">
-          Configure os dias e horários de atendimento do seu pet shop.
+          {t.settings.hoursPageSubtitle}
         </p>
       </div>
       <HoursForm initial={initial} />

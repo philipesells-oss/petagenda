@@ -6,6 +6,7 @@
 
 import { cn } from '@/lib/utils'
 import { formatTime } from '@/lib/utils/format'
+import { useLanguage } from '@/lib/i18n'
 import type { AppointmentStatus } from '@/types'
 
 export interface AppointmentCardProps {
@@ -19,15 +20,6 @@ export interface AppointmentCardProps {
   employeeName?: string | null
   status: AppointmentStatus
   onClick?: () => void
-}
-
-const STATUS_LABEL: Record<AppointmentStatus, string> = {
-  scheduled: 'Agendado',
-  confirmed: 'Confirmado',
-  in_progress: 'Em andamento',
-  completed: 'Concluído',
-  canceled: 'Cancelado',
-  no_show: 'Não compareceu',
 }
 
 const STATUS_STYLE: Record<AppointmentStatus, string> = {
@@ -53,6 +45,17 @@ export function AppointmentCard(props: AppointmentCardProps) {
     status,
     onClick,
   } = props
+
+  const { t } = useLanguage()
+
+  const STATUS_LABEL: Record<AppointmentStatus, string> = {
+    scheduled: t.agenda.status.scheduled,
+    confirmed: t.agenda.status.confirmed,
+    in_progress: t.agenda.status.inProgress,
+    completed: t.agenda.status.completed,
+    canceled: t.agenda.status.cancelled,
+    no_show: t.agenda.status.noShow,
+  }
 
   const bg = serviceColor ?? '#3b82f6'
 
@@ -97,4 +100,4 @@ export function AppointmentCard(props: AppointmentCardProps) {
   )
 }
 
-export { STATUS_LABEL, STATUS_STYLE }
+export { STATUS_STYLE }

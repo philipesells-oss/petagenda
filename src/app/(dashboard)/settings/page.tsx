@@ -8,44 +8,47 @@ import {
   ChevronRightIcon,
 } from 'lucide-react'
 import { getCurrentUser } from '@/lib/auth/get-current-user'
+import { getT } from '@/lib/server-i18n'
 
 export default async function SettingsPage() {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
+  const t = await getT()
+
   const items = [
     {
       href: '/settings/profile',
       icon: BuildingIcon,
-      title: 'Informações do Pet Shop',
-      description: 'Nome, endereço e telefone do seu pet shop.',
+      title: t.settings.profileTitle,
+      description: t.settings.profileSubtitle,
     },
     {
       href: '/settings/hours',
       icon: ClockIcon,
-      title: 'Horário de funcionamento',
-      description: 'Dias e horários em que o pet shop atende.',
+      title: t.settings.hoursTitle,
+      description: t.settings.hoursSubtitle,
     },
     {
       href: '/settings/services',
       icon: ScissorsIcon,
-      title: 'Serviços',
-      description: 'Cadastre e edite os serviços oferecidos.',
+      title: t.settings.servicesTitle,
+      description: t.settings.servicesSubtitle,
     },
     {
       href: '/settings/team',
       icon: UsersIcon,
-      title: 'Equipe',
-      description: 'Adicione funcionários e gerencie acessos.',
+      title: t.settings.teamTitle,
+      description: t.settings.teamSubtitle,
     },
   ]
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6 p-4 md:p-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Configurações</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t.settings.title}</h1>
         <p className="text-sm text-muted-foreground">
-          Gerencie as configurações do seu pet shop.
+          {t.settings.subtitle}
         </p>
       </header>
 

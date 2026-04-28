@@ -33,6 +33,17 @@ export interface Translations {
     inactive: string
     blocked: string
     schedule: string
+    any: string
+    employee: string
+    service: string
+    pet: string
+    noAppointments: string
+    total: string
+    name: string
+    phone: string
+    email: string
+    address: string
+    actions: string
   }
   clientDetail: {
     title: string
@@ -60,12 +71,60 @@ export interface Translations {
   }
   agenda: {
     title: string
+    subtitle: string
+    newAppointment: string
     today: string
+    all: string
+    outsideHours: string
+    scheduleSlot: string
     schedule: string
     noAppointments: string
     slot: string
     available: string
     unavailable: string
+    form: {
+      title: string
+      titleEdit: string
+      subtitle: string
+      client: string
+      searchClient: string
+      pet: string
+      selectClientFirst: string
+      service: string
+      selectService: string
+      employee: string
+      anyEmployee: string
+      time: string
+      date: string
+      price: string
+      notes: string
+      notesPlaceholder: string
+      cancel: string
+      submit: string
+      saving: string
+      noSlotsAvailable: string
+    }
+    status: {
+      scheduled: string
+      confirmed: string
+      inProgress: string
+      completed: string
+      cancelled: string
+      noShow: string
+    }
+    detail: {
+      title: string
+      confirmAction: string
+      startAction: string
+      completeAction: string
+      cancelAction: string
+      noShowAction: string
+      employee: string
+      unassigned: string
+      price: string
+      notes: string
+      history: string
+    }
   }
   dashboard: {
     title: string
@@ -81,10 +140,15 @@ export interface Translations {
   }
   settings: {
     title: string
+    subtitle: string
     profile: string
+    profileSubtitle: string
     hours: string
+    hoursSubtitle: string
     services: string
+    servicesSubtitle: string
     team: string
+    teamSubtitle: string
     save: string
     shopName: string
     phone: string
@@ -93,10 +157,27 @@ export interface Translations {
     closed: string
     copyWeekdays: string
     profileTitle: string
-    profileSubtitle: string
+    profilePageSubtitle: string
+    hoursTitle: string
+    hoursPageSubtitle: string
+    servicesTitle: string
+    servicesPageSubtitle: string
+    teamTitle: string
+    teamPageSubtitle: string
   }
   whatsapp: {
     title: string
+    subtitle: string
+    templatesTitle: string
+    templatesSubtitle: string
+    logsTitle: string
+    logsSubtitle: string
+    noConfig: string
+    saveConfig: string
+    instanceId: string
+    token: string
+    connecting: string
+    connectedSince: string
     templates: string
     logs: string
     connect: string
@@ -172,6 +253,9 @@ export const translations: Record<Locale, Translations> = {
     common: {
       save: 'Salvar', cancel: 'Cancelar', edit: 'Editar', delete: 'Deletar', back: 'Voltar', loading: 'Carregando...',
       yes: 'Sim', no: 'Não', new: 'Novo', search: 'Buscar', active: 'Ativo', inactive: 'Inativo', blocked: 'Bloqueado', schedule: 'Agendar',
+      any: 'Qualquer', employee: 'Funcionário', service: 'Serviço', pet: 'Pet',
+      noAppointments: 'Nenhum agendamento', total: 'Total', name: 'Nome', phone: 'Telefone',
+      email: 'E-mail', address: 'Endereço', actions: 'Ações',
     },
     clientDetail: {
       title: 'Cliente', totalSpent: 'Total gasto', points: 'Pontos', visits: 'Visitas', whatsappOptIn: 'WhatsApp',
@@ -184,18 +268,103 @@ export const translations: Record<Locale, Translations> = {
       title: 'Clientes', new: 'Novo cliente', tutor: 'Tutor', status: 'Status', lastVisit: 'Última visita', totalSpent: 'Total gasto', phone: 'Telefone',
       subtitle: 'Tutores cadastrados no seu pet shop',
     },
-    agenda: { title: 'Agenda', today: 'Hoje', schedule: 'Agendar', noAppointments: 'Nenhum agendamento', slot: 'Horário', available: 'Disponível', unavailable: 'Indisponível' },
+    agenda: {
+      title: 'Agenda',
+      subtitle: 'Visualize e gerencie os agendamentos do dia.',
+      newAppointment: 'Novo agendamento',
+      today: 'Hoje',
+      all: 'Todos',
+      outsideHours: 'Fora do horário',
+      scheduleSlot: 'Agendar',
+      schedule: 'Agendar',
+      noAppointments: 'Nenhum agendamento',
+      slot: 'Horário',
+      available: 'Disponível',
+      unavailable: 'Indisponível',
+      form: {
+        title: 'Novo agendamento',
+        titleEdit: 'Editar agendamento',
+        subtitle: 'Preencha os dados para agendar um serviço.',
+        client: 'Cliente',
+        searchClient: 'Buscar por nome ou telefone…',
+        pet: 'Pet',
+        selectClientFirst: 'Escolha o cliente primeiro',
+        service: 'Serviço',
+        selectService: 'Selecione o serviço',
+        employee: 'Funcionário',
+        anyEmployee: 'Qualquer um',
+        time: 'Horário',
+        date: 'Data',
+        price: 'Preço (R$)',
+        notes: 'Notas',
+        notesPlaceholder: 'Observações do agendamento',
+        cancel: 'Cancelar',
+        submit: 'Agendar',
+        saving: 'Salvando…',
+        noSlotsAvailable: 'Nenhum horário disponível',
+      },
+      status: {
+        scheduled: 'Agendado',
+        confirmed: 'Confirmado',
+        inProgress: 'Em andamento',
+        completed: 'Concluído',
+        cancelled: 'Cancelado',
+        noShow: 'Não compareceu',
+      },
+      detail: {
+        title: 'Detalhes do agendamento',
+        confirmAction: 'Confirmar',
+        startAction: 'Iniciar serviço',
+        completeAction: 'Concluir',
+        cancelAction: 'Cancelar',
+        noShowAction: 'Não compareceu',
+        employee: 'Funcionário',
+        unassigned: 'Qualquer um',
+        price: 'Preço',
+        notes: 'Notas',
+        history: 'Histórico',
+      },
+    },
     dashboard: {
       title: 'Dashboard', today: 'Hoje', revenue: 'Faturamento', appointments: 'Agendamentos', clients: 'Clientes', newClients: 'Novos clientes',
       thisMonth: 'Este mês', topServices: 'Serviços mais vendidos', welcome: 'Olá', summary: 'Bem-vindo ao PetFlow. Aqui está o resumo do seu dia.',
     },
     settings: {
-      title: 'Configurações', profile: 'Perfil', hours: 'Horários', services: 'Serviços', team: 'Equipe', save: 'Salvar',
+      title: 'Configurações',
+      subtitle: 'Gerencie as configurações do seu pet shop.',
+      profile: 'Perfil',
+      profileSubtitle: 'Nome, endereço e telefone do seu pet shop.',
+      hours: 'Horários',
+      hoursSubtitle: 'Dias e horários em que o pet shop atende.',
+      services: 'Serviços',
+      servicesSubtitle: 'Cadastre e edite os serviços oferecidos.',
+      team: 'Equipe',
+      teamSubtitle: 'Adicione funcionários e gerencie acessos.',
+      save: 'Salvar',
       shopName: 'Nome do pet shop', phone: 'Telefone', address: 'Endereço', open: 'Aberto', closed: 'Fechado', copyWeekdays: 'Copiar para dias úteis',
-      profileTitle: 'Informações do Pet Shop', profileSubtitle: 'Nome, endereço e telefone do seu pet shop.',
+      profileTitle: 'Informações do Pet Shop',
+      profilePageSubtitle: 'Nome, endereço e telefone do seu pet shop.',
+      hoursTitle: 'Horário de Funcionamento',
+      hoursPageSubtitle: 'Configure os dias e horários de atendimento do seu pet shop.',
+      servicesTitle: 'Serviços',
+      servicesPageSubtitle: 'Gerencie os serviços oferecidos pelo seu pet shop.',
+      teamTitle: 'Equipe',
+      teamPageSubtitle: 'Gerencie os funcionários do seu pet shop.',
     },
     whatsapp: {
-      title: 'WhatsApp', templates: 'Templates', logs: 'Histórico', connect: 'Conectar', disconnect: 'Desconectar',
+      title: 'WhatsApp',
+      subtitle: 'Conecte seu número e automatize mensagens',
+      templatesTitle: 'Templates de Mensagens',
+      templatesSubtitle: 'Templates padrão do sistema + seus templates personalizados',
+      logsTitle: 'Histórico de Mensagens',
+      logsSubtitle: 'Últimas 100 mensagens enviadas via WhatsApp',
+      noConfig: 'Configure a integração abaixo para começar.',
+      saveConfig: 'Salvar configuração',
+      instanceId: 'ID da instância',
+      token: 'Token',
+      connecting: 'Conectando...',
+      connectedSince: 'Conectado desde',
+      templates: 'Templates', logs: 'Histórico', connect: 'Conectar', disconnect: 'Desconectar',
       status: { connected: 'Conectado', disconnected: 'Desconectado', connecting: 'Conectando...' },
     },
     onboarding: { welcome: 'Bem-vindo!', step1: 'Configure seu pet shop', step2: 'Cadastre seus serviços', step3: 'Pronto!' },
@@ -206,6 +375,9 @@ export const translations: Record<Locale, Translations> = {
     common: {
       save: 'Guardar', cancel: 'Cancelar', edit: 'Editar', delete: 'Eliminar', back: 'Voltar', loading: 'A carregar...',
       yes: 'Sim', no: 'Não', new: 'Novo', search: 'Pesquisar', active: 'Ativo', inactive: 'Inativo', blocked: 'Bloqueado', schedule: 'Marcar',
+      any: 'Qualquer', employee: 'Funcionário', service: 'Serviço', pet: 'Animal',
+      noAppointments: 'Sem marcações', total: 'Total', name: 'Nome', phone: 'Telemóvel',
+      email: 'E-mail', address: 'Morada', actions: 'Ações',
     },
     clientDetail: {
       title: 'Cliente', totalSpent: 'Total gasto', points: 'Pontos', visits: 'Visitas', whatsappOptIn: 'WhatsApp',
@@ -218,18 +390,103 @@ export const translations: Record<Locale, Translations> = {
       title: 'Clientes', new: 'Novo cliente', tutor: 'Tutor', status: 'Estado', lastVisit: 'Última visita', totalSpent: 'Total gasto', phone: 'Telemóvel',
       subtitle: 'Tutores registados na sua pet shop',
     },
-    agenda: { title: 'Agenda', today: 'Hoje', schedule: 'Marcar', noAppointments: 'Sem marcações', slot: 'Horário', available: 'Disponível', unavailable: 'Indisponível' },
+    agenda: {
+      title: 'Agenda',
+      subtitle: 'Visualize e gira as marcações do dia.',
+      newAppointment: 'Nova marcação',
+      today: 'Hoje',
+      all: 'Todos',
+      outsideHours: 'Fora do horário',
+      scheduleSlot: 'Marcar',
+      schedule: 'Marcar',
+      noAppointments: 'Sem marcações',
+      slot: 'Horário',
+      available: 'Disponível',
+      unavailable: 'Indisponível',
+      form: {
+        title: 'Nova marcação',
+        titleEdit: 'Editar marcação',
+        subtitle: 'Preencha os dados para marcar um serviço.',
+        client: 'Cliente',
+        searchClient: 'Pesquisar por nome ou telemóvel…',
+        pet: 'Animal',
+        selectClientFirst: 'Escolha o cliente primeiro',
+        service: 'Serviço',
+        selectService: 'Selecione o serviço',
+        employee: 'Funcionário',
+        anyEmployee: 'Qualquer um',
+        time: 'Horário',
+        date: 'Data',
+        price: 'Preço (€)',
+        notes: 'Notas',
+        notesPlaceholder: 'Observações da marcação',
+        cancel: 'Cancelar',
+        submit: 'Marcar',
+        saving: 'A guardar…',
+        noSlotsAvailable: 'Nenhum horário disponível',
+      },
+      status: {
+        scheduled: 'Marcado',
+        confirmed: 'Confirmado',
+        inProgress: 'Em curso',
+        completed: 'Concluído',
+        cancelled: 'Cancelado',
+        noShow: 'Não compareceu',
+      },
+      detail: {
+        title: 'Detalhes da marcação',
+        confirmAction: 'Confirmar',
+        startAction: 'Iniciar serviço',
+        completeAction: 'Concluir',
+        cancelAction: 'Cancelar',
+        noShowAction: 'Não compareceu',
+        employee: 'Funcionário',
+        unassigned: 'Qualquer um',
+        price: 'Preço',
+        notes: 'Notas',
+        history: 'Histórico',
+      },
+    },
     dashboard: {
       title: 'Painel', today: 'Hoje', revenue: 'Faturação', appointments: 'Marcações', clients: 'Clientes', newClients: 'Novos clientes',
       thisMonth: 'Este mês', topServices: 'Serviços mais vendidos', welcome: 'Olá', summary: 'Bem-vindo ao PetFlow. Aqui está o resumo do seu dia.',
     },
     settings: {
-      title: 'Definições', profile: 'Perfil', hours: 'Horários', services: 'Serviços', team: 'Equipa', save: 'Guardar',
+      title: 'Definições',
+      subtitle: 'Gira as definições da sua pet shop.',
+      profile: 'Perfil',
+      profileSubtitle: 'Nome, morada e telemóvel da sua pet shop.',
+      hours: 'Horários',
+      hoursSubtitle: 'Dias e horários em que a pet shop atende.',
+      services: 'Serviços',
+      servicesSubtitle: 'Crie e edite os serviços oferecidos.',
+      team: 'Equipa',
+      teamSubtitle: 'Adicione funcionários e gira acessos.',
+      save: 'Guardar',
       shopName: 'Nome da pet shop', phone: 'Telemóvel', address: 'Morada', open: 'Aberto', closed: 'Fechado', copyWeekdays: 'Copiar para dias úteis',
-      profileTitle: 'Informações da Pet Shop', profileSubtitle: 'Nome, morada e telemóvel da sua pet shop.',
+      profileTitle: 'Informações da Pet Shop',
+      profilePageSubtitle: 'Nome, morada e telemóvel da sua pet shop.',
+      hoursTitle: 'Horário de Funcionamento',
+      hoursPageSubtitle: 'Configure os dias e horários de atendimento da sua pet shop.',
+      servicesTitle: 'Serviços',
+      servicesPageSubtitle: 'Gira os serviços oferecidos pela sua pet shop.',
+      teamTitle: 'Equipa',
+      teamPageSubtitle: 'Gira os funcionários da sua pet shop.',
     },
     whatsapp: {
-      title: 'WhatsApp', templates: 'Modelos', logs: 'Histórico', connect: 'Ligar', disconnect: 'Desligar',
+      title: 'WhatsApp',
+      subtitle: 'Ligue o seu número e automatize mensagens',
+      templatesTitle: 'Modelos de Mensagens',
+      templatesSubtitle: 'Modelos padrão do sistema + os seus modelos personalizados',
+      logsTitle: 'Histórico de Mensagens',
+      logsSubtitle: 'Últimas 100 mensagens enviadas via WhatsApp',
+      noConfig: 'Configure a integração abaixo para começar.',
+      saveConfig: 'Guardar configuração',
+      instanceId: 'ID da instância',
+      token: 'Token',
+      connecting: 'A ligar...',
+      connectedSince: 'Ligado desde',
+      templates: 'Modelos', logs: 'Histórico', connect: 'Ligar', disconnect: 'Desligar',
       status: { connected: 'Ligado', disconnected: 'Desligado', connecting: 'A ligar...' },
     },
     onboarding: { welcome: 'Bem-vindo!', step1: 'Configure a sua pet shop', step2: 'Registe os seus serviços', step3: 'Pronto!' },
@@ -240,6 +497,9 @@ export const translations: Record<Locale, Translations> = {
     common: {
       save: 'Save', cancel: 'Cancel', edit: 'Edit', delete: 'Delete', back: 'Back', loading: 'Loading...',
       yes: 'Yes', no: 'No', new: 'New', search: 'Search', active: 'Active', inactive: 'Inactive', blocked: 'Blocked', schedule: 'Schedule',
+      any: 'Any', employee: 'Employee', service: 'Service', pet: 'Pet',
+      noAppointments: 'No appointments', total: 'Total', name: 'Name', phone: 'Phone',
+      email: 'Email', address: 'Address', actions: 'Actions',
     },
     clientDetail: {
       title: 'Client', totalSpent: 'Total spent', points: 'Points', visits: 'Visits', whatsappOptIn: 'WhatsApp',
@@ -252,18 +512,103 @@ export const translations: Record<Locale, Translations> = {
       title: 'Clients', new: 'New client', tutor: 'Owner', status: 'Status', lastVisit: 'Last visit', totalSpent: 'Total spent', phone: 'Phone',
       subtitle: 'Owners registered at your pet shop',
     },
-    agenda: { title: 'Schedule', today: 'Today', schedule: 'Book', noAppointments: 'No appointments', slot: 'Slot', available: 'Available', unavailable: 'Unavailable' },
+    agenda: {
+      title: 'Schedule',
+      subtitle: 'View and manage today\'s appointments.',
+      newAppointment: 'New appointment',
+      today: 'Today',
+      all: 'All',
+      outsideHours: 'Outside hours',
+      scheduleSlot: 'Book',
+      schedule: 'Book',
+      noAppointments: 'No appointments',
+      slot: 'Slot',
+      available: 'Available',
+      unavailable: 'Unavailable',
+      form: {
+        title: 'New appointment',
+        titleEdit: 'Edit appointment',
+        subtitle: 'Fill in the details to book a service.',
+        client: 'Client',
+        searchClient: 'Search by name or phone…',
+        pet: 'Pet',
+        selectClientFirst: 'Select a client first',
+        service: 'Service',
+        selectService: 'Select a service',
+        employee: 'Employee',
+        anyEmployee: 'Any employee',
+        time: 'Time',
+        date: 'Date',
+        price: 'Price ($)',
+        notes: 'Notes',
+        notesPlaceholder: 'Appointment notes',
+        cancel: 'Cancel',
+        submit: 'Book',
+        saving: 'Saving…',
+        noSlotsAvailable: 'No time slots available',
+      },
+      status: {
+        scheduled: 'Scheduled',
+        confirmed: 'Confirmed',
+        inProgress: 'In progress',
+        completed: 'Completed',
+        cancelled: 'Cancelled',
+        noShow: 'No show',
+      },
+      detail: {
+        title: 'Appointment details',
+        confirmAction: 'Confirm',
+        startAction: 'Start service',
+        completeAction: 'Complete',
+        cancelAction: 'Cancel',
+        noShowAction: 'No show',
+        employee: 'Employee',
+        unassigned: 'Any employee',
+        price: 'Price',
+        notes: 'Notes',
+        history: 'History',
+      },
+    },
     dashboard: {
       title: 'Dashboard', today: 'Today', revenue: 'Revenue', appointments: 'Appointments', clients: 'Clients', newClients: 'New clients',
       thisMonth: 'This month', topServices: 'Top services', welcome: 'Hello', summary: 'Welcome to PetFlow. Here is your daily summary.',
     },
     settings: {
-      title: 'Settings', profile: 'Profile', hours: 'Hours', services: 'Services', team: 'Team', save: 'Save',
+      title: 'Settings',
+      subtitle: 'Manage your pet shop settings.',
+      profile: 'Profile',
+      profileSubtitle: 'Name, address and phone of your pet shop.',
+      hours: 'Hours',
+      hoursSubtitle: 'Days and hours your pet shop is open.',
+      services: 'Services',
+      servicesSubtitle: 'Create and edit the services you offer.',
+      team: 'Team',
+      teamSubtitle: 'Add staff members and manage access.',
+      save: 'Save',
       shopName: 'Shop name', phone: 'Phone', address: 'Address', open: 'Open', closed: 'Closed', copyWeekdays: 'Copy to weekdays',
-      profileTitle: 'Pet Shop Information', profileSubtitle: 'Name, address and phone of your pet shop.',
+      profileTitle: 'Pet Shop Information',
+      profilePageSubtitle: 'Name, address and phone of your pet shop.',
+      hoursTitle: 'Business Hours',
+      hoursPageSubtitle: 'Set the days and hours your pet shop operates.',
+      servicesTitle: 'Services',
+      servicesPageSubtitle: 'Manage the services offered by your pet shop.',
+      teamTitle: 'Team',
+      teamPageSubtitle: 'Manage your pet shop staff.',
     },
     whatsapp: {
-      title: 'WhatsApp', templates: 'Templates', logs: 'Message log', connect: 'Connect', disconnect: 'Disconnect',
+      title: 'WhatsApp',
+      subtitle: 'Connect your number and automate messages',
+      templatesTitle: 'Message Templates',
+      templatesSubtitle: 'System default templates + your custom templates',
+      logsTitle: 'Message Log',
+      logsSubtitle: 'Last 100 messages sent via WhatsApp',
+      noConfig: 'Set up the integration below to get started.',
+      saveConfig: 'Save configuration',
+      instanceId: 'Instance ID',
+      token: 'Token',
+      connecting: 'Connecting...',
+      connectedSince: 'Connected since',
+      templates: 'Templates', logs: 'Message log', connect: 'Connect', disconnect: 'Disconnect',
       status: { connected: 'Connected', disconnected: 'Disconnected', connecting: 'Connecting...' },
     },
     onboarding: { welcome: 'Welcome!', step1: 'Set up your pet shop', step2: 'Register your services', step3: 'All set!' },
@@ -274,6 +619,9 @@ export const translations: Record<Locale, Translations> = {
     common: {
       save: 'Guardar', cancel: 'Cancelar', edit: 'Editar', delete: 'Eliminar', back: 'Volver', loading: 'Cargando...',
       yes: 'Sí', no: 'No', new: 'Nuevo', search: 'Buscar', active: 'Activo', inactive: 'Inactivo', blocked: 'Bloqueado', schedule: 'Agendar',
+      any: 'Cualquiera', employee: 'Empleado', service: 'Servicio', pet: 'Mascota',
+      noAppointments: 'Sin citas', total: 'Total', name: 'Nombre', phone: 'Teléfono',
+      email: 'Correo', address: 'Dirección', actions: 'Acciones',
     },
     clientDetail: {
       title: 'Cliente', totalSpent: 'Total gastado', points: 'Puntos', visits: 'Visitas', whatsappOptIn: 'WhatsApp',
@@ -286,18 +634,103 @@ export const translations: Record<Locale, Translations> = {
       title: 'Clientes', new: 'Nuevo cliente', tutor: 'Tutor', status: 'Estado', lastVisit: 'Última visita', totalSpent: 'Total gastado', phone: 'Teléfono',
       subtitle: 'Tutores registrados en tu pet shop',
     },
-    agenda: { title: 'Agenda', today: 'Hoy', schedule: 'Agendar', noAppointments: 'Sin citas', slot: 'Horario', available: 'Disponible', unavailable: 'No disponible' },
+    agenda: {
+      title: 'Agenda',
+      subtitle: 'Visualiza y gestiona las citas del día.',
+      newAppointment: 'Nueva cita',
+      today: 'Hoy',
+      all: 'Todos',
+      outsideHours: 'Fuera del horario',
+      scheduleSlot: 'Agendar',
+      schedule: 'Agendar',
+      noAppointments: 'Sin citas',
+      slot: 'Horario',
+      available: 'Disponible',
+      unavailable: 'No disponible',
+      form: {
+        title: 'Nueva cita',
+        titleEdit: 'Editar cita',
+        subtitle: 'Completa los datos para agendar un servicio.',
+        client: 'Cliente',
+        searchClient: 'Buscar por nombre o teléfono…',
+        pet: 'Mascota',
+        selectClientFirst: 'Elige el cliente primero',
+        service: 'Servicio',
+        selectService: 'Selecciona el servicio',
+        employee: 'Empleado',
+        anyEmployee: 'Cualquier empleado',
+        time: 'Horario',
+        date: 'Fecha',
+        price: 'Precio ($)',
+        notes: 'Notas',
+        notesPlaceholder: 'Observaciones de la cita',
+        cancel: 'Cancelar',
+        submit: 'Agendar',
+        saving: 'Guardando…',
+        noSlotsAvailable: 'No hay horarios disponibles',
+      },
+      status: {
+        scheduled: 'Agendado',
+        confirmed: 'Confirmado',
+        inProgress: 'En curso',
+        completed: 'Completado',
+        cancelled: 'Cancelado',
+        noShow: 'No se presentó',
+      },
+      detail: {
+        title: 'Detalles de la cita',
+        confirmAction: 'Confirmar',
+        startAction: 'Iniciar servicio',
+        completeAction: 'Completar',
+        cancelAction: 'Cancelar',
+        noShowAction: 'No se presentó',
+        employee: 'Empleado',
+        unassigned: 'Cualquier empleado',
+        price: 'Precio',
+        notes: 'Notas',
+        history: 'Historial',
+      },
+    },
     dashboard: {
       title: 'Panel', today: 'Hoy', revenue: 'Ingresos', appointments: 'Citas', clients: 'Clientes', newClients: 'Nuevos clientes',
       thisMonth: 'Este mes', topServices: 'Servicios más vendidos', welcome: 'Hola', summary: 'Bienvenido a PetFlow. Aquí está el resumen de tu día.',
     },
     settings: {
-      title: 'Ajustes', profile: 'Perfil', hours: 'Horarios', services: 'Servicios', team: 'Equipo', save: 'Guardar',
+      title: 'Ajustes',
+      subtitle: 'Gestiona los ajustes de tu pet shop.',
+      profile: 'Perfil',
+      profileSubtitle: 'Nombre, dirección y teléfono de tu pet shop.',
+      hours: 'Horarios',
+      hoursSubtitle: 'Días y horarios en que el pet shop atiende.',
+      services: 'Servicios',
+      servicesSubtitle: 'Crea y edita los servicios que ofreces.',
+      team: 'Equipo',
+      teamSubtitle: 'Agrega empleados y gestiona accesos.',
+      save: 'Guardar',
       shopName: 'Nombre del pet shop', phone: 'Teléfono', address: 'Dirección', open: 'Abierto', closed: 'Cerrado', copyWeekdays: 'Copiar a días laborables',
-      profileTitle: 'Información del Pet Shop', profileSubtitle: 'Nombre, dirección y teléfono de tu pet shop.',
+      profileTitle: 'Información del Pet Shop',
+      profilePageSubtitle: 'Nombre, dirección y teléfono de tu pet shop.',
+      hoursTitle: 'Horario de Atención',
+      hoursPageSubtitle: 'Configura los días y horarios de atención de tu pet shop.',
+      servicesTitle: 'Servicios',
+      servicesPageSubtitle: 'Gestiona los servicios que ofrece tu pet shop.',
+      teamTitle: 'Equipo',
+      teamPageSubtitle: 'Gestiona los empleados de tu pet shop.',
     },
     whatsapp: {
-      title: 'WhatsApp', templates: 'Plantillas', logs: 'Historial', connect: 'Conectar', disconnect: 'Desconectar',
+      title: 'WhatsApp',
+      subtitle: 'Conecta tu número y automatiza mensajes',
+      templatesTitle: 'Plantillas de Mensajes',
+      templatesSubtitle: 'Plantillas predeterminadas del sistema + tus plantillas personalizadas',
+      logsTitle: 'Historial de Mensajes',
+      logsSubtitle: 'Últimos 100 mensajes enviados por WhatsApp',
+      noConfig: 'Configura la integración abajo para comenzar.',
+      saveConfig: 'Guardar configuración',
+      instanceId: 'ID de instancia',
+      token: 'Token',
+      connecting: 'Conectando...',
+      connectedSince: 'Conectado desde',
+      templates: 'Plantillas', logs: 'Historial', connect: 'Conectar', disconnect: 'Desconectar',
       status: { connected: 'Conectado', disconnected: 'Desconectado', connecting: 'Conectando...' },
     },
     onboarding: { welcome: '¡Bienvenido!', step1: 'Configura tu pet shop', step2: 'Registra tus servicios', step3: '¡Listo!' },
