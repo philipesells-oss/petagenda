@@ -6,6 +6,7 @@ import { getCurrentUser } from '@/lib/auth/get-current-user'
 import { buttonVariants } from '@/components/ui/button'
 import { ClientsTable } from './clients-table'
 import { formatPhone, formatCurrency, formatDate } from '@/lib/utils/format'
+import { getT } from '@/lib/server-i18n'
 import type { ClientRow, ClientStatus } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -20,6 +21,7 @@ export default async function ClientsPage({ searchParams }: PageProps) {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
+  const t = await getT()
   const sp = await searchParams
   const q = typeof sp.q === 'string' ? sp.q : ''
   const status = typeof sp.status === 'string' ? sp.status : null
@@ -58,11 +60,11 @@ export default async function ClientsPage({ searchParams }: PageProps) {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Clientes</h1>
-          <p className="text-muted-foreground text-sm">Tutores cadastrados no seu pet shop</p>
+          <h1 className="text-2xl font-bold">{t.clients.title}</h1>
+          <p className="text-muted-foreground text-sm">{t.clients.subtitle}</p>
         </div>
         <Link href="/clients/new" className={buttonVariants()}>
-          <Plus className="w-4 h-4 mr-2" /> Novo cliente
+          <Plus className="w-4 h-4 mr-2" /> {t.clients.new}
         </Link>
       </div>
 

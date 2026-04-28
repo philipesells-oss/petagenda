@@ -9,7 +9,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PetCard } from '@/components/clients/pet-card'
 import { EditClientDialog, AddPetDialog } from '@/components/clients/edit-client-dialog'
+import { ClientMessagesTab } from '@/components/clients/client-messages-tab'
 import { formatPhone, formatCurrency, formatDate } from '@/lib/utils/format'
+import { getT } from '@/lib/server-i18n'
 import type { ClientRow, PetRow, AppointmentRow } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -28,6 +30,7 @@ export default async function ClientProfilePage({
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
+  const t = await getT()
   const supabase = await createClient()
 
   const { data: client } = await supabase
@@ -62,7 +65,7 @@ export default async function ClientProfilePage({
   return (
     <div className="p-6 space-y-6 max-w-5xl mx-auto">
       <Link href="/clients" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
-        <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
+        <ArrowLeft className="w-4 h-4 mr-2" /> {t.common.back}
       </Link>
 
       <Card>
@@ -72,7 +75,7 @@ export default async function ClientProfilePage({
               <h1 className="text-2xl font-bold">{client.full_name}</h1>
               {client.status !== 'active' && (
                 <Badge variant={client.status === 'blocked' ? 'destructive' : 'secondary'}>
-                  {client.status === 'inactive' ? 'Inativo' : 'Bloqueado'}
+                  {client.status === 'inactive' ? t.common.inactive : t.common.blocked}
                 </Badge>
               )}
             </div>
@@ -93,20 +96,20 @@ export default async function ClientProfilePage({
           </div>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-muted-foreground">Total gasto</p>
+              <p className="text-muted-foreground">{t.clientDetail.totalSpent}</p>
               <p className="font-semibold">{formatCurrency(client.total_spent)}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Pontos</p>
+              <p className="text-muted-foreground">{t.clientDetail.points}</p>
               <p className="font-semibold">{client.loyalty_points}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Visitas</p>
+              <p className="text-muted-foreground">{t.clientDetail.visits}</p>
               <p className="font-semibold">{client.visit_count}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">WhatsApp</p>
-              <p className="font-semibold">{client.whatsapp_opt_in ? 'Sim' : 'Não'}</p>
+              <p className="text-muted-foreground">{t.clientDetail.whatsappOptIn}</p>
+              <p className="font-semibold">{client.whatsapp_opt_in ? t.common.yes : t.common.no}</p>
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -126,9 +129,9 @@ export default async function ClientProfilePage({
 
       <Tabs defaultValue="pets">
         <TabsList>
-          <TabsTrigger value="pets">Pets ({petList.length})</TabsTrigger>
-          <TabsTrigger value="history">Histórico</TabsTrigger>
-          <TabsTrigger value="messages">Mensagens</TabsTrigger>
+          <TabsTrigger value="pets">{t.clientDetail.tabs.pets} ({petList.length})</TabsTrigger>
+          <TabsTrigger value="history">{t.clientDetail.tabs.history}</TabsTrigger>
+          <TabsTrigger value="messages">{t.clientDetail.tabs.messages}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pets" className="space-y-4">
@@ -137,7 +140,7 @@ export default async function ClientProfilePage({
           </div>
           {petList.length === 0 ? (
             <p className="text-muted-foreground text-center py-8">
-              Nenhum pet cadastrado
+              {t.clientDetail.noPets}
             </p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -149,7 +152,7 @@ export default async function ClientProfilePage({
         <TabsContent value="history">
           {apptList.length === 0 ? (
             <p className="text-muted-foreground text-center py-8">
-              Nenhum atendimento ainda
+              {t.clientDetail.noHistory}
             </p>
           ) : (
             <div className="space-y-2">
@@ -158,10 +161,10 @@ export default async function ClientProfilePage({
                   <CardContent className="p-4 flex justify-between items-center">
                     <div>
                       <p className="font-medium">
-                        {a.services?.name ?? 'Serviço'} — {a.pets?.name ?? '—'}
+                        {a.services?.name ?? t.settings.services} — {a.pets?.name ?? '—'}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {formatDate(a.date)} às {a.start_time.slice(0, 5)}
+                        {formatDate(a.date)} {a.start_time.slice(0, 5)}
                       </p>
                     </div>
                     <div className="text-right">
@@ -175,32 +178,11 @@ export default async function ClientProfilePage({
           )}
         </TabsContent>
 
-        <TabsContent value="messages" className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Envie uma mensagem rápida para {client.full_name} pelo WhatsApp.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {[
-              { label: 'Lembrete de agendamento', msg: `Olá ${client.full_name.split(' ')[0]}! 👋 Passando para lembrar do agendamento do seu pet aqui no nosso pet shop. Qualquer dúvida, é só responder!` },
-              { label: 'Promoção / oferta', msg: `Olá ${client.full_name.split(' ')[0]}! 🐾 Temos uma promoção especial esta semana. Que tal trazer seu pet para um banho e tosa? Entre em contato e agende já!` },
-              { label: 'Reativar cliente inativo', msg: `Olá ${client.full_name.split(' ')[0]}! Sentimos sua falta! 🐶 Faz um tempinho que não vemos seu pet por aqui. Que tal agendar uma visita? Temos novidades te esperando!` },
-              { label: 'Mensagem personalizada', msg: `Olá ${client.full_name.split(' ')[0]}! ` },
-            ].map(({ label, msg }) => (
-              <Link
-                key={label}
-                href={`https://wa.me/55${client.phone.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-lg border p-4 hover:bg-muted transition-colors"
-              >
-                <MessageCircle className="h-5 w-5 shrink-0 text-[#25D366]" />
-                <div>
-                  <p className="text-sm font-medium">{label}</p>
-                  <p className="text-xs text-muted-foreground line-clamp-1">{msg}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
+        <TabsContent value="messages">
+          <ClientMessagesTab
+            clientFirstName={client.full_name.split(' ')[0] ?? client.full_name}
+            clientPhone={client.phone}
+          />
         </TabsContent>
       </Tabs>
     </div>

@@ -7,6 +7,7 @@ import {
 } from '@/components/dashboard/today-appointments'
 import { RevenueChart } from '@/components/dashboard/revenue-chart'
 import { Launchpad } from '@/components/dashboard/launchpad'
+import { getT } from '@/lib/server-i18n'
 import type { AppointmentStatus } from '@/types'
 
 const PT_DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -19,6 +20,7 @@ export default async function DashboardHome() {
   const user = await getCurrentUser()
   if (!user) return null
 
+  const t = await getT()
   const supabase = await createClient()
   const today = new Date().toISOString().slice(0, 10) // 'YYYY-MM-DD'
   const tenantId = user.tenantId
@@ -196,10 +198,10 @@ export default async function DashboardHome() {
 
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">
-          Olá, {user.fullName.split(' ')[0]} 🐾
+          {t.dashboard.welcome}, {user.fullName.split(' ')[0]} 🐾
         </h1>
         <p className="text-sm text-muted-foreground">
-          Bem-vindo ao PetFlow. Aqui está o resumo do seu dia.
+          {t.dashboard.summary}
         </p>
       </header>
 
