@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { LogOutIcon, UserIcon } from 'lucide-react'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -13,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { signOut } from '@/actions/auth'
+import { LanguageSwitcher } from '@/components/layout/language-switcher'
+import { useLanguage } from '@/lib/i18n/language-context'
 
 interface TopbarProps {
   shopName: string
@@ -31,49 +34,59 @@ function initials(name: string) {
 }
 
 export function Topbar({ shopName, userName, userEmail }: TopbarProps) {
+  const { t } = useLanguage()
+
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-background px-4">
       <div className="flex items-center gap-2">
         <span className="text-sm font-semibold truncate max-w-[60vw]">{shopName}</span>
       </div>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button variant="ghost" size="icon" aria-label="Menu do usuário">
-              <Avatar className="size-8">
-                <AvatarFallback>{initials(userName) || 'U'}</AvatarFallback>
-              </Avatar>
-            </Button>
-          }
-        />
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{userName}</span>
-              {userEmail && (
-                <span className="text-xs text-muted-foreground truncate">{userEmail}</span>
-              )}
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <UserIcon className="size-4" />
-            Minha conta
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <form action={signOut}>
+      <div className="flex items-center gap-1">
+        <LanguageSwitcher />
+
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="ghost" size="icon" aria-label={t('topbar.account')}>
+                <Avatar className="size-8">
+                  <AvatarFallback>{initials(userName) || 'U'}</AvatarFallback>
+                </Avatar>
+              </Button>
+            }
+          />
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium">{userName}</span>
+                {userEmail && (
+                  <span className="text-xs text-muted-foreground truncate">{userEmail}</span>
+                )}
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
             <DropdownMenuItem
               render={
-                <button type="submit" className="w-full">
-                  <LogOutIcon className="size-4" />
-                  Sair
-                </button>
+                <Link href="/settings/profile" className="w-full">
+                  <UserIcon className="size-4" />
+                  {t('topbar.account')}
+                </Link>
               }
             />
-          </form>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            <DropdownMenuSeparator />
+            <form action={signOut}>
+              <DropdownMenuItem
+                render={
+                  <button type="submit" className="w-full">
+                    <LogOutIcon className="size-4" />
+                    {t('topbar.signOut')}
+                  </button>
+                }
+              />
+            </form>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </header>
   )
 }

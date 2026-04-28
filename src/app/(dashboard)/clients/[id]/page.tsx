@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PetCard } from '@/components/clients/pet-card'
 import { EditClientDialog, AddPetDialog } from '@/components/clients/edit-client-dialog'
+import { ClientMessagesTab } from '@/components/clients/client-messages-tab'
 import { formatPhone, formatCurrency, formatDate } from '@/lib/utils/format'
 import type { ClientRow, PetRow, AppointmentRow } from '@/types'
 
@@ -175,32 +176,12 @@ export default async function ClientProfilePage({
           )}
         </TabsContent>
 
-        <TabsContent value="messages" className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Envie uma mensagem rápida para {client.full_name} pelo WhatsApp.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {[
-              { label: 'Lembrete de agendamento', msg: `Olá ${client.full_name.split(' ')[0]}! 👋 Passando para lembrar do agendamento do seu pet aqui no nosso pet shop. Qualquer dúvida, é só responder!` },
-              { label: 'Promoção / oferta', msg: `Olá ${client.full_name.split(' ')[0]}! 🐾 Temos uma promoção especial esta semana. Que tal trazer seu pet para um banho e tosa? Entre em contato e agende já!` },
-              { label: 'Reativar cliente inativo', msg: `Olá ${client.full_name.split(' ')[0]}! Sentimos sua falta! 🐶 Faz um tempinho que não vemos seu pet por aqui. Que tal agendar uma visita? Temos novidades te esperando!` },
-              { label: 'Mensagem personalizada', msg: `Olá ${client.full_name.split(' ')[0]}! ` },
-            ].map(({ label, msg }) => (
-              <Link
-                key={label}
-                href={`https://wa.me/55${client.phone.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-lg border p-4 hover:bg-muted transition-colors"
-              >
-                <MessageCircle className="h-5 w-5 shrink-0 text-[#25D366]" />
-                <div>
-                  <p className="text-sm font-medium">{label}</p>
-                  <p className="text-xs text-muted-foreground line-clamp-1">{msg}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
+        <TabsContent value="messages">
+          <ClientMessagesTab
+            clientFullName={client.full_name}
+            clientPhone={client.phone}
+            petName={petList[0]?.name ?? null}
+          />
         </TabsContent>
       </Tabs>
     </div>

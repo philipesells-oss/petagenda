@@ -4,6 +4,7 @@ import { Sidebar, MobileBottomNav } from '@/components/layout/sidebar'
 import { Topbar } from '@/components/layout/topbar'
 import { Toaster } from '@/components/ui/sonner'
 import { getCurrentUser } from '@/lib/auth/get-current-user'
+import { LanguageProvider } from '@/lib/i18n/language-context'
 
 /**
  * Dashboard Layout — Server Component.
@@ -22,18 +23,20 @@ export default async function DashboardLayout({
   if (user.forcePasswordChange) redirect('/first-access')
 
   return (
-    <div className="flex min-h-screen bg-muted/30">
-      <Sidebar />
-      <div className="flex flex-1 flex-col">
-        <Topbar
-          shopName={user.tenant.name}
-          userName={user.fullName}
-          userEmail={user.email}
-        />
-        <main className="flex-1 pb-20 md:pb-0">{children}</main>
+    <LanguageProvider>
+      <div className="flex min-h-screen bg-muted/30">
+        <Sidebar />
+        <div className="flex flex-1 flex-col">
+          <Topbar
+            shopName={user.tenant.name}
+            userName={user.fullName}
+            userEmail={user.email}
+          />
+          <main className="flex-1 pb-20 md:pb-0">{children}</main>
+        </div>
+        <MobileBottomNav />
+        <Toaster />
       </div>
-      <MobileBottomNav />
-      <Toaster />
-    </div>
+    </LanguageProvider>
   )
 }
