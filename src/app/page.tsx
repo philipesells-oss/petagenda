@@ -464,32 +464,64 @@ export default async function LandingPage() {
       <PlatformShowcase locale={locale} />
 
       {/* ── Depoimentos ────────────────────────────────────────── */}
-      <section className="bg-emerald-50 py-16 dark:bg-emerald-950/20 overflow-hidden">
-        <div className="mx-auto max-w-4xl px-4">
+      <section className="relative bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-20 dark:from-emerald-950/30 dark:via-gray-950 dark:to-teal-950/20 overflow-hidden">
+        {/* decorative blobs */}
+        <div className="pointer-events-none absolute -top-24 -left-24 h-64 w-64 rounded-full bg-emerald-200/40 blur-3xl dark:bg-emerald-800/20" />
+        <div className="pointer-events-none absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-teal-200/40 blur-3xl dark:bg-teal-800/20" />
+
+        <div className="relative mx-auto max-w-6xl px-4">
           <h2 className="mb-2 text-center text-2xl font-bold md:text-3xl">
             {c.testimonialsHeadline}
           </h2>
-          <p className="mb-8 text-center text-sm text-gray-500 dark:text-gray-400">{c.testimonialsSub}</p>
+          <p className="mb-12 text-center text-sm text-gray-500 dark:text-gray-400">{c.testimonialsSub}</p>
+
+          {/* staggered masonry-style grid */}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {c.testimonials.map((t, i) => {
+              const rotations = ['-rotate-1', 'rotate-1', '-rotate-2', 'rotate-2', '-rotate-1', 'rotate-1', '-rotate-2']
+              const tops = ['mt-0', 'mt-6', 'mt-3', 'mt-8', 'mt-2', 'mt-5', 'mt-1']
+              return (
+                <div
+                  key={t.name}
+                  className={`group relative cursor-default rounded-2xl border border-white/80 bg-white p-6 shadow-md transition-all duration-300 ease-out hover:scale-105 hover:rotate-0 hover:shadow-xl hover:z-10 dark:border-gray-700/60 dark:bg-gray-800/90 ${rotations[i % rotations.length]} ${tops[i % tops.length]}`}
+                >
+                  {/* quote mark */}
+                  <span className="absolute -top-3 left-5 text-5xl leading-none text-emerald-300 dark:text-emerald-600 select-none">"</span>
+
+                  {/* stars */}
+                  <div className="mb-3 flex gap-0.5 pt-3">
+                    {Array.from({ length: 5 }).map((_, s) => (
+                      <StarIcon key={s} className="size-3.5 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+
+                  {/* text — clipped by default, full on hover */}
+                  <p className="mb-5 text-sm leading-relaxed text-gray-600 line-clamp-4 group-hover:line-clamp-none transition-all duration-300 dark:text-gray-300">
+                    {t.text}
+                  </p>
+
+                  {/* divider */}
+                  <div className="mb-3 h-px bg-gradient-to-r from-emerald-200 via-teal-100 to-transparent dark:from-emerald-800 dark:via-teal-900" />
+
+                  {/* author */}
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300">
+                      {t.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{t.name}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{t.city}</p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
-        <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 px-4 md:px-[max(1rem,calc((100vw-56rem)/2))]"
-             style={{ scrollbarWidth: 'none' }}>
-          {c.testimonials.map((t) => (
-            <div key={t.name}
-              className="snap-start shrink-0 w-[85vw] max-w-sm md:w-80 rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
-              <div className="mb-3 flex gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => <StarIcon key={i} className="size-4 fill-amber-400 text-amber-400" />)}
-              </div>
-              <p className="mb-4 text-sm leading-relaxed text-gray-700 dark:text-gray-300">"{t.text}"</p>
-              <div>
-                <p className="text-sm font-semibold">{t.name}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{t.city}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 flex justify-center gap-2">
+
+        <div className="mt-10 flex justify-center gap-2">
           {[0,1,2].map((i) => (
-            <span key={i} className="inline-block h-2 w-2 rounded-full bg-emerald-300 dark:bg-emerald-700" />
+            <span key={i} className="inline-block h-1.5 w-6 rounded-full bg-emerald-400/60 dark:bg-emerald-700" />
           ))}
         </div>
       </section>
