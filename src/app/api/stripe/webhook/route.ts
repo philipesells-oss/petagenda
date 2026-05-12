@@ -34,6 +34,8 @@ export async function POST(req: Request) {
     customer_details?: { email?: string; name?: string } | null
     customer?: string | null
     subscription?: string | null
+    amount_total?: number | null
+    currency?: string | null
   }
 
   const email = session.customer_details?.email
@@ -92,11 +94,13 @@ export async function POST(req: Request) {
   }
 
   // Fire server-side Purchase event to Meta Conversions API
+  const purchaseValue = session.amount_total ? session.amount_total / 100 : 29.90
+  const purchaseCurrency = (session.currency ?? 'brl').toUpperCase()
   await sendCAPIEvent({
     eventName: 'Purchase',
     email,
-    value: 29.90,
-    currency: 'BRL',
+    value: purchaseValue,
+    currency: purchaseCurrency,
     eventSourceUrl: `${appUrl}/login?welcome=1`,
   })
 

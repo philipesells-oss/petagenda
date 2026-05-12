@@ -30,6 +30,11 @@ export function CheckoutButton({
   async function handleClick() {
     setLoading(true)
     setError(null)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fbq = (window as any).fbq
+    if (typeof fbq === 'function') {
+      fbq('track', 'InitiateCheckout')
+    }
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
