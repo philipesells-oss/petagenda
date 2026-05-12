@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { Resend } from 'resend'
 import { sendCAPIEvent } from '@/lib/meta/capi'
+import { generateReferralCode, getReferralUrl } from '@/lib/referral'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -36,6 +37,7 @@ export async function POST(req: Request) {
     subscription?: string | null
     amount_total?: number | null
     currency?: string | null
+    metadata?: Record<string, string> | null
   }
 
   const email = session.customer_details?.email
@@ -72,24 +74,90 @@ export async function POST(req: Request) {
     .update({ force_password_change: true })
     .eq('id', userId)
 
-  // Store Stripe IDs on tenant for future billing management
-  if (session.customer || session.subscription) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: userRow } = await (adminClient.from('users') as any)
-      .select('tenant_id')
-      .eq('id', userId)
-      .maybeSingle() as { data: { tenant_id: string } | null }
+  // Store Stripe IDs, plan status, and referral data on tenant
+  const referralCode = generateReferralCode(userId)
+  const referredByCode = session.metadata?.pf_ref ?? null
 
-    if (userRow?.tenant_id) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: userRow } = await (adminClient.from('users') as any)
+    .select('tenant_id')
+    .eq('id', userId)
+    .maybeSingle() as { data: { tenant_id: string } | null }
+
+  if (userRow?.tenant_id) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (adminClient.from('tenants') as any)
+      .update({
+        stripe_customer_id: (session.customer as string) ?? null,
+        stripe_subscription_id: (session.subscription as string) ?? null,
+        plan: 'starter',
+        plan_status: 'active',
+        referral_code: referralCode,
+        ...(referredByCode ? { referred_by_code: referredByCode } : {}),
+      })
+      .eq('id', userRow.tenant_id)
+  }
+
+  // Reward referrer: 1 free month + notification email
+  if (referredByCode && /^[A-Z0-9]{6,12}$/.test(referredByCode)) {
+    try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (adminClient.from('tenants') as any)
-        .update({
-          stripe_customer_id: (session.customer as string) ?? null,
-          stripe_subscription_id: (session.subscription as string) ?? null,
-          plan: 'starter',
-          plan_status: 'active',
-        })
-        .eq('id', userRow.tenant_id)
+      const { data: referrerTenant } = await (adminClient.from('tenants') as any)
+        .select('id, stripe_subscription_id')
+        .eq('referral_code', referredByCode)
+        .maybeSingle() as { data: { id: string; stripe_subscription_id: string | null } | null }
+
+      if (referrerTenant?.stripe_subscription_id) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: referrerUserRow } = await (adminClient.from('users') as any)
+          .select('id')
+          .eq('tenant_id', referrerTenant.id)
+          .maybeSingle() as { data: { id: string } | null }
+
+        if (referrerUserRow) {
+          const { data: referrerAuth } = await adminClient.auth.admin.getUserById(referrerUserRow.id)
+          const referrerEmail = referrerAuth?.user?.email
+
+          // Apply one free month coupon to referrer subscription
+          const coupon = await stripe.coupons.create({
+            duration: 'once',
+            percent_off: 100,
+            name: 'Mês grátis — indicação PetFlow',
+          })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (stripe.subscriptions as any).update(referrerTenant.stripe_subscription_id, {
+            coupon: coupon.id,
+          })
+
+          // Notify referrer
+          if (referrerEmail) {
+            await resend.emails.send({
+              from: 'PetFlow <noreply@contato.getpetflow.com>',
+              to: referrerEmail,
+              subject: '🎉 Sua indicação deu certo — 1 mês grátis no PetFlow!',
+              html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 0; color: #1a1a1a;">
+  <div style="background: #f0fdf4; padding: 24px; text-align: center; border-bottom: 2px solid #d1fae5;">
+    <span style="font-size: 28px; font-weight: 800; color: #059669; letter-spacing: -0.5px;">🐾 PetFlow</span>
+  </div>
+  <div style="padding: 32px 24px;">
+    <h2 style="color: #059669; margin-top: 0;">🎉 Sua indicação funcionou!</h2>
+    <p>Alguém que você indicou acabou de assinar o PetFlow. Como obrigado, seu próximo mês é <strong>100% grátis</strong> — sem fazer nada, o desconto já foi aplicado na sua próxima fatura.</p>
+    <p style="margin-top: 20px; font-size: 13px; color: #6b7280;">Continue indicando e ganhe 1 mês grátis a cada nova assinatura confirmada.</p>
+  </div>
+  <div style="background: #f9fafb; padding: 16px; text-align: center; border-top: 1px solid #e5e7eb;">
+    <p style="font-size: 12px; color: #9ca3af; margin: 0;">© ${new Date().getFullYear()} PetFlow · Todos os direitos reservados</p>
+  </div>
+</body>
+</html>`,
+            })
+          }
+        }
+      }
+    } catch (err) {
+      console.error('[webhook] referral reward error:', err)
     }
   }
 
@@ -142,6 +210,11 @@ export async function POST(req: Request) {
       <a href="${appUrl}/forgot-password" style="color:#059669;">Esqueci minha senha</a>.
     </p>
     <hr style="margin: 32px 0; border-color: #e5e7eb;">
+    <div style="background:#f0fdf4; border-radius:12px; padding:20px; margin-bottom:24px;">
+      <p style="margin:0 0 8px; font-weight:700; color:#059669;">🎁 Indique e ganhe 1 mês grátis</p>
+      <p style="margin:0 0 12px; font-size:13px; color:#374151;">Compartilhe seu link exclusivo. A cada amigo que assinar, você ganha <strong>1 mês grátis</strong> automaticamente — sem precisar fazer nada.</p>
+      <p style="margin:0; background:#fff; border:1px solid #d1fae5; border-radius:8px; padding:10px 14px; font-family:monospace; font-size:13px; color:#059669; word-break:break-all;">${getReferralUrl(referralCode)}</p>
+    </div>
     <p style="font-size: 12px; color: #6b7280; margin: 0;">Se você não criou uma conta, ignore este e-mail.</p>
   </div>
   <div style="background: #f9fafb; padding: 16px; text-align: center; border-top: 1px solid #e5e7eb;">

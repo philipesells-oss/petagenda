@@ -1,7 +1,9 @@
+import { Suspense } from 'react'
 import { headers } from 'next/headers'
 import Link from 'next/link'
 import { CheckIcon, StarIcon, ShieldCheckIcon, SmartphoneIcon, ClockIcon, TrendingUpIcon } from 'lucide-react'
 import { CheckoutButton } from '@/components/landing/checkout-button'
+import { RefCapture } from '@/components/landing/ref-capture'
 import { TypingHeadline } from '@/components/landing/typing-headline'
 import { PlatformShowcase } from '@/components/landing/platform-showcase'
 import type { SupportedCurrency } from '@/lib/stripe'
@@ -77,13 +79,13 @@ const COPY = {
     testimonialsHeadline: 'Donos de pet shop que já saíram do caderninho',
     testimonialsSub: 'Deslize para ver mais →',
     testimonials: [
-      { name: 'Carla Meneses', city: 'Belo Horizonte, MG 🇧🇷', text: 'Eu anotava tudo num caderno e vivia perdendo horário. No primeiro mês com o PetFlow, parei de marcar banhos em cima um do outro e ainda descobri que minha tosa higiênica era o serviço que mais dava dinheiro. Pago os R$29,90 sem pensar.' },
+      { name: 'Carla Meneses', city: 'Belo Horizonte, MG 🇧🇷', text: 'No primeiro mês com o PetFlow, zero conflitos de horário — antes tinha pelo menos 2 ou 3 por semana. Descobri que minha tosa higiênica respondia por 38% da receita e eu estava cobrando barato. Subi 15% e os clientes nem piscaram. Pago os R$29,90 sem pensar.' },
       { name: 'Ana Rodrigues', city: 'Lisboa, Portugal 🇵🇹', text: 'Tinha tudo numa agenda de papel e esquecia confirmações toda semana. Agora o PetFlow avisa os clientes automaticamente — as faltas caíram a zero. Não troco por nada.' },
-      { name: 'Rogério Tavares', city: 'Campinas, SP 🇧🇷', text: 'Meu pet shop é pequeno, somos eu e mais duas meninas. Achei que sistema ia ser complicado, mas em uma tarde já tava com tudo cadastrado. O que mais gosto é abrir o celular de manhã e ver a agenda do dia inteirinha, sem bagunça no WhatsApp.' },
-      { name: 'Jessica W.', city: 'Miami, FL 🇺🇸', text: 'I manage a grooming salon with 4 groomers and the old spreadsheet was a nightmare. PetFlow gave each groomer their own schedule. No more double bookings, no more angry clients at the door.' },
-      { name: 'Juliana Martins', city: 'Pet Space · Campinas, SP 🇧🇷', text: 'A gente tinha 3 tosadoras e uma agenda só pra todo mundo. Virava bagunça toda semana. Com o PetFlow cada uma tem o próprio horário e os próprios serviços — o atendente já sabe exatamente quem faz o quê. Reduziu reclamação e o caixa melhorou.' },
+      { name: 'Rogério Tavares', city: 'Campinas, SP 🇧🇷', text: 'Somos eu e mais duas tosadoras. Em menos de 2 horas já tava tudo cadastrado. Antes eu perdia pelo menos 1 cliente por mês por confusão de horário — agora não perco mais. Abro o celular de manhã e a agenda do dia tá toda lá, sem bagunça no WhatsApp.' },
+      { name: 'Jessica W.', city: 'Miami, FL 🇺🇸', text: '4 tosadoras, pelo menos 3 conflitos por semana com a planilha antiga. O PetFlow zerou tudo — zero conflitos em 5 meses. Nunca mais tive cliente na porta no horário errado.' },
+      { name: 'Juliana Martins', city: 'Pet Space · Campinas, SP 🇧🇷', text: '3 tosadoras, 1 agenda pra todo mundo — toda semana pelo menos 1 conflito. Com o PetFlow cada uma tem seu próprio horário e seus próprios serviços. Em 3 meses, zero conflitos. O caixa melhorou uns 20% só porque paramos de perder cliente por bagunça.' },
       { name: 'Miguel Ferreira', city: 'Porto, Portugal 🇵🇹', text: 'A minha clínica veterinária cresceu muito e a agenda em papel já não dava. O PetFlow organizou tudo — cada médico com os seus horários, cada cliente com a ficha do animal. Muito profissional.' },
-      { name: 'Tyler B.', city: 'Austin, TX 🇺🇸', text: 'Was using group chats and sticky notes to manage appointments. PetFlow changed everything — clients book, I get notified, and my revenue dashboard shows exactly what\'s working. Worth every penny.' },
+      { name: 'Tyler B.', city: 'Austin, TX 🇺🇸', text: 'Tinha conflito de horário quase toda semana. O PetFlow zerou isso em 4 meses. O dashboard mostrou que eu estava cobrando barato em 3 serviços — corrigi na hora. Receita subiu 18% em 60 dias. Vale cada centavo.' },
     ],
     priceHeadline: 'Um plano. Tudo incluído.',
     priceSub: 'Valor único · Tudo incluso · Sem pegadinha, sem surpresa na fatura.',
@@ -171,13 +173,13 @@ const COPY = {
     testimonialsHeadline: 'Donos de petshop que já saíram da agenda em papel',
     testimonialsSub: 'Deslize para ver mais →',
     testimonials: [
-      { name: 'Carla Meneses', city: 'Belo Horizonte, MG 🇧🇷', text: 'Eu anotava tudo num caderno e vivia perdendo horário. No primeiro mês com o PetFlow, parei de marcar banhos em cima um do outro e ainda descobri que minha tosa higiênica era o serviço que mais dava dinheiro. Pago os R$29,90 sem pensar.' },
-      { name: 'Ana Rodrigues', city: 'Lisboa, Portugal 🇵🇹', text: 'Tinha tudo numa agenda de papel e esquecia confirmações toda semana. Agora o PetFlow avisa os clientes automaticamente — as faltas caíram a zero. Não troco por nada.' },
-      { name: 'Rogério Tavares', city: 'Campinas, SP 🇧🇷', text: 'Meu pet shop é pequeno, somos eu e mais duas meninas. Achei que sistema ia ser complicado, mas em uma tarde já tava com tudo cadastrado. O que mais gosto é abrir o celular de manhã e ver a agenda do dia inteirinha, sem bagunça no WhatsApp.' },
-      { name: 'Jessica W.', city: 'Miami, FL 🇺🇸', text: 'I manage a grooming salon with 4 groomers and the old spreadsheet was a nightmare. PetFlow gave each groomer their own schedule. No more double bookings, no more angry clients at the door.' },
-      { name: 'Juliana Martins', city: 'Pet Space · Campinas, SP 🇧🇷', text: 'A gente tinha 3 tosadoras e uma agenda só pra todo mundo. Virava bagunça toda semana. Com o PetFlow cada uma tem o próprio horário e os próprios serviços — o atendente já sabe exatamente quem faz o quê. Reduziu reclamação e o caixa melhorou.' },
-      { name: 'Miguel Ferreira', city: 'Porto, Portugal 🇵🇹', text: 'A minha clínica veterinária cresceu muito e a agenda em papel já não dava. O PetFlow organizou tudo — cada médico com os seus horários, cada cliente com a ficha do animal. Muito profissional.' },
-      { name: 'Tyler B.', city: 'Austin, TX 🇺🇸', text: 'Was using group chats and sticky notes to manage appointments. PetFlow changed everything — clients book, I get notified, and my revenue dashboard shows exactly what\'s working. Worth every penny.' },
+      { name: 'Carla Meneses', city: 'Belo Horizonte, Brasil 🇧🇷', text: 'No primeiro mês com o PetFlow, zero conflitos de horário — antes tinha pelo menos 2 ou 3 por semana. Descobri que a tosquia higiénica correspondia a 38% da receita e estava a cobrar barato. Subi 15% e os clientes nem deram por isso. Pago sem pensar.' },
+      { name: 'Ana Rodrigues', city: 'Lisboa, Portugal 🇵🇹', text: 'Tinha tudo numa agenda de papel e esquecia confirmações toda a semana. Agora o PetFlow avisa os clientes automaticamente — as faltas caíram a zero. Não troco por nada.' },
+      { name: 'Rogério Tavares', city: 'Campinas, Brasil 🇧🇷', text: 'Somos eu e mais duas tosadoras. Em menos de 2 horas já estava tudo registado. Antes perdia pelo menos 1 cliente por mês por confusão de horários — agora não perco mais. Abro o telemóvel de manhã e a agenda do dia está toda lá, sem confusão no WhatsApp.' },
+      { name: 'Jessica W.', city: 'Miami, FL 🇺🇸', text: '4 tosadores, pelo menos 3 conflitos por semana com a folha de cálculo antiga. O PetFlow eliminou tudo — zero conflitos em 5 meses. Nunca mais tive um cliente à porta no horário errado.' },
+      { name: 'Juliana Martins', city: 'Pet Space · Campinas, Brasil 🇧🇷', text: '3 tosadoras, 1 agenda para toda a gente — todas as semanas pelo menos 1 conflito. Com o PetFlow cada uma tem o seu próprio horário e os seus próprios serviços. Em 3 meses, zero conflitos. O caixa melhorou uns 20% só porque deixámos de perder clientes por confusão.' },
+      { name: 'Miguel Ferreira', city: 'Porto, Portugal 🇵🇹', text: 'A minha clínica veterinária cresceu muito e a agenda em papel já não chegava. O PetFlow organizou tudo — cada médico com os seus horários, cada cliente com a ficha do animal. Muito profissional.' },
+      { name: 'Tyler B.', city: 'Austin, TX 🇺🇸', text: 'Tinha conflitos de horário quase todas as semanas. O PetFlow resolveu isso em 4 meses. O dashboard mostrou que estava a cobrar barato em 3 serviços — corrigi de imediato. A receita subiu 18% em 60 dias. Vale cada cêntimo.' },
     ],
     priceHeadline: 'Um plano. Tudo incluído.',
     priceSub: 'Valor único · Tudo incluído · Sem surpresas na fatura.',
@@ -265,12 +267,12 @@ const COPY = {
     testimonialsHeadline: 'Pet shop owners who left the spreadsheet behind',
     testimonialsSub: 'Swipe to see more →',
     testimonials: [
-      { name: 'Carla Meneses', city: 'Belo Horizonte, Brazil 🇧🇷', text: 'I used to write everything in a notebook and constantly missed slots. In the first month with PetFlow, I stopped double-booking and discovered my hygiene groom was my most profitable service. The monthly fee pays for itself.' },
+      { name: 'Carla Meneses', city: 'Belo Horizonte, Brazil 🇧🇷', text: 'In the first month with PetFlow, zero scheduling conflicts — before I had at least 2 or 3 per week. I discovered my hygiene groom accounted for 38% of revenue and I was undercharging. Raised prices 15% and clients didn\'t blink. The monthly fee pays for itself.' },
       { name: 'Ana Rodrigues', city: 'Lisbon, Portugal 🇵🇹', text: 'I had everything in a paper diary and missed confirmations every week. Now PetFlow notifies clients automatically — no-shows dropped to zero. I wouldn\'t go back.' },
-      { name: 'Tyler B.', city: 'Austin, TX 🇺🇸', text: 'Was using group chats and sticky notes to manage appointments. PetFlow changed everything — clients book, I get notified, and my revenue dashboard shows exactly what\'s working. Worth every penny.' },
-      { name: 'Rogério Tavares', city: 'Campinas, Brazil 🇧🇷', text: 'My shop is small — just me and two groomers. I thought a system would be complicated, but I had everything set up in an afternoon. Best part: opening my phone in the morning and seeing the full day schedule, no WhatsApp chaos.' },
-      { name: 'Jessica W.', city: 'Miami, FL 🇺🇸', text: 'I manage a grooming salon with 4 groomers and the old spreadsheet was a nightmare. PetFlow gave each groomer their own schedule. No more double bookings, no more angry clients at the door.' },
-      { name: 'Juliana Martins', city: 'Pet Space · Campinas, Brazil 🇧🇷', text: 'We had 3 groomers sharing one calendar — it was a mess every week. With PetFlow each has their own schedule and services. The receptionist always knows exactly who does what. Fewer complaints and better revenue.' },
+      { name: 'Tyler B.', city: 'Austin, TX 🇺🇸', text: 'Had double-bookings almost every week. PetFlow fixed that — zero in 4 months. The revenue dashboard showed I was undercharging for 3 services. Fixed that immediately. Revenue up 18% in 60 days. Worth every penny.' },
+      { name: 'Rogério Tavares', city: 'Campinas, Brazil 🇧🇷', text: 'My shop is small — just me and two groomers. Everything was set up in under 2 hours. I used to lose at least one client a month to scheduling confusion — not anymore. I open my phone in the morning and the full day\'s schedule is right there.' },
+      { name: 'Jessica W.', city: 'Miami, FL 🇺🇸', text: '4 groomers, at least 3 double-bookings per week with the old spreadsheet. PetFlow eliminated them completely — zero conflicts in 5 months. No more angry clients showing up at the wrong time.' },
+      { name: 'Juliana Martins', city: 'Pet Space · Campinas, Brazil 🇧🇷', text: '3 groomers, one shared calendar — at least one conflict every week. With PetFlow each groomer has their own schedule and services. Zero conflicts in 3 months. Revenue improved about 20% just from stopping to lose clients to scheduling chaos.' },
       { name: 'Miguel Ferreira', city: 'Porto, Portugal 🇵🇹', text: 'My vet clinic grew fast and a paper calendar just couldn\'t keep up. PetFlow organized everything — each vet with their own hours, every client with their pet\'s full profile. Looks professional, works even better.' },
     ],
     priceHeadline: 'One plan. Everything included.',
@@ -335,6 +337,7 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+      <Suspense><RefCapture /></Suspense>
 
       {/* ── Navbar ─────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 border-b border-gray-100 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/90">

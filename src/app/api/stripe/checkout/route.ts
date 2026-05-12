@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { stripe, getPriceIdForCurrency, type SupportedCurrency } from '@/lib/stripe'
 
 const STRIPE_LOCALE: Record<SupportedCurrency, 'pt-BR' | 'pt' | 'en'> = {
@@ -13,8 +14,6 @@ export async function POST(req: Request) {
   let email: string | undefined
   let requestedCurrency: SupportedCurrency = 'BRL'
   try {
-    const appUrl = 'https://getpetflow.com'
-
     const body = await req.json().catch(() => ({}))
     email = typeof body.email === 'string' ? body.email.trim() : undefined
     if (body.currency === 'EUR' || body.currency === 'USD' || body.currency === 'BRL') {
@@ -23,6 +22,9 @@ export async function POST(req: Request) {
   } catch {
     // email and currency are optional
   }
+
+  const cookieStore = await cookies()
+  const pfRef = cookieStore.get('pf_ref')?.value
 
   const { priceId, currency } = getPriceIdForCurrency(requestedCurrency)
 
@@ -35,7 +37,11 @@ export async function POST(req: Request) {
     cancel_url: `${appUrl}/`,
     locale: STRIPE_LOCALE[currency],
     billing_address_collection: 'auto',
-    metadata: { source: 'landing_page', requested_currency: requestedCurrency },
+    metadata: {
+      source: 'landing_page',
+      requested_currency: requestedCurrency,
+      ...(pfRef ? { pf_ref: pfRef } : {}),
+    },
   })
 
   return NextResponse.json({ url: session.url })
