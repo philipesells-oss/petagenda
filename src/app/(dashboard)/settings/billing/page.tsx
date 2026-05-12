@@ -20,11 +20,15 @@ export default function BillingPage() {
   const [cancelLoading, setCancelLoading] = useState(false)
   const [confirmCancel, setConfirmCancel] = useState(false)
   const [referralUrl, setReferralUrl] = useState<string | null>(null)
+  const [hasStripeCustomer, setHasStripeCustomer] = useState(true)
 
   useEffect(() => {
     fetch('/api/billing/summary')
       .then(r => r.json())
-      .then(d => { if (d.referralUrl) setReferralUrl(d.referralUrl) })
+      .then(d => {
+        if (d.referralUrl) setReferralUrl(d.referralUrl)
+        setHasStripeCustomer(d.hasStripeCustomer ?? false)
+      })
       .catch(() => {})
   }, [])
 
@@ -111,12 +115,18 @@ export default function BillingPage() {
           </div>
         </div>
 
-        <Button onClick={openPortal} disabled={portalLoading} className="w-full" variant="outline">
-          {portalLoading
-            ? <><Loader2Icon className="size-4 animate-spin" /> Abrindo portal…</>
-            : <><ExternalLinkIcon className="size-4" /> Gerenciar plano / alterar cartão</>
-          }
-        </Button>
+        {hasStripeCustomer ? (
+          <Button onClick={openPortal} disabled={portalLoading} className="w-full" variant="outline">
+            {portalLoading
+              ? <><Loader2Icon className="size-4 animate-spin" /> Abrindo portal…</>
+              : <><ExternalLinkIcon className="size-4" /> Gerenciar plano / alterar cartão</>
+            }
+          </Button>
+        ) : (
+          <p className="text-xs text-center text-muted-foreground py-1">
+            Para alterar o cartão, entre em contato: <a href="mailto:suporte@getpetflow.com" className="underline">suporte@getpetflow.com</a>
+          </p>
+        )}
       </div>
 
       {/* Referral section */}
