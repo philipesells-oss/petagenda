@@ -34,17 +34,17 @@ function detectLocale(hdrs: Headers): { locale: Locale; currency: SupportedCurre
 const COPY = {
   'pt-BR': {
     badge: '🆕 Agenda por profissional já disponível · R$29,90/mês · Sem fidelidade',
-    heroSupport: 'Seu pet shop merece',
-    heroTypingPhrases: ['sair do caderninho.', 'ser mais lucrativo.', 'impressionar clientes.'],
+    heroSupport: 'Cada profissional com sua própria agenda.',
+    heroTypingPhrases: ['Sem conflito de horário.', 'Sem bagunça no WhatsApp.', 'Mais dinheiro no caixa.'],
     heroSub: 'Cada profissional tem seu horário, seus serviços e sua agenda — o cliente agenda direto com quem faz. Menos confusão, menos conflito, mais dinheiro no caixa.',
     heroGuarantee: '7 dias de garantia · Cancele quando quiser · Suporte humano em português',
     navLogin: 'Entrar',
     navCta: 'Assinar agora',
     statsItems: [
-      { value: '232+', label: 'agendamentos processados' },
-      { value: '71+', label: 'pets cadastrados' },
-      { value: '20+', label: 'serviços configurados' },
-      { value: '100%', label: 'dados seus, sempre' },
+      { value: '< 3min', label: 'para o primeiro agendamento' },
+      { value: '0', label: 'conflitos com agenda por profissional' },
+      { value: '100%', label: 'na nuvem — funciona em qualquer tela' },
+      { value: '7 dias', label: 'de garantia, sem perguntas' },
     ],
     problemHeadline: 'Você se identifica?',
     problems: [
@@ -128,17 +128,17 @@ const COPY = {
 
   'pt-PT': {
     badge: '🆕 Agenda por profissional disponível · €19,90/mês · Sem fidelidade',
-    heroSupport: 'O seu petshop merece',
-    heroTypingPhrases: ['sair da agenda em papel.', 'ser mais lucrativo.', 'impressionar clientes.'],
+    heroSupport: 'Cada profissional com a sua própria agenda.',
+    heroTypingPhrases: ['Sem conflito de horários.', 'Sem confusão no WhatsApp.', 'Mais dinheiro no caixa.'],
     heroSub: 'Cada profissional tem o seu horário, os seus serviços e a sua agenda — o cliente marca diretamente com quem faz. Menos confusão, menos conflitos, mais dinheiro no caixa.',
     heroGuarantee: '7 dias de garantia · Cancele quando quiser · Suporte humano em português',
     navLogin: 'Entrar',
     navCta: 'Subscrever agora',
     statsItems: [
-      { value: '232+', label: 'marcações processadas' },
-      { value: '71+', label: 'animais registados' },
-      { value: '20+', label: 'serviços configurados' },
-      { value: '100%', label: 'dados seus, sempre' },
+      { value: '< 3min', label: 'para a primeira marcação' },
+      { value: '0', label: 'conflitos com agenda por profissional' },
+      { value: '100%', label: 'na nuvem — funciona em qualquer ecrã' },
+      { value: '7 dias', label: 'de garantia, sem perguntas' },
     ],
     problemHeadline: 'Isto soa-lhe familiar?',
     problems: [
@@ -222,17 +222,17 @@ const COPY = {
 
   en: {
     badge: '🆕 Per-staff scheduling available · $19.90/mo · Cancel anytime',
-    heroSupport: 'Your pet shop deserves to',
-    heroTypingPhrases: ['leave the spreadsheet.', 'be more profitable.', 'impress clients.'],
+    heroSupport: 'Each staff member has their own schedule.',
+    heroTypingPhrases: ['Zero double-bookings.', 'No WhatsApp chaos.', 'More money in the register.'],
     heroSub: 'Each staff member has their own schedule, services, and calendar — clients book directly with who does the work. Less chaos, fewer conflicts, more money in the register.',
     heroGuarantee: '7-day guarantee · Cancel anytime · Human support in your language',
     navLogin: 'Log in',
     navCta: 'Subscribe now',
     statsItems: [
-      { value: '232+', label: 'appointments processed' },
-      { value: '71+', label: 'pets registered' },
-      { value: '20+', label: 'services configured' },
-      { value: '100%', label: 'your data, always' },
+      { value: '< 3min', label: 'to your first booking' },
+      { value: '0', label: 'conflicts with per-staff scheduling' },
+      { value: '100%', label: 'cloud-based — works on any device' },
+      { value: '7 days', label: 'money-back guarantee, no questions' },
     ],
     problemHeadline: 'Does this sound familiar?',
     problems: [
@@ -375,7 +375,7 @@ export default async function LandingPage() {
         <div className="mx-auto max-w-4xl px-4">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {c.statsItems.map((s, i) => {
-              const icons = [ClockIcon, '🐾', '✂️', ShieldCheckIcon]
+              const icons = [ClockIcon, CheckIcon, SmartphoneIcon, ShieldCheckIcon]
               const IconOrEmoji = icons[i]
               return (
                 <div key={s.label} className="flex flex-col items-center gap-1 text-center">
