@@ -6,6 +6,8 @@ import {
   UsersIcon,
   BuildingIcon,
   ChevronRightIcon,
+  CreditCardIcon,
+  CalendarCheckIcon,
 } from 'lucide-react'
 import { getCurrentUser } from '@/lib/auth/get-current-user'
 import { getT } from '@/lib/server-i18n'
@@ -40,6 +42,18 @@ export default async function SettingsPage() {
       icon: UsersIcon,
       title: t.settings.teamTitle,
       description: t.settings.teamSubtitle,
+    },
+    {
+      href: '/settings/billing',
+      icon: CreditCardIcon,
+      title: 'Plano e cobrança',
+      description: 'Gerencie sua assinatura e método de pagamento.',
+    },
+    {
+      href: '/settings/booking',
+      icon: CalendarCheckIcon,
+      title: 'Agendamento online',
+      description: 'Link público para clientes agendarem diretamente.',
     },
   ]
 

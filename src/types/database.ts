@@ -61,6 +61,8 @@ export interface TenantRow {
   trial_ends_at: string | null
   messages_used: number
   messages_limit: number
+  public_booking_enabled: boolean
+  booking_instructions: string | null
   created_at: string
   updated_at: string
 }

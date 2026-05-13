@@ -16,6 +16,28 @@ const tenantProfileSchema = z.object({
   address: z.string().trim().optional().nullable(),
 })
 
+export async function updateBookingSettings(
+  tenantId: string,
+  { enabled, instructions }: { enabled: boolean; instructions: string },
+): Promise<ActionResult<void>> {
+  const user = await getCurrentUser()
+  if (!user || user.tenantId !== tenantId) return { ok: false, error: 'Não autenticado' }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('tenants')
+    .update({
+      public_booking_enabled: enabled,
+      booking_instructions: instructions.trim() || null,
+    } as never)
+    .eq('id', tenantId)
+
+  if (error) return { ok: false, error: error.message }
+
+  revalidatePath('/settings/booking')
+  return { ok: true, data: undefined }
+}
+
 export async function updateTenantProfile(
   formData: FormData,
 ): Promise<ActionResult<void>> {
