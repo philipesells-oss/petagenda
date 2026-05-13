@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getReferralUrl } from '@/lib/referral'
+import { stripe } from '@/lib/stripe'
 
 export async function GET() {
   const supabase = await createClient()
@@ -25,9 +26,22 @@ export async function GET() {
     .maybeSingle() as { data: { referral_code: string | null; stripe_customer_id: string | null } | null }
 
   const referralCode = tenant?.referral_code ?? null
+  const stripeCustomerId = tenant?.stripe_customer_id ?? null
+
+  let subscriptionStatus: string | null = null
+  if (stripeCustomerId) {
+    try {
+      const subs = await stripe.subscriptions.list({ customer: stripeCustomerId, limit: 1 })
+      subscriptionStatus = subs.data[0]?.status ?? null
+    } catch {
+      subscriptionStatus = null
+    }
+  }
+
   return NextResponse.json({
     referralCode,
     referralUrl: referralCode ? getReferralUrl(referralCode) : null,
-    hasStripeCustomer: !!tenant?.stripe_customer_id,
+    hasStripeCustomer: !!stripeCustomerId,
+    subscriptionStatus,
   })
 }

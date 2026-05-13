@@ -9,6 +9,7 @@ import { SetupForm } from '@/components/whatsapp/setup-form'
 import { ConnectionStatus } from '@/components/whatsapp/connection-status'
 import { QrCodeCard } from '@/components/whatsapp/qr-code-card'
 import { MessageCounter } from '@/components/whatsapp/message-counter'
+import { QuotaWarning } from '@/components/whatsapp/quota-warning'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { WhatsappConfig } from '@/actions/whatsapp'
@@ -59,6 +60,10 @@ export default async function WhatsappPage() {
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-4">
             <ConnectionStatus config={config} />
+            <QuotaWarning
+              used={user.tenant.messagesUsed}
+              limit={user.tenant.messagesLimit}
+            />
             <MessageCounter
               used={user.tenant.messagesUsed}
               limit={user.tenant.messagesLimit}

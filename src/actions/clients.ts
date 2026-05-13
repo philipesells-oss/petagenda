@@ -222,13 +222,24 @@ export async function uploadPetPhotoAction(
   const file = formData.get('file') as File | null
   if (!file || file.size === 0) return { ok: false, error: 'Nenhum arquivo enviado' }
 
-  const ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase()
+  const ALLOWED_TYPES: Record<string, string> = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+  }
+  const MAX_SIZE = 5 * 1024 * 1024
+
+  if (!ALLOWED_TYPES[file.type]) return { ok: false, error: 'Formato inválido. Use JPG, PNG, WebP ou GIF.' }
+  if (file.size > MAX_SIZE) return { ok: false, error: 'Arquivo muito grande. Máximo 5MB.' }
+
+  const ext = ALLOWED_TYPES[file.type]
   const path = `${user.tenantId}/${petId}.${ext}`
 
   const supabase = await createSupabase()
   const { error } = await supabase.storage.from('pets').upload(path, file, {
     upsert: true,
-    contentType: file.type || 'image/jpeg',
+    contentType: file.type,
   })
   if (error) return { ok: false, error: error.message }
 

@@ -87,6 +87,14 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Case 4: authenticated but subscription canceled — gate to billing page.
+  // plan_status is stored in user_metadata (set by webhook) to avoid DB on every request.
+  if (user && user.user_metadata?.plan_status === 'canceled') {
+    if (pathname !== BILLING_ROUTE && !pathname.startsWith(BILLING_ROUTE)) {
+      return NextResponse.redirect(new URL(BILLING_ROUTE, request.url))
+    }
+  }
+
   return response
 }
 

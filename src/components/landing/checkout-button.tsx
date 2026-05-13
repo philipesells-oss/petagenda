@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import { Loader2Icon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import type { SupportedCurrency } from '@/lib/stripe'
+import type { SupportedCurrency, BillingInterval } from '@/lib/stripe'
 
 interface Props {
   label?: string
   size?: 'default' | 'lg' | 'sm'
   className?: string
   currency?: SupportedCurrency
+  interval?: BillingInterval
 }
 
 export function CheckoutButton({
@@ -17,11 +18,18 @@ export function CheckoutButton({
   size = 'lg',
   className,
   currency = 'BRL',
+  interval = 'month',
 }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const defaultLabel = currency === 'EUR'
+  const defaultLabel = interval === 'year'
+    ? currency === 'EUR'
+      ? 'Começar agora — €199/ano'
+      : currency === 'USD'
+      ? 'Start now — $199/year'
+      : 'Começar agora — R$299/ano'
+    : currency === 'EUR'
     ? 'Começar agora — €19,90/mês'
     : currency === 'USD'
     ? 'Start now — $19.90/mo'
@@ -39,7 +47,7 @@ export function CheckoutButton({
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currency }),
+        body: JSON.stringify({ currency, interval }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))

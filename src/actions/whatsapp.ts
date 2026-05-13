@@ -368,6 +368,7 @@ export async function toggleTemplate(
     .update({ is_active: isActive } as never)
     .eq('id', id)
     .eq('tenant_id', user.tenantId)
+    .eq('is_default', false)
 
   if (error) return { ok: false, error: error.message }
 

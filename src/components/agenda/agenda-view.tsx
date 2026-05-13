@@ -7,7 +7,7 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, UsersIcon } from 'lucide-react'
+import { CalendarX, ChevronLeftIcon, ChevronRightIcon, PlusIcon, UsersIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -313,6 +313,16 @@ export function AgendaView({
           {isClosedDay ? (
             <div className="p-8 text-center text-sm text-muted-foreground">
               O pet shop está fechado neste dia.
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+              <CalendarX className="size-12 text-muted-foreground" aria-hidden="true" />
+              <h3 className="text-base font-semibold text-foreground">
+                Nenhum agendamento
+              </h3>
+              <p className="max-w-xs text-sm text-muted-foreground">
+                Clique no botão + para agendar o primeiro horário do dia.
+              </p>
             </div>
           ) : (
             <div className="divide-y">

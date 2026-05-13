@@ -2,11 +2,14 @@ import type { NextConfig } from "next";
 
 const SUPABASE_HOSTNAME = (() => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!url) return "qckasnpabjucioiemiot.supabase.co";
+  if (!url) {
+    if (process.env.NODE_ENV === 'production') throw new Error("NEXT_PUBLIC_SUPABASE_URL is required");
+    return "localhost";
+  }
   try {
     return new URL(url).hostname;
   } catch {
-    return "qckasnpabjucioiemiot.supabase.co";
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL is not a valid URL");
   }
 })();
 
@@ -23,7 +26,7 @@ const securityHeaders = [
       "default-src 'self'",
       // Next.js requires unsafe-inline + unsafe-eval for hydration in dev;
       // in prod the inline scripts use nonces injected by the framework.
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
+      "script-src 'self' 'unsafe-inline' https://js.stripe.com",
       "style-src 'self' 'unsafe-inline'",
       `img-src 'self' data: blob: ${SUPABASE_URL}`,
       `connect-src 'self' ${SUPABASE_URL} wss://${SUPABASE_HOSTNAME} https://api.stripe.com`,

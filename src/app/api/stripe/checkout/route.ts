@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { stripe, getPriceIdForCurrency, type SupportedCurrency } from '@/lib/stripe'
+import { stripe, getPriceIdForCurrency, type SupportedCurrency, type BillingInterval } from '@/lib/stripe'
 
 const STRIPE_LOCALE: Record<SupportedCurrency, 'pt-BR' | 'pt' | 'en'> = {
   BRL: 'pt-BR',
@@ -13,11 +13,15 @@ export async function POST(req: Request) {
 
   let email: string | undefined
   let requestedCurrency: SupportedCurrency = 'BRL'
+  let requestedInterval: BillingInterval = 'month'
   try {
     const body = await req.json().catch(() => ({}))
     email = typeof body.email === 'string' ? body.email.trim() : undefined
     if (body.currency === 'EUR' || body.currency === 'USD' || body.currency === 'BRL') {
       requestedCurrency = body.currency as SupportedCurrency
+    }
+    if (body.interval === 'year') {
+      requestedInterval = 'year'
     }
   } catch {
     // email and currency are optional
@@ -26,7 +30,7 @@ export async function POST(req: Request) {
   const cookieStore = await cookies()
   const pfRef = cookieStore.get('pf_ref')?.value
 
-  const { priceId, currency } = getPriceIdForCurrency(requestedCurrency)
+  const { priceId, currency } = getPriceIdForCurrency(requestedCurrency, requestedInterval)
 
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
@@ -40,6 +44,7 @@ export async function POST(req: Request) {
     metadata: {
       source: 'landing_page',
       requested_currency: requestedCurrency,
+      billing_interval: requestedInterval,
       ...(pfRef ? { pf_ref: pfRef } : {}),
     },
   })

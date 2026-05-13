@@ -14,6 +14,14 @@ const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   incomplete:  { label: 'Incompleto', color: 'text-gray-500' },
 }
 
+const CANCEL_REASONS = [
+  { value: 'too_expensive',     label: 'Muito caro' },
+  { value: 'not_enough_usage',  label: 'Não uso o suficiente' },
+  { value: 'missing_features',  label: 'Faltam funcionalidades' },
+  { value: 'switching',         label: 'Vou para outro sistema' },
+  { value: 'other',             label: 'Outro motivo' },
+] as const
+
 export default function BillingPage() {
   const router = useRouter()
   const [portalLoading, setPortalLoading] = useState(false)
@@ -21,6 +29,9 @@ export default function BillingPage() {
   const [confirmCancel, setConfirmCancel] = useState(false)
   const [referralUrl, setReferralUrl] = useState<string | null>(null)
   const [hasStripeCustomer, setHasStripeCustomer] = useState(true)
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string>('active')
+  const [cancelReason, setCancelReason] = useState<string | null>(null)
+  const [showSurvey, setShowSurvey] = useState(false)
 
   useEffect(() => {
     fetch('/api/billing/summary')
@@ -28,6 +39,7 @@ export default function BillingPage() {
       .then(d => {
         if (d.referralUrl) setReferralUrl(d.referralUrl)
         setHasStripeCustomer(d.hasStripeCustomer ?? false)
+        if (d.subscriptionStatus) setSubscriptionStatus(d.subscriptionStatus)
       })
       .catch(() => {})
   }, [])
@@ -54,13 +66,19 @@ export default function BillingPage() {
   }
 
   async function cancelSubscription() {
+    if (!cancelReason) {
+      setShowSurvey(true)
+      return
+    }
     setCancelLoading(true)
     try {
-      const res = await fetch('/api/stripe/cancel', { method: 'POST' })
+      const res = await fetch(`/api/stripe/cancel?reason=${encodeURIComponent(cancelReason)}`, { method: 'POST' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
       toast.success('Assinatura cancelada. Você mantém o acesso até o fim do período pago.')
       setConfirmCancel(false)
+      setShowSurvey(false)
+      setCancelReason(null)
       router.refresh()
     } catch {
       toast.error('Erro ao cancelar. Tente novamente ou use o portal de cobrança.')
@@ -86,8 +104,8 @@ export default function BillingPage() {
             <p className="font-semibold text-sm">PetFlow — Plano Único</p>
             <p className="text-xs text-muted-foreground mt-0.5">R$29,90 / mês · Cancele quando quiser</p>
           </div>
-          <span className={`text-xs font-semibold ${STATUS_LABEL['active'].color}`}>
-            {STATUS_LABEL['active'].label}
+          <span className={`text-xs font-semibold ${(STATUS_LABEL[subscriptionStatus] ?? STATUS_LABEL['active']).color}`}>
+            {(STATUS_LABEL[subscriptionStatus] ?? STATUS_LABEL['active']).label}
           </span>
         </div>
 
@@ -189,16 +207,55 @@ export default function BillingPage() {
             <p className="text-xs text-muted-foreground">
               Seu acesso será mantido até o fim do período atual. Após isso, sua conta será suspensa e os dados preservados por 30 dias.
             </p>
+
+            {showSurvey && (
+              <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
+                <p className="text-xs font-semibold">Por que você está cancelando?</p>
+                <div className="flex flex-col gap-1.5">
+                  {CANCEL_REASONS.map(reason => {
+                    const selected = cancelReason === reason.value
+                    return (
+                      <button
+                        key={reason.value}
+                        type="button"
+                        onClick={() => setCancelReason(reason.value)}
+                        className={`flex items-center gap-2 rounded-md border px-3 py-2 text-left text-xs transition-colors ${
+                          selected
+                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300'
+                            : 'border-input bg-background hover:bg-muted'
+                        }`}
+                      >
+                        <span
+                          className={`size-3.5 shrink-0 rounded-full border ${
+                            selected ? 'border-emerald-500 bg-emerald-500' : 'border-muted-foreground/40'
+                          }`}
+                        />
+                        {reason.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2">
               <Button
                 size="sm"
                 variant="destructive"
-                disabled={cancelLoading}
+                disabled={cancelLoading || (showSurvey && !cancelReason)}
                 onClick={cancelSubscription}
               >
                 {cancelLoading ? <><Loader2Icon className="size-3.5 animate-spin" /> Cancelando…</> : 'Sim, cancelar'}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => setConfirmCancel(false)}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setConfirmCancel(false)
+                  setShowSurvey(false)
+                  setCancelReason(null)
+                }}
+              >
                 Voltar
               </Button>
             </div>

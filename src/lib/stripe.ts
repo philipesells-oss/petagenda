@@ -14,12 +14,27 @@ export type SupportedCurrency = 'BRL' | 'EUR' | 'USD'
 /** @deprecated use SupportedCurrency */
 export type PlanCurrency = SupportedCurrency
 
-const BRL_PRICE_ID = 'price_1TNeYfGtK644c9ETLEaiGSxA'
+export type BillingInterval = 'month' | 'year'
 
-export function getPriceIdForCurrency(currency: SupportedCurrency): {
-  priceId: string
-  currency: SupportedCurrency
-} {
+const BRL_PRICE_ID = process.env.STRIPE_PRICE_BRL ?? 'price_1TNeYfGtK644c9ETLEaiGSxA'
+const BRL_PRICE_ANNUAL_ID = process.env.STRIPE_PRICE_BRL_ANNUAL ?? 'price_1TWYXVGtK644c9ETaOpZiICG'
+
+export function getPriceIdForCurrency(
+  currency: SupportedCurrency,
+  interval: BillingInterval = 'month',
+): { priceId: string; currency: SupportedCurrency } {
+  if (interval === 'year') {
+    if (currency === 'EUR') {
+      const id = (process.env.STRIPE_PRICE_EUR_ANNUAL ?? '').trim()
+      if (id) return { priceId: id, currency: 'EUR' }
+    }
+    if (currency === 'USD') {
+      const id = (process.env.STRIPE_PRICE_USD_ANNUAL ?? '').trim()
+      if (id) return { priceId: id, currency: 'USD' }
+    }
+    return { priceId: BRL_PRICE_ANNUAL_ID, currency: 'BRL' }
+  }
+
   if (currency === 'EUR') {
     const id = (process.env.STRIPE_PRICE_EUR ?? '').trim()
     if (id) return { priceId: id, currency: 'EUR' }

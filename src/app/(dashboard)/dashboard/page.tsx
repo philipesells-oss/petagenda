@@ -7,6 +7,7 @@ import {
 } from '@/components/dashboard/today-appointments'
 import { RevenueChart } from '@/components/dashboard/revenue-chart'
 import { Launchpad } from '@/components/dashboard/launchpad'
+import { ReferralCard } from '@/components/dashboard/referral-card'
 import { getT } from '@/lib/server-i18n'
 import type { AppointmentStatus } from '@/types'
 
@@ -195,6 +196,8 @@ export default async function DashboardHome() {
         hasTeam={hasTeam}
         hasFirstAppointment={hasFirstAppointment}
       />
+
+      <ReferralCard />
 
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">

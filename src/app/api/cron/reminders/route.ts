@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { verifySignatureAppRouter } from '@upstash/qstash/nextjs'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendWhatsappMessage } from '@/lib/whatsapp/send-message'
 
@@ -16,14 +17,15 @@ function toHHMM(d: Date): string {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get('authorization') ?? ''
-  const cronSecret = process.env.CRON_SECRET
-
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+/**
+ * Core cron logic — runs only after the request has been authenticated by
+ * one of two paths:
+ *   1. QStash signature (production / Vercel cron via QStash). Verified by the
+ *      `verifySignatureAppRouter` wrapper below.
+ *   2. `Authorization: Bearer ${CRON_SECRET}` header (manual / Vercel Cron
+ *      that does NOT route through QStash). Handled in `GET` before delegating.
+ */
+async function runReminders(): Promise<NextResponse> {
   const admin = createAdminClient()
   const now = new Date()
 
@@ -159,4 +161,26 @@ interface AppointmentWithRelations {
   clients: { phone: string | null; full_name: string } | null
   pets: { name: string } | null
   services: { name: string } | null
+}
+
+export async function GET(req: NextRequest) {
+  // Path 1: Manual / non-QStash callers send `Authorization: Bearer
+  // ${CRON_SECRET}`. We keep this path so that Vercel Cron, scripts and
+  // on-call humans can trigger the job without involving QStash.
+  const authHeader = req.headers.get('authorization') ?? ''
+  const cronSecret = process.env.CRON_SECRET
+  if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
+    return runReminders()
+  }
+
+  // Path 2: Requests forwarded by QStash carry an `Upstash-Signature`
+  // header. verifySignatureAppRouter is created lazily here so the module
+  // can load without QSTASH_* keys being set (e.g. local dev).
+  if (req.headers.get('upstash-signature')) {
+    const qstashHandler = verifySignatureAppRouter(async () => runReminders())
+    return qstashHandler(req) as Promise<NextResponse>
+  }
+
+  // No valid auth path → fail closed.
+  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 }

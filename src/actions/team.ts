@@ -10,7 +10,7 @@ import type { ActionResult } from '@/types'
 const createEmployeeSchema = z.object({
   full_name: z.string().trim().min(2, 'Nome obrigatório'),
   email: z.string().trim().email('E-mail inválido'),
-  password: z.string().min(6, 'Senha mínima de 6 caracteres'),
+  password: z.string().min(8, 'Senha mínima de 8 caracteres'),
   role: z.enum(['employee', 'admin']).default('employee'),
 })
 
@@ -140,6 +140,15 @@ export async function saveEmployeeScheduleAction(
   }
 
   const admin = createAdminClient()
+
+  const { data: empCheck } = await admin
+    .from('users')
+    .select('id')
+    .eq('id', employeeId)
+    .eq('tenant_id', caller.tenantId)
+    .single()
+
+  if (!empCheck) return { ok: false, error: 'Funcionário não encontrado' }
 
   const rows = schedules.map((s) => ({
     tenant_id: caller.tenantId,

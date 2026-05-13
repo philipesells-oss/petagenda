@@ -12,11 +12,15 @@
 
 import { z } from 'zod'
 import { redirect } from 'next/navigation'
-import { headers } from 'next/headers'
 import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 import type { ActionResult } from '@/types'
+
+// Standard message shown to users when they hit any auth rate limit.
+const RATE_LIMITED_MSG =
+  'Muitas tentativas. Aguarde alguns minutos e tente novamente.'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -58,13 +62,8 @@ function formatZodError<T>(err: z.ZodError<T>): ActionResult<never> {
   }
 }
 
-async function getOrigin(): Promise<string> {
-  const h = await headers()
-  // Prefer explicit forwarded host for deployed environments, fallback to
-  // host header for local dev. Scheme follows x-forwarded-proto.
-  const host = h.get('x-forwarded-host') ?? h.get('host') ?? 'localhost:3000'
-  const proto = h.get('x-forwarded-proto') ?? (host.startsWith('localhost') ? 'http' : 'https')
-  return `${proto}://${host}`
+function getOrigin(): string {
+  return process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 }
 
 // ---------------------------------------------------------------------------
@@ -72,6 +71,18 @@ async function getOrigin(): Promise<string> {
 // ---------------------------------------------------------------------------
 
 export async function signUp(formData: FormData): Promise<ActionResult<{ email: string }>> {
+  // Rate limit: 5 signups per 10 min per IP — blocks account-creation abuse.
+  const ip = await getClientIp()
+  const rl = await checkRateLimit({
+    namespace: 'auth:signUp',
+    identifier: ip,
+    limit: 5,
+    windowSeconds: 10 * 60,
+  })
+  if (!rl.success) {
+    return { ok: false, error: RATE_LIMITED_MSG }
+  }
+
   const parsed = signUpSchema.safeParse({
     fullName: formData.get('fullName'),
     email: formData.get('email'),
@@ -114,6 +125,19 @@ export async function signIn(formData: FormData): Promise<ActionResult<{ next: s
   })
 
   if (!parsed.success) return formatZodError(parsed.error)
+
+  // Rate limit: 10 attempts per 10 min per email — blocks credential stuffing.
+  // We key on email (not IP) so a corp NAT does not lock everyone out; the
+  // same email targeted from multiple IPs still hits the same bucket.
+  const rl = await checkRateLimit({
+    namespace: 'auth:signIn',
+    identifier: parsed.data.email,
+    limit: 10,
+    windowSeconds: 10 * 60,
+  })
+  if (!rl.success) {
+    return { ok: false, error: RATE_LIMITED_MSG }
+  }
 
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword(parsed.data)
@@ -175,6 +199,19 @@ export async function resetPassword(formData: FormData): Promise<ActionResult<{ 
   if (!parsed.success) return formatZodError(parsed.error)
 
   const { email } = parsed.data
+
+  // Rate limit: 3 reset emails per hour per email — protects against
+  // email-bombing and reduces Resend cost from automated abuse.
+  const rl = await checkRateLimit({
+    namespace: 'auth:resetPassword',
+    identifier: email,
+    limit: 3,
+    windowSeconds: 60 * 60,
+  })
+  if (!rl.success) {
+    return { ok: false, error: RATE_LIMITED_MSG }
+  }
+
   const origin = await getOrigin()
   const admin = createAdminClient()
 

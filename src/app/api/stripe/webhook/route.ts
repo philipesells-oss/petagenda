@@ -5,7 +5,7 @@ import { Resend } from 'resend'
 import { sendCAPIEvent } from '@/lib/meta/capi'
 import { generateReferralCode, getReferralUrl } from '@/lib/referral'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const getResend = () => new Resend(process.env.RESEND_API_KEY)
 
 function secureRandomPassword(len = 20): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&*'
@@ -131,7 +131,7 @@ export async function POST(req: Request) {
 
           // Notify referrer
           if (referrerEmail) {
-            await resend.emails.send({
+            await getResend().emails.send({
               from: 'PetFlow <noreply@contato.getpetflow.com>',
               to: referrerEmail,
               subject: '🎉 Sua indicação deu certo — 1 mês grátis no PetFlow!',
@@ -186,7 +186,7 @@ export async function POST(req: Request) {
 
   const accessLink = linkData?.properties?.action_link ?? `${appUrl}/forgot-password`
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: 'PetFlow <noreply@contato.getpetflow.com>',
     to: email,
     subject: 'Seu acesso ao PetFlow está pronto 🐾',
