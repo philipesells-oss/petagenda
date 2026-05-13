@@ -579,6 +579,28 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* ── Vídeo Demo ─────────────────────────────────────────── */}
+      <section className="bg-gray-950 px-4 py-16">
+        <div className="mx-auto max-w-4xl text-center">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-400">Demonstração</p>
+          <h2 className="mb-3 text-2xl font-bold text-white md:text-3xl">
+            Veja o PetFlow em ação
+          </h2>
+          <p className="mb-8 text-sm text-gray-400">Dashboard real, agenda lotada e QR Code — tudo em 30 segundos.</p>
+          <div className="relative overflow-hidden rounded-2xl border border-gray-700/60 shadow-2xl">
+            <video
+              src="/petflow-walkthrough.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full"
+              style={{ display: 'block' }}
+            />
+          </div>
+        </div>
+      </section>
+
       {/* ── Plataforma por dentro ───────────────────────────────── */}
       <PlatformShowcase locale={locale} />
 
