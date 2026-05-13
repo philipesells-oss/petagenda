@@ -13,6 +13,7 @@ const bookSchema = z.object({
   clientPhone: z.string().trim().min(8).max(20),
   petName: z.string().trim().min(1).max(80),
   petSpecies: z.enum(['dog', 'cat', 'bird', 'other']),
+  staffId: z.string().uuid().nullable().optional(),
 })
 
 function overlaps(aS: number, aE: number, bS: number, bE: number) {
@@ -39,7 +40,7 @@ export async function POST(
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Dados inválidos' }, { status: 422 })
   }
 
-  const { serviceId, date, time, clientName, clientPhone, petName, petSpecies } = parsed.data
+  const { serviceId, date, time, clientName, clientPhone, petName, petSpecies, staffId } = parsed.data
   const today = new Date().toISOString().slice(0, 10)
   if (date < today) return NextResponse.json({ error: 'Data inválida' }, { status: 422 })
 
@@ -118,6 +119,7 @@ export async function POST(
     tenant_id: tenant.id, client_id: clientId, pet_id: petId, service_id: serviceId,
     date, start_time: time, end_time: endTime, status: 'scheduled',
     price: Number(svc.price), source: 'public_booking',
+    ...(staffId ? { assigned_to: staffId } : {}),
   } as never).select('id').single()
 
   if (ae || !appt) return NextResponse.json({ error: 'Erro ao criar agendamento' }, { status: 500 })

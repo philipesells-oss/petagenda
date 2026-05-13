@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Supabase Auth Users</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0f0f; font-family: -apple-system, 'Inter', sans-serif; font-size: 13px; color: #ededed; width: 1280px; }
+
+  /* Top nav */
+  .topnav { background: #1c1c1c; border-bottom: 1px solid #2e2e2e; height: 48px; display: flex; align-items: center; padding: 0 20px; gap: 16px; }
+  .topnav .logo { color: #3ecf8e; font-weight: 800; font-size: 15px; letter-spacing: -0.3px; }
+  .topnav .breadcrumb { color: #666; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .topnav .breadcrumb span { color: #999; }
+  .topnav .breadcrumb .active { color: #ededed; }
+
+  /* Layout */
+  .layout { display: flex; height: calc(100vh - 48px); min-height: 600px; }
+
+  /* Sidebar */
+  .sidebar { width: 220px; background: #161616; border-right: 1px solid #2e2e2e; padding: 12px 0; flex-shrink: 0; }
+  .sidebar-section { padding: 4px 12px; margin-bottom: 2px; }
+  .sidebar-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.8px; padding: 8px 12px 4px; font-weight: 600; }
+  .sidebar-item { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 4px; color: #aaa; font-size: 12px; cursor: pointer; margin: 1px 4px; }
+  .sidebar-item:hover { background: #222; color: #ededed; }
+  .sidebar-item.active { background: #1a3a2a; color: #3ecf8e; font-weight: 500; }
+  .sidebar-icon { width: 14px; height: 14px; opacity: 0.7; }
+
+  /* Main content */
+  .main { flex: 1; overflow-y: auto; padding: 24px 32px; }
+  .page-header { margin-bottom: 20px; }
+  .page-header h1 { font-size: 18px; font-weight: 600; color: #ededed; }
+  .page-header p { font-size: 12px; color: #666; margin-top: 4px; }
+
+  /* Toolbar */
+  .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .search-box { display: flex; align-items: center; gap: 8px; background: #1c1c1c; border: 1px solid #2e2e2e; border-radius: 6px; padding: 7px 12px; flex: 1; max-width: 340px; }
+  .search-box input { background: none; border: none; outline: none; color: #ededed; font-size: 13px; flex: 1; }
+  .search-box .icon { color: #555; font-size: 12px; }
+  .btn { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid #2e2e2e; background: #1c1c1c; color: #ededed; }
+  .btn-primary { background: #3ecf8e; border-color: #3ecf8e; color: #000; font-weight: 600; }
+  .count-badge { background: #222; border: 1px solid #2e2e2e; border-radius: 5px; padding: 4px 10px; font-size: 11px; color: #888; margin-left: auto; }
+
+  /* Table */
+  .table-wrap { border: 1px solid #2e2e2e; border-radius: 8px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: #1a1a1a; padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: #777; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2e2e2e; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid #1e1e1e; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover td { background: #181818; }
+  tbody tr.highlighted td { background: #0d2318 !important; }
+  td { padding: 12px 14px; font-size: 12px; color: #ccc; vertical-align: middle; }
+  .email-cell { color: #ededed; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+  .email-cell .avatar { width: 28px; height: 28px; border-radius: 50%; background: #3ecf8e22; border: 1px solid #3ecf8e44; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #3ecf8e; font-weight: 700; flex-shrink: 0; }
+  .provider-badge { display: inline-flex; align-items: center; gap: 4px; background: #222; border: 1px solid #333; border-radius: 4px; padding: 2px 7px; font-size: 10px; color: #aaa; }
+  .dot-green { width: 7px; height: 7px; border-radius: 50%; background: #3ecf8e; display: inline-block; margin-right: 3px; }
+  .tag { display: inline-block; background: #1a3a2a; border: 1px solid #2a5a3a; border-radius: 4px; padding: 2px 7px; font-size: 10px; color: #3ecf8e; font-weight: 600; }
+  .tag-yellow { background: #2a2500; border-color: #4a4200; color: #f0c040; }
+  .mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 10px; color: #888; }
+
+  /* Highlighted row label */
+  .row-label { position: relative; }
+  .glow { box-shadow: inset 0 0 0 1px #3ecf8e55; }
+
+  /* Footer pagination */
+  .pagination { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #161616; border-top: 1px solid #2e2e2e; font-size: 11px; color: #666; }
+  .pagination .rows { display: flex; align-items: center; gap: 6px; }
+  .pag-btn { padding: 4px 10px; border-radius: 4px; border: 1px solid #2e2e2e; background: #1c1c1c; color: #888; font-size: 11px; cursor: pointer; }
+
+  /* Evidence callout */
+  .callout { background: #0d2318; border: 1px solid #3ecf8e55; border-radius: 8px; padding: 12px 16px; margin-top: 20px; }
+  .callout-title { font-size: 11px; font-weight: 700; color: #3ecf8e; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .callout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .callout-item { background: #0a1a10; border: 1px solid #1a3a2a; border-radius: 6px; padding: 8px 12px; }
+  .callout-item .label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .callout-item .value { font-size: 12px; font-weight: 700; color: #ededed; }
+  .callout-item .value.highlight { color: #3ecf8e; }
+  .callout-item .sub { font-size: 10px; color: #666; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- Top nav -->
+<div class="topnav">
+  <div class="logo">Supabase</div>
+  <div class="breadcrumb">
+    <span>PetFlow</span>
+    <span style="color:#444">›</span>
+    <span>Authentication</span>
+    <span style="color:#444">›</span>
+    <span class="active">Users</span>
+  </div>
+  <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
+    <span style="font-size:11px; color:#555;">Project ref: qckasnpabjucioiemiot</span>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-label">Authentication</div>
+    <div class="sidebar-item active">
+      <svg class="sidebar-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+      Users
+    </div>
+    <div class="sidebar-item">
+      <svg class="sidebar-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+      Policies
+    </div>
+    <div class="sidebar-item">
+      <svg class="sidebar-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><circle cx="12" cy="12" r="3" /></svg>
+      Configuration
+    </div>
+    <div class="sidebar-item">
+      <svg class="sidebar-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+      Email Templates
+    </div>
+    <div class="sidebar-label" style="margin-top:8px;">URL Configuration</div>
+    <div class="sidebar-item">
+      <svg class="sidebar-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+      URL Configuration
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="page-header">
+      <h1>Users</h1>
+      <p>View and manage your users</p>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <span class="icon">🔍</span>
+        <input type="text" value="silv123cinara@gmail.com" readonly />
+      </div>
+      <button class="btn">Filter</button>
+      <button class="btn">Columns</button>
+      <div class="count-badge">1 user found</div>
+      <button class="btn btn-primary" style="margin-left:8px;">+ Invite user</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:32px;"><input type="checkbox" style="accent-color:#3ecf8e;"></th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Providers</th>
+            <th>Created At</th>
+            <th>Last Sign In</th>
+            <th>User UID</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Highlighted row - Cinara -->
+          <tr class="highlighted glow">
+            <td><input type="checkbox" checked style="accent-color:#3ecf8e;"></td>
+            <td>
+              <div class="email-cell">
+                <div class="avatar">C</div>
+                <div>
+                  <div>silv123cinara@gmail.com</div>
+                  <div style="font-size:10px; color:#3ecf8e; margin-top:2px;"><span class="dot-green"></span>Email confirmed · 19/04/2026</div>
+                </div>
+              </div>
+            </td>
+            <td><span style="color:#555;">—</span></td>
+            <td><span class="provider-badge">✉ email</span></td>
+            <td><span style="color:#ededed;">19 Apr 2026, 23:46:53</span></td>
+            <td>
+              <div>
+                <span style="color:#3ecf8e; font-weight:700;">19 Apr 2026, 23:48:35</span>
+                <div style="font-size:10px; color:#3ecf8e; margin-top:2px;">102s after purchase ⭐</div>
+              </div>
+            </td>
+            <td><span class="mono">bb6141e8-5a09-48ce...</span></td>
+            <td style="text-align:right;"><button class="btn" style="font-size:11px; padding:4px 10px;">•••</button></td>
+          </tr>
+
+          <!-- Other users (dimmed) -->
+          <tr style="opacity:0.3;">
+            <td><input type="checkbox"></td>
+            <td><div class="email-cell"><div class="avatar" style="background:#222; border-color:#333; color:#666;">D</div>danilalimamessias@gmail.com</div></td>
+            <td>—</td>
+            <td><span class="provider-badge">✉ email</span></td>
+            <td>24 Apr 2026, 22:05:42</td>
+            <td>26 Apr 2026, 14:57:54</td>
+            <td><span class="mono">e7bc3afc-4567-4ff5...</span></td>
+            <td></td>
+          </tr>
+          <tr style="opacity:0.3;">
+            <td><input type="checkbox"></td>
+            <td><div class="email-cell"><div class="avatar" style="background:#222; border-color:#333; color:#666;">M</div>centroesteticoducao@gmail.com</div></td>
+            <td>—</td>
+            <td><span class="provider-badge">✉ email</span></td>
+            <td>24 Apr 2026, 18:53:42</td>
+            <td>24 Apr 2026, 18:57:15</td>
+            <td><span class="mono">69487c03-be3c-48a0...</span></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <div class="rows">
+          Rows per page:
+          <select style="background:#1c1c1c; border:1px solid #2e2e2e; color:#ededed; border-radius:4px; padding:2px 6px; font-size:11px;"><option>20</option></select>
+        </div>
+        <span>Showing 1–1 of 1 user (filtered)</span>
+        <div style="display:flex; gap:4px;">
+          <button class="pag-btn">‹</button>
+          <button class="pag-btn" style="background:#222; color:#ededed;">1</button>
+          <button class="pag-btn">›</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evidence callout -->
+    <div class="callout">
+      <div class="callout-title">
+        <span>🔐</span> Auth Log — silv123cinara@gmail.com (User ID: bb6141e8-5a09-48ce-94bc-d0b2befb89a8)
+      </div>
+      <div class="callout-grid">
+        <div class="callout-item">
+          <div class="label">Account Created</div>
+          <div class="value">2026-04-19T23:46:53.844Z</div>
+          <div class="sub">19/04/2026 às 20:46:53 (Horário Brasília)</div>
+        </div>
+        <div class="callout-item">
+          <div class="label">Email Confirmed At</div>
+          <div class="value">2026-04-19T23:46:53.932Z</div>
+          <div class="sub">Confirmado automaticamente via webhook Stripe</div>
+        </div>
+        <div class="callout-item" style="border-color:#3ecf8e55; background:#071a0e;">
+          <div class="label">⭐ Last Sign In At</div>
+          <div class="value highlight">2026-04-19T23:48:35.463Z</div>
+          <div class="sub">20:48:35 BRT — 102 segundos após o pagamento</div>
+        </div>
+        <div class="callout-item" style="border-color:#3ecf8e55; background:#071a0e;">
+          <div class="label">⭐ Recovery Sent At</div>
+          <div class="value highlight">2026-04-25T07:05:23.997Z</div>
+          <div class="sub">5 dias após a compra — ainda tentando acessar</div>
+        </div>
+        <div class="callout-item">
+          <div class="label">Provider</div>
+          <div class="value">email (Stripe webhook → magic link)</div>
+          <div class="sub">Autenticada via link no email de boas-vindas</div>
+        </div>
+        <div class="callout-item">
+          <div class="label">Role / Status</div>
+          <div class="value">owner · <span style="color:#3ecf8e;">is_active: true</span></div>
+          <div class="sub">Tenant: "Meu Pet Shop" · plan: starter · active</div>
+        </div>
+      </div>
+      <div style="margin-top:10px; font-size:10px; color:#555; border-top:1px solid #1a3a2a; padding-top:8px;">
+        Source: Supabase Auth API · Project: qckasnpabjucioiemiot.supabase.co · Exported: 12/05/2026 · For use in Stripe Dispute du_1TSKPUGtK644c9ET9aK22zcN
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

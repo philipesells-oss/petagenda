@@ -14,7 +14,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
 
-const PUBLIC_ROUTES = ['/login', '/signup', '/forgot-password', '/first-access']
+const PUBLIC_ROUTES = ['/login', '/signup', '/forgot-password', '/first-access', '/book']
 const BILLING_ROUTE = '/settings/billing'
 const FIRST_ACCESS_ROUTE = '/first-access'
 

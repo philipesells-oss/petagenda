@@ -28,7 +28,7 @@ const securityHeaders = [
       // in prod the inline scripts use nonces injected by the framework.
       "script-src 'self' 'unsafe-inline' https://js.stripe.com",
       "style-src 'self' 'unsafe-inline'",
-      `img-src 'self' data: blob: ${SUPABASE_URL}`,
+      `img-src 'self' data: blob: ${SUPABASE_URL} https://api.qrserver.com`,
       `connect-src 'self' ${SUPABASE_URL} wss://${SUPABASE_HOSTNAME} https://api.stripe.com`,
       "font-src 'self'",
       "frame-src https://js.stripe.com",
