@@ -1,11 +1,14 @@
 import { Suspense } from 'react'
 import { headers } from 'next/headers'
 import Link from 'next/link'
-import { CheckIcon, StarIcon, ShieldCheckIcon, SmartphoneIcon, ClockIcon, TrendingUpIcon } from 'lucide-react'
+import { CheckIcon, StarIcon, ShieldCheckIcon, SmartphoneIcon, ClockIcon, TrendingUpIcon, CheckCircleIcon } from 'lucide-react'
 import { CheckoutButton } from '@/components/landing/checkout-button'
+import { PricingToggle } from '@/components/landing/pricing-toggle'
 import { RefCapture } from '@/components/landing/ref-capture'
 import { TypingHeadline } from '@/components/landing/typing-headline'
 import { PlatformShowcase } from '@/components/landing/platform-showcase'
+import { MobileCta } from '@/components/landing/mobile-cta'
+import { FaqAccordion } from '@/components/landing/faq-accordion'
 import type { SupportedCurrency } from '@/lib/stripe'
 
 // ── Locale detection ──────────────────────────────────────────────────────────
@@ -91,6 +94,13 @@ const COPY = {
     priceSub: 'Valor único · Tudo incluso · Sem pegadinha, sem surpresa na fatura.',
     priceDisplay: 'R$29,90',
     pricePeriod: '/mês · Cancele quando quiser',
+    priceAnnualDisplay: 'R$299',
+    priceAnnualPeriod: '/ano · 2 meses grátis',
+    priceAnnualMonthly: 'equivale a R$24,92/mês',
+    priceLabelMonthly: 'Mensal',
+    priceLabelAnnual: 'Anual',
+    priceBadgeAnnual: '2 meses grátis',
+    ctaLabelAnnual: 'Quero começar por R$299/ano',
     priceFeatures: [
       'Agenda inteligente sem conflito de horários',
       'Clientes e pets com ficha completa e histórico',
@@ -121,6 +131,15 @@ const COPY = {
       { q: 'Funciona pra pet shop pequeno, com 1 ou 2 funcionários?', a: 'Foi feito pra isso. O PetFlow foi desenhado pro dono que atende no balcão e precisa de algo simples, rápido e que não atrapalhe o dia.' },
       { q: 'E se eu não gostar? Tem garantia?', a: 'Sim. Você tem 7 dias de garantia total. Se não ficar satisfeito por qualquer motivo, devolvemos 100% do valor pago — sem perguntas e sem burocracia. É seu direito pelo Código de Defesa do Consumidor (Art. 49) e a gente cumpre com prazer.' },
     ],
+    referralHeadline: 'Indique e ganhe 1 mês grátis',
+    referralSub: 'Cada amigo dono de pet shop que assinar usando o seu link = 1 mês 100% grátis pra você. Automático, sem precisar pedir.',
+    referralSteps: [
+      { emoji: '🔑', title: 'Assine o PetFlow', body: 'Ao ativar, você recebe um link exclusivo de indicação no painel.' },
+      { emoji: '📤', title: 'Compartilhe com amigos', body: 'Mande pra colegas donos de pet shop — WhatsApp, Instagram, boca a boca.' },
+      { emoji: '🎁', title: 'Eles assinam, você ganha', body: '1 mês grátis por cada novo assinante. Sem limite de indicações.' },
+    ],
+    referralBadge: 'Sem limite · Acumula · 100% automático',
+    referralCta: 'Assinar e ganhar meu link',
     ctaFinalHeadline: 'Seu próximo banho pode já sair organizado.',
     ctaFinalSub: 'R$29,90/mês pra ter agenda, equipe e caixa organizados num só lugar. Ative agora e comece a usar hoje mesmo.',
     ctaFinalGuarantee: '🛡️ Garantia de 7 dias — não gostou, devolvemos tudo. Sem perguntas.',
@@ -185,6 +204,13 @@ const COPY = {
     priceSub: 'Valor único · Tudo incluído · Sem surpresas na fatura.',
     priceDisplay: '€19,90',
     pricePeriod: '/mês · Cancele quando quiser',
+    priceAnnualDisplay: '€199',
+    priceAnnualPeriod: '/ano · 2 meses grátis',
+    priceAnnualMonthly: 'equivale a €16,58/mês',
+    priceLabelMonthly: 'Mensal',
+    priceLabelAnnual: 'Anual',
+    priceBadgeAnnual: '2 meses grátis',
+    ctaLabelAnnual: 'Quero começar por €199/ano',
     priceFeatures: [
       'Agenda inteligente sem conflito de horários',
       'Clientes e animais com ficha completa e historial',
@@ -215,6 +241,15 @@ const COPY = {
       { q: 'Funciona para um petshop pequeno, com 1 ou 2 funcionários?', a: 'Foi feito para isso. O PetFlow foi desenhado para o dono que atende no balcão e precisa de algo simples, rápido e que não atrapalhe o dia.' },
       { q: 'E se não gostar? Há garantia?', a: 'Sim. Tem 7 dias de garantia total. Se não ficar satisfeito por qualquer motivo, devolvemos 100% do valor pago — sem perguntas e sem burocracia.' },
     ],
+    referralHeadline: 'Indique e ganhe 1 mês grátis',
+    referralSub: 'Cada amigo dono de petshop que subscrever com o seu link = 1 mês 100% grátis para si. Automático, sem precisar pedir.',
+    referralSteps: [
+      { emoji: '🔑', title: 'Subscreva o PetFlow', body: 'Ao ativar, recebe um link exclusivo de indicação no painel.' },
+      { emoji: '📤', title: 'Partilhe com amigos', body: 'Envie a colegas donos de petshop — WhatsApp, Instagram, onde preferir.' },
+      { emoji: '🎁', title: 'Eles subscrevem, você ganha', body: '1 mês grátis por cada novo subscritor. Sem limite de indicações.' },
+    ],
+    referralBadge: 'Sem limite · Acumula · 100% automático',
+    referralCta: 'Subscrever e ganhar o meu link',
     ctaFinalHeadline: 'A sua próxima marcação pode sair já organizada.',
     ctaFinalSub: '€19,90/mês para ter agenda, equipa e caixa organizados num só lugar. Ative agora e comece a usar hoje mesmo.',
     ctaFinalGuarantee: '🛡️ Garantia de 7 dias — não gostou, devolvemos tudo. Sem perguntas.',
@@ -279,6 +314,13 @@ const COPY = {
     priceSub: 'Flat rate · All features · No hidden fees, no surprises.',
     priceDisplay: '$19.90',
     pricePeriod: '/month · Cancel anytime',
+    priceAnnualDisplay: '$199',
+    priceAnnualPeriod: '/year · 2 months free',
+    priceAnnualMonthly: 'equals $16.58/month',
+    priceLabelMonthly: 'Monthly',
+    priceLabelAnnual: 'Annual',
+    priceBadgeAnnual: '2 months free',
+    ctaLabelAnnual: 'Start now — $199/year',
     priceFeatures: [
       'Smart scheduling with no double-booking',
       'Client and pet profiles with full history',
@@ -309,6 +351,15 @@ const COPY = {
       { q: 'Does it work for a small shop with 1 or 2 staff?', a: 'It was built for exactly that. PetFlow is designed for the owner who works the counter and needs something simple, fast, and out of the way.' },
       { q: "What if I don't like it? Is there a guarantee?", a: 'Yes. You have a full 7-day guarantee. If you are not satisfied for any reason, we refund 100% — no questions, no hassle.' },
     ],
+    referralHeadline: 'Refer a friend, get 1 month free',
+    referralSub: 'Every friend who subscribes using your link = 1 free month for you. Automatic, no questions asked.',
+    referralSteps: [
+      { emoji: '🔑', title: 'Subscribe to PetFlow', body: 'Once active, you get a unique referral link in your dashboard.' },
+      { emoji: '📤', title: 'Share with friends', body: 'Send it to fellow pet shop owners — WhatsApp, Instagram, word of mouth.' },
+      { emoji: '🎁', title: 'They subscribe, you earn', body: '1 free month per new subscriber. No limit on referrals.' },
+    ],
+    referralBadge: 'No limit · Stackable · 100% automatic',
+    referralCta: 'Subscribe and get my link',
     ctaFinalHeadline: 'Your next appointment can be organized starting today.',
     ctaFinalSub: '$19.90/month to keep your schedule, team, and cash flow in one place. Activate now and start using it today.',
     ctaFinalGuarantee: '🛡️ 7-day guarantee — not happy, we refund everything. No questions.',
@@ -330,13 +381,17 @@ export default async function LandingPage() {
         badge: '🆕 Per-staff scheduling available · €19.90/mo · Cancel anytime',
         priceDisplay: '€19,90',
         pricePeriod: '/month · Cancel anytime',
+        priceAnnualDisplay: '€199',
+        priceAnnualPeriod: '/year · 2 months free',
+        priceAnnualMonthly: 'equals €16.58/month',
         ctaLabel: 'Start now — €19.90/month',
+        ctaLabelAnnual: 'Start now — €199/year',
         ctaFinalSub: '€19.90/month to keep your schedule, team, and cash flow in one place. Activate now and start using it today.',
       }
     : { ...base }
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <div className="min-h-screen bg-white text-gray-900 pb-20 md:pb-0 dark:bg-gray-950 dark:text-gray-100">
       <Suspense><RefCapture /></Suspense>
 
       {/* ── Navbar ─────────────────────────────────────────────── */}
@@ -514,6 +569,10 @@ export default async function LandingPage() {
                     <div>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{t.name}</p>
                       <p className="text-xs text-gray-400 dark:text-gray-500">{t.city}</p>
+                      <p className="mt-0.5 flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                        <CheckCircleIcon className="size-3" aria-hidden="true" />
+                        {locale === 'en' ? 'Verified customer' : 'Cliente verificado'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -534,21 +593,20 @@ export default async function LandingPage() {
         <div className="mx-auto max-w-md">
           <h2 className="mb-2 text-center text-2xl font-bold md:text-3xl">{c.priceHeadline}</h2>
           <p className="mb-8 text-center text-sm text-gray-500 dark:text-gray-400">{c.priceSub}</p>
-          <div className="rounded-3xl border-2 border-emerald-500 p-8 shadow-xl shadow-emerald-100 dark:shadow-emerald-900/20">
-            <div className="mb-6 text-center">
-              <p className="text-5xl font-bold text-gray-900 dark:text-white">{c.priceDisplay}</p>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{c.pricePeriod}</p>
-            </div>
-            <ul className="mb-8 space-y-3">
-              {c.priceFeatures.map((b) => (
-                <li key={b} className="flex items-start gap-3 text-sm">
-                  <CheckIcon className="mt-0.5 size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                  {b}
-                </li>
-              ))}
-            </ul>
-            <CheckoutButton label={c.ctaLabel} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" currency={currency} />
-          </div>
+          <PricingToggle
+            currency={currency}
+            monthlyDisplay={c.priceDisplay}
+            annualDisplay={c.priceAnnualDisplay}
+            monthlyPeriod={c.pricePeriod}
+            annualPeriod={c.priceAnnualPeriod}
+            annualMonthly={c.priceAnnualMonthly}
+            ctaMonthly={c.ctaLabel}
+            ctaAnnual={c.ctaLabelAnnual}
+            features={c.priceFeatures}
+            labelMonthly={c.priceLabelMonthly}
+            labelAnnual={c.priceLabelAnnual}
+            badgeAnnual={c.priceBadgeAnnual}
+          />
         </div>
       </section>
 
@@ -592,14 +650,37 @@ export default async function LandingPage() {
       <section className="bg-white px-4 py-16 dark:bg-gray-950">
         <div className="mx-auto max-w-2xl">
           <h2 className="mb-10 text-center text-2xl font-bold md:text-3xl">{c.faqHeadline}</h2>
-          <div className="space-y-4">
-            {c.faqs.map((item) => (
-              <details key={item.q} className="group rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
-                <summary className="cursor-pointer list-none font-medium">{item.q}</summary>
-                <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">{item.a}</p>
-              </details>
+          <FaqAccordion items={c.faqs} />
+        </div>
+      </section>
+
+      {/* ── Referral ───────────────────────────────────────────── */}
+      <section className="bg-gradient-to-br from-emerald-50 to-teal-50 px-4 py-16 dark:from-emerald-950/30 dark:to-teal-950/20">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="mb-4 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+            {c.referralBadge}
+          </span>
+          <h2 className="mb-3 text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
+            {c.referralHeadline}
+          </h2>
+          <p className="mx-auto mb-10 max-w-xl text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+            {c.referralSub}
+          </p>
+          <div className="grid gap-4 md:grid-cols-3 mb-10">
+            {c.referralSteps.map((step, i) => (
+              <div key={i} className="rounded-2xl bg-white p-6 shadow-sm border border-emerald-100 dark:bg-gray-900 dark:border-emerald-900/50 text-left">
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="text-2xl">{step.emoji}</span>
+                  <span className="flex size-6 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                    {i + 1}
+                  </span>
+                </div>
+                <h3 className="mb-1 text-sm font-semibold text-gray-900 dark:text-white">{step.title}</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{step.body}</p>
+              </div>
             ))}
           </div>
+          <CheckoutButton label={c.referralCta} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30" currency={currency} />
         </div>
       </section>
 
@@ -628,6 +709,14 @@ export default async function LandingPage() {
           <a href={`mailto:${c.supportEmail}`} className="hover:underline">{c.supportEmail}</a>
         </p>
       </footer>
+
+      {/* ── Mobile sticky CTA (mobile only) ─────────────────────── */}
+      <MobileCta
+        priceDisplay={c.priceDisplay}
+        pricePeriodShort={locale === 'en' ? '/mo · Cancel anytime' : '/mês · Cancele quando quiser'}
+        ctaLabel={locale === 'en' ? 'Start now' : 'Começar agora'}
+        currency={currency}
+      />
     </div>
   )
 }
