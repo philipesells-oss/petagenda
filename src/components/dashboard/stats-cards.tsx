@@ -90,7 +90,7 @@ export function StatsCards({
   ]
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {stats.map((s) => {
         const Icon = s.icon
         return (
@@ -126,7 +126,7 @@ export function StatsCards({
 
 export function StatsCardsSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
         <Card key={i} className="p-4">
           <div className="flex items-center justify-between gap-3">
