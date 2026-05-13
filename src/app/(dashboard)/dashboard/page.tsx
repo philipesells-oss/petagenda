@@ -1,5 +1,6 @@
 import { getCurrentUser } from '@/lib/auth/get-current-user'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { StatsCards } from '@/components/dashboard/stats-cards'
 import {
   TodayAppointments,
@@ -8,6 +9,7 @@ import {
 import { RevenueChart } from '@/components/dashboard/revenue-chart'
 import { Launchpad } from '@/components/dashboard/launchpad'
 import { ReferralCard } from '@/components/dashboard/referral-card'
+import { BookingLinkCard } from '@/components/dashboard/booking-link-card'
 import { getT } from '@/lib/server-i18n'
 import type { AppointmentStatus } from '@/types'
 
@@ -114,6 +116,16 @@ export default async function DashboardHome() {
   const hasTeam = (teamMembersResult.count ?? 0) > 0
   const hasFirstAppointment = (anyAppointmentResult.count ?? 0) > 0
 
+  const admin = createAdminClient()
+  const { data: tenantRow } = await admin
+    .from('tenants')
+    .select('slug, public_booking_enabled')
+    .eq('id', tenantId)
+    .maybeSingle() as { data: { slug: string; public_booking_enabled: boolean } | null }
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://getpetflow.com'
+  const bookingUrl = tenantRow?.slug ? `${appUrl}/book/${tenantRow.slug}` : null
+  const bookingEnabled = tenantRow?.public_booking_enabled ?? false
+
   const todayRevenue = (completedTodayResult.data ?? []).reduce(
     (acc: number, row: { price: number | null }) => acc + (row.price ?? 0),
     0,
@@ -198,6 +210,8 @@ export default async function DashboardHome() {
       />
 
       <ReferralCard />
+
+      {bookingEnabled && bookingUrl && <BookingLinkCard bookingUrl={bookingUrl} />}
 
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">

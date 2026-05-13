@@ -94,6 +94,37 @@ export function BookingSettingsForm({
         <p className="text-xs text-muted-foreground">Compartilhe este link com seus clientes.</p>
       </div>
 
+      {/* QR Code */}
+      <div className="space-y-2">
+        <Label>QR Code</Label>
+        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+          <div className="rounded-xl border border-border bg-white p-3 shadow-sm dark:bg-gray-900">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(bookingUrl)}&margin=0`}
+              alt="QR Code de agendamento"
+              width={160}
+              height={160}
+              className="rounded"
+            />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-medium">Imprima e cole no balcão</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              O cliente aponta a câmera do celular e abre direto a página de agendamento — sem precisar digitar nada.
+            </p>
+            <a
+              href={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(bookingUrl)}&margin=10`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block text-xs text-blue-600 hover:underline dark:text-blue-400"
+            >
+              Baixar QR Code em alta resolução →
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Instructions */}
       <div className="space-y-2">
         <Label htmlFor="instructions">Mensagem para clientes (opcional)</Label>
