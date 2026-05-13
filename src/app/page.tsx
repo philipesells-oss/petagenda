@@ -38,10 +38,10 @@ function detectLocale(hdrs: Headers): { locale: Locale; currency: SupportedCurre
 
 const COPY = {
   'pt-BR': {
-    badge: '🆕 Agenda por profissional já disponível · R$29,90/mês · Sem fidelidade',
-    heroSupport: 'Cada profissional com sua própria agenda.',
-    heroTypingPhrases: ['Sem conflito de horário.', 'Sem bagunça no WhatsApp.', 'Mais dinheiro no caixa.'],
-    heroSub: 'Cada profissional tem seu horário, seus serviços e sua agenda — o cliente agenda direto com quem faz. Menos confusão, menos conflito, mais dinheiro no caixa.',
+    badge: '📲 Clientes agendam pelo QR Code — sem WhatsApp · R$29,90/mês · Cancele quando quiser',
+    heroSupport: 'Você não abriu um pet shop pra gerenciar WhatsApp.',
+    heroTypingPhrases: ['Seu cliente escaneia e agenda sozinho.', 'Zero conflito de horário.', 'Mais dinheiro no caixa.'],
+    heroSub: 'O PetFlow dá ao seu pet shop uma página própria de agendamento online com QR Code — o cliente escaneia, escolhe o serviço, o profissional e o horário, e confirma. Sem ligar pra você, sem WhatsApp, sem confusão.',
     heroGuarantee: '7 dias de garantia · Cancele quando quiser · Suporte humano em português',
     navLogin: 'Entrar',
     navCta: 'Assinar agora',
@@ -62,7 +62,7 @@ const COPY = {
     comparisonBefore: '😰 Antes',
     comparisonAfter: '✅ Com PetFlow',
     comparisonRows: [
-      { situation: 'Agendar um banho', before: 'WhatsApp + caderno + torcer pra não conflitar', after: 'Atendente abre o sistema, escolhe horário livre e confirma' },
+      { situation: 'Cliente quer marcar um banho', before: 'Te manda mensagem no WhatsApp e espera você responder', after: 'Escaneia o QR Code e agenda sozinho, 24h por dia' },
       { situation: 'Lembrar o histórico do pet', before: 'Pergunta tudo de novo a cada visita', after: 'Ficha completa com raça, alergias e todos os banhos anteriores' },
       { situation: 'Saber o faturamento do dia', before: 'Soma no caderno ou na maquininha no final do dia', after: 'Dashboard em tempo real, atualizado a cada serviço concluído' },
       { situation: 'Saber quais serviços mais vendem', before: 'Achismo ou planilha desatualizada', after: 'Gráfico de faturamento por período, atualizado a cada serviço concluído' },
@@ -72,6 +72,7 @@ const COPY = {
     featuresHeadline: 'Tudo que seu pet shop precisa',
     featuresSub: 'Em menos de uma tarde você configura e já começa a usar.',
     features: [
+      { emoji: '📲', title: 'Agendamento online com QR Code', body: 'Seu pet shop ganha uma página de agendamento pública. Imprima o QR Code e cole no balcão — o cliente escaneia e agenda sem precisar te chamar.' },
       { emoji: '📅', title: 'Agenda inteligente', body: 'Marque banho, tosa e consulta sem conflito de horário — e confirme com o tutor em 2 toques.' },
       { emoji: '🐶', title: 'Ficha do cliente e do pet', body: 'Raça, pelagem, manias, vacinas. Tudo na mão quando o tutor cruzar a porta.' },
       { emoji: '✂️', title: 'Catálogo de serviços', body: 'Cadastre banho, tosa, hidratação e pacotes com preço certinho — sem calcular na ponta do lápis.' },
@@ -102,6 +103,7 @@ const COPY = {
     priceBadgeAnnual: '2 meses grátis',
     ctaLabelAnnual: 'Quero começar por R$299/ano',
     priceFeatures: [
+      'Agendamento online com link público e QR Code imprimível',
       'Agenda inteligente sem conflito de horários',
       'Clientes e pets com ficha completa e histórico',
       'Catálogo de serviços e pacotes ilimitados',
@@ -124,6 +126,7 @@ const COPY = {
     ],
     faqHeadline: 'Perguntas frequentes',
     faqs: [
+      { q: 'Como funciona o agendamento online?', a: 'Você recebe um link único e um QR Code imprimível no seu painel. Cole no balcão, poste no Instagram ou mande pelo WhatsApp. O cliente abre pelo celular, escolhe o serviço, o profissional e um horário disponível, e confirma. O agendamento entra direto no sistema — sem precisar falar com você.' },
       { q: 'Preciso instalar alguma coisa?', a: 'Não. O PetFlow funciona direto no navegador do celular, tablet ou computador. Basta fazer login e usar.' },
       { q: 'Tem fidelidade ou multa pra cancelar?', a: 'Nenhuma. Você paga mês a mês e cancela quando quiser, sem burocracia.' },
       { q: 'E se eu cancelar — perco meus dados?', a: 'Não. Seus dados ficam seguros nos nossos servidores e nossa equipe te ajuda a extrair tudo antes do cancelamento. Clientes, pets, histórico — tudo seu, sempre.' },
@@ -131,6 +134,15 @@ const COPY = {
       { q: 'Funciona pra pet shop pequeno, com 1 ou 2 funcionários?', a: 'Foi feito pra isso. O PetFlow foi desenhado pro dono que atende no balcão e precisa de algo simples, rápido e que não atrapalhe o dia.' },
       { q: 'E se eu não gostar? Tem garantia?', a: 'Sim. Você tem 7 dias de garantia total. Se não ficar satisfeito por qualquer motivo, devolvemos 100% do valor pago — sem perguntas e sem burocracia. É seu direito pelo Código de Defesa do Consumidor (Art. 49) e a gente cumpre com prazer.' },
     ],
+    howItWorksHeadline: 'Do QR Code ao horário confirmado em menos de 1 minuto',
+    howItWorksSub: 'Sem app pra baixar. Sem cadastro. Sem WhatsApp.',
+    howItWorksSteps: [
+      { emoji: '📷', title: 'Escaneia o QR Code', body: 'O QR Code fica no balcão, no Instagram ou no WhatsApp do seu pet shop.' },
+      { emoji: '✂️', title: 'Escolhe serviço e profissional', body: 'Vê os serviços disponíveis, o preço e escolhe quem vai atender.' },
+      { emoji: '📅', title: 'Escolhe data e horário livre', body: 'Só aparecem horários realmente disponíveis — zero conflito garantido.' },
+      { emoji: '✅', title: 'Confirma e pronto', body: 'O agendamento entra direto no sistema. Você recebe o aviso. Cliente fica tranquilo.' },
+    ],
+    howItWorksNote: '🛡️ Funciona no celular, sem instalar nada — o cliente abre pelo navegador e agenda em segundos.',
     referralHeadline: 'Indique e ganhe 1 mês grátis',
     referralSub: 'Cada amigo dono de pet shop que assinar usando o seu link = 1 mês 100% grátis pra você. Automático, sem precisar pedir.',
     referralSteps: [
@@ -148,10 +160,10 @@ const COPY = {
   },
 
   'pt-PT': {
-    badge: '🆕 Agenda por profissional disponível · €19,90/mês · Sem fidelidade',
-    heroSupport: 'Cada profissional com a sua própria agenda.',
-    heroTypingPhrases: ['Sem conflito de horários.', 'Sem confusão no WhatsApp.', 'Mais dinheiro no caixa.'],
-    heroSub: 'Cada profissional tem o seu horário, os seus serviços e a sua agenda — o cliente marca diretamente com quem faz. Menos confusão, menos conflitos, mais dinheiro no caixa.',
+    badge: '📲 Clientes marcam pelo QR Code — sem WhatsApp · €19,90/mês · Cancele quando quiser',
+    heroSupport: 'Não abriu um petshop para gerir mensagens no WhatsApp.',
+    heroTypingPhrases: ['Digitalizou. Escolheu. Marcou.', 'Zero conflitos de horários.', 'Mais dinheiro no caixa.'],
+    heroSub: 'O PetFlow dá ao seu petshop uma página pública de marcação com QR Code — o cliente digitaliza, escolhe o serviço, o profissional e o horário, e confirma. Sem ligar, sem WhatsApp, sem confusão.',
     heroGuarantee: '7 dias de garantia · Cancele quando quiser · Suporte humano em português',
     navLogin: 'Entrar',
     navCta: 'Subscrever agora',
@@ -172,7 +184,7 @@ const COPY = {
     comparisonBefore: '😰 Antes',
     comparisonAfter: '✅ Com PetFlow',
     comparisonRows: [
-      { situation: 'Marcar um banho', before: 'WhatsApp + caderno + torcer para não haver conflito', after: 'Atendente abre o sistema, escolhe horário livre e confirma' },
+      { situation: 'Cliente quer marcar um banho', before: 'Envia mensagem no WhatsApp e espera você responder', after: 'Digitaliza o QR Code e marca sozinho, 24h por dia' },
       { situation: 'Lembrar o historial do animal', before: 'Pergunta tudo de novo a cada visita', after: 'Ficha completa com raça, alergias e todos os banhos anteriores' },
       { situation: 'Saber o faturamento do dia', before: 'Soma no caderno ou no terminal no fim do dia', after: 'Dashboard em tempo real, atualizado a cada serviço concluído' },
       { situation: 'Saber quais serviços mais vendem', before: 'Achismo ou folha de cálculo desatualizada', after: 'Gráfico de faturamento por período, atualizado a cada serviço concluído' },
@@ -182,6 +194,7 @@ const COPY = {
     featuresHeadline: 'Tudo o que o seu petshop precisa',
     featuresSub: 'Em menos de uma tarde configura e já começa a usar.',
     features: [
+      { emoji: '📲', title: 'Marcação online com QR Code', body: 'O seu petshop ganha uma página de marcação pública. Imprima o QR Code e cole no balcão — o cliente digitaliza e marca sem precisar de ligar.' },
       { emoji: '📅', title: 'Agenda inteligente', body: 'Marque banho, tosquia e consulta sem conflito de horário — e confirme com o tutor em 2 toques.' },
       { emoji: '🐶', title: 'Ficha do cliente e do animal', body: 'Raça, pelagem, manias, vacinas. Tudo à mão quando o tutor entrar.' },
       { emoji: '✂️', title: 'Catálogo de serviços', body: 'Registe banho, tosquia, hidratação e pacotes com preço certo — sem calcular na ponta do lápis.' },
@@ -212,6 +225,7 @@ const COPY = {
     priceBadgeAnnual: '2 meses grátis',
     ctaLabelAnnual: 'Quero começar por €199/ano',
     priceFeatures: [
+      'Marcação online com link público e QR Code imprimível',
       'Agenda inteligente sem conflito de horários',
       'Clientes e animais com ficha completa e historial',
       'Catálogo de serviços e pacotes ilimitados',
@@ -234,6 +248,7 @@ const COPY = {
     ],
     faqHeadline: 'Perguntas frequentes',
     faqs: [
+      { q: 'Como funciona a marcação online?', a: 'Recebe um link único e um QR Code imprimível no seu painel. Cole no balcão, publique no Instagram ou envie pelo WhatsApp. O cliente abre pelo telemóvel, escolhe o serviço, o profissional e um horário disponível, e confirma. A marcação entra direto no sistema — sem precisar de falar consigo.' },
       { q: 'Preciso de instalar alguma coisa?', a: 'Não. O PetFlow funciona diretamente no browser do telemóvel, tablet ou computador. Basta fazer login e usar.' },
       { q: 'Tem fidelidade ou multa para cancelar?', a: 'Nenhuma. Paga mês a mês e cancela quando quiser, sem burocracia.' },
       { q: 'Se cancelar, perco os meus dados?', a: 'Não. Os seus dados ficam seguros nos nossos servidores e a nossa equipa ajuda-o a extrair tudo antes do cancelamento.' },
@@ -241,6 +256,15 @@ const COPY = {
       { q: 'Funciona para um petshop pequeno, com 1 ou 2 funcionários?', a: 'Foi feito para isso. O PetFlow foi desenhado para o dono que atende no balcão e precisa de algo simples, rápido e que não atrapalhe o dia.' },
       { q: 'E se não gostar? Há garantia?', a: 'Sim. Tem 7 dias de garantia total. Se não ficar satisfeito por qualquer motivo, devolvemos 100% do valor pago — sem perguntas e sem burocracia.' },
     ],
+    howItWorksHeadline: 'Do QR Code à marcação confirmada em menos de 1 minuto',
+    howItWorksSub: 'Sem app para instalar. Sem conta. Sem WhatsApp.',
+    howItWorksSteps: [
+      { emoji: '📷', title: 'Digitaliza o QR Code', body: 'O QR Code fica no balcão, no Instagram ou no WhatsApp do petshop.' },
+      { emoji: '✂️', title: 'Escolhe serviço e profissional', body: 'Vê os serviços disponíveis, o preço e escolhe quem vai atender.' },
+      { emoji: '📅', title: 'Escolhe data e horário livre', body: 'Só aparecem horários realmente disponíveis — zero conflitos garantidos.' },
+      { emoji: '✅', title: 'Confirma e pronto', body: 'A marcação entra direto no sistema. É notificado, o cliente fica descansado.' },
+    ],
+    howItWorksNote: '🛡️ Funciona no browser do telemóvel — sem instalar nada, sem conta, sem fricção.',
     referralHeadline: 'Indique e ganhe 1 mês grátis',
     referralSub: 'Cada amigo dono de petshop que subscrever com o seu link = 1 mês 100% grátis para si. Automático, sem precisar pedir.',
     referralSteps: [
@@ -258,10 +282,10 @@ const COPY = {
   },
 
   en: {
-    badge: '🆕 Per-staff scheduling available · $19.90/mo · Cancel anytime',
-    heroSupport: 'Each staff member has their own schedule.',
-    heroTypingPhrases: ['Zero double-bookings.', 'No WhatsApp chaos.', 'More money in the register.'],
-    heroSub: 'Each staff member has their own schedule, services, and calendar — clients book directly with who does the work. Less chaos, fewer conflicts, more money in the register.',
+    badge: '📲 Clients self-book via QR Code — no phone calls · $19.90/mo · Cancel anytime',
+    heroSupport: "You didn't open a pet shop to manage text messages.",
+    heroTypingPhrases: ['Scan. Choose. Booked.', 'Zero double-bookings.', 'More money in the register.'],
+    heroSub: 'PetFlow gives your shop its own public booking page with a printable QR Code — clients scan, pick the service, the groomer, and the time slot, and confirm. No calls, no WhatsApp, no confusion.',
     heroGuarantee: '7-day guarantee · Cancel anytime · Human support in your language',
     navLogin: 'Log in',
     navCta: 'Subscribe now',
@@ -282,7 +306,7 @@ const COPY = {
     comparisonBefore: '😰 Before',
     comparisonAfter: '✅ With PetFlow',
     comparisonRows: [
-      { situation: 'Book a bath', before: 'WhatsApp + notebook + hope there is no conflict', after: 'Staff opens the system, picks a free slot, confirms instantly' },
+      { situation: 'Client wants to book a bath', before: 'Texts you on WhatsApp and waits for you to reply', after: 'Scans the QR Code and books themselves, 24/7' },
       { situation: "Remember the pet's history", before: 'Ask everything again on every visit', after: 'Full profile with breed, allergies, and all previous visits' },
       { situation: "Today's revenue", before: 'Count entries at end of day on the terminal', after: 'Real-time dashboard updated after each completed service' },
       { situation: 'Best-selling services', before: 'Guesswork or an outdated spreadsheet', after: 'Revenue chart by period, updated automatically' },
@@ -292,6 +316,7 @@ const COPY = {
     featuresHeadline: 'Everything your pet shop needs',
     featuresSub: 'Set up in an afternoon and start using it the same day.',
     features: [
+      { emoji: '📲', title: 'Public booking + QR Code', body: 'Your shop gets its own booking page. Print the QR Code and put it on the counter — clients scan and book without calling you.' },
       { emoji: '📅', title: 'Smart scheduling', body: 'Book baths, grooming, and consultations without double-booking — confirm with the owner in 2 taps.' },
       { emoji: '🐶', title: 'Client and pet profiles', body: 'Breed, coat, allergies, vaccines. Everything at hand when the owner walks in.' },
       { emoji: '✂️', title: 'Service catalog', body: 'Set up baths, grooming, and packages with exact pricing — no more mental math.' },
@@ -322,6 +347,7 @@ const COPY = {
     priceBadgeAnnual: '2 months free',
     ctaLabelAnnual: 'Start now — $199/year',
     priceFeatures: [
+      'Public booking page with printable QR Code',
       'Smart scheduling with no double-booking',
       'Client and pet profiles with full history',
       'Unlimited service catalog and packages',
@@ -344,6 +370,7 @@ const COPY = {
     ],
     faqHeadline: 'Frequently asked questions',
     faqs: [
+      { q: 'How does the online booking work?', a: 'You get a unique link and a printable QR Code in your dashboard. Put it on the counter, post it on Instagram, or share it on WhatsApp. Clients open it on their phone, pick the service, groomer, and an available time slot, and confirm. The booking goes straight into your system — no need to talk to you.' },
       { q: 'Do I need to install anything?', a: 'No. PetFlow runs directly in the browser on any device. Just log in and use it.' },
       { q: 'Is there a contract or cancellation fee?', a: 'None. Pay month-to-month and cancel whenever you want, no strings attached.' },
       { q: 'If I cancel, do I lose my data?', a: 'No. Your data stays safe on our servers and our team helps you export everything before cancellation.' },
@@ -351,6 +378,15 @@ const COPY = {
       { q: 'Does it work for a small shop with 1 or 2 staff?', a: 'It was built for exactly that. PetFlow is designed for the owner who works the counter and needs something simple, fast, and out of the way.' },
       { q: "What if I don't like it? Is there a guarantee?", a: 'Yes. You have a full 7-day guarantee. If you are not satisfied for any reason, we refund 100% — no questions, no hassle.' },
     ],
+    howItWorksHeadline: 'From QR Code to confirmed booking in under a minute',
+    howItWorksSub: 'No app to download. No account needed. No phone call.',
+    howItWorksSteps: [
+      { emoji: '📷', title: 'Scan the QR Code', body: 'The QR Code lives on your counter, Instagram, or WhatsApp.' },
+      { emoji: '✂️', title: 'Choose service and staff', body: 'Clients see available services, prices, and who will do the work.' },
+      { emoji: '📅', title: 'Pick a free time slot', body: 'Only real available slots appear — zero double-booking guaranteed.' },
+      { emoji: '✅', title: 'Confirm and done', body: 'Booking goes straight into your system. You get notified. Client is happy.' },
+    ],
+    howItWorksNote: '🛡️ Works on any phone browser — no install, no signup, no friction.',
     referralHeadline: 'Refer a friend, get 1 month free',
     referralSub: 'Every friend who subscribes using your link = 1 free month for you. Automatic, no questions asked.',
     referralSteps: [
@@ -378,7 +414,7 @@ export default async function LandingPage() {
   const c = (locale === 'en' && currency === 'EUR')
     ? {
         ...base,
-        badge: '🆕 Per-staff scheduling available · €19.90/mo · Cancel anytime',
+        badge: '📲 Clients self-book via QR Code — no phone calls · €19.90/mo · Cancel anytime',
         priceDisplay: '€19,90',
         pricePeriod: '/month · Cancel anytime',
         priceAnnualDisplay: '€199',
@@ -518,6 +554,31 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* ── Como funciona ──────────────────────────────────────── */}
+      <section className="bg-white px-4 py-16 dark:bg-gray-950">
+        <div className="mx-auto max-w-4xl">
+          <h2 className="mb-3 text-center text-2xl font-bold md:text-3xl">{c.howItWorksHeadline}</h2>
+          <p className="mb-12 text-center text-sm text-gray-500 dark:text-gray-400">{c.howItWorksSub}</p>
+          <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
+            {c.howItWorksSteps.map((step, i) => (
+              <div key={i} className="flex flex-col items-center text-center">
+                <div className="relative mb-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-3xl dark:bg-emerald-950/30">
+                    {step.emoji}
+                  </div>
+                  <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white">
+                    {i + 1}
+                  </span>
+                </div>
+                <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">{step.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{step.body}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-10 text-center text-xs text-gray-400 dark:text-gray-500">{c.howItWorksNote}</p>
+        </div>
+      </section>
+
       {/* ── Plataforma por dentro ───────────────────────────────── */}
       <PlatformShowcase locale={locale} />
 
@@ -544,7 +605,7 @@ export default async function LandingPage() {
                   className={`group relative cursor-default rounded-2xl border border-white/80 bg-white p-6 shadow-md transition-all duration-300 ease-out hover:scale-105 hover:rotate-0 hover:shadow-xl hover:z-10 dark:border-gray-700/60 dark:bg-gray-800/90 ${rotations[i % rotations.length]} ${tops[i % tops.length]}`}
                 >
                   {/* quote mark */}
-                  <span className="absolute -top-3 left-5 text-5xl leading-none text-emerald-300 dark:text-emerald-600 select-none">"</span>
+                  <span className="absolute -top-3 left-5 text-5xl leading-none text-emerald-300 dark:text-emerald-600 select-none">&ldquo;</span>
 
                   {/* stars */}
                   <div className="mb-3 flex gap-0.5 pt-3">

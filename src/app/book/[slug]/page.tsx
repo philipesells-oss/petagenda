@@ -71,6 +71,11 @@ export default async function PublicBookingPage({ params }: Props) {
           }))}
           closedDaysOfWeek={closedDaysOfWeek}
         />
+        <p className="mt-8 text-center text-xs text-slate-400">
+          <a href="https://getpetflow.com" target="_blank" rel="noopener noreferrer" className="hover:text-slate-600 transition-colors">
+            Powered by PetFlow
+          </a>
+        </p>
       </div>
     </main>
   )
