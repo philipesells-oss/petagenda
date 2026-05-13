@@ -8,9 +8,10 @@ import Link from 'next/link'
 
 interface Props {
   bookingUrl: string
+  enabled: boolean
 }
 
-export function BookingLinkCard({ bookingUrl }: Props) {
+export function BookingLinkCard({ bookingUrl, enabled }: Props) {
   const [copied, setCopied] = useState(false)
 
   function copy() {
@@ -19,6 +20,35 @@ export function BookingLinkCard({ bookingUrl }: Props) {
       toast.success('Link copiado!')
       setTimeout(() => setCopied(false), 2000)
     })
+  }
+
+  if (!enabled) {
+    return (
+      <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/30">
+        <div className="flex items-start gap-3">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+            <CalendarIcon className="size-5 text-slate-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Agendamento online desativado
+            </p>
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+              Ative para gerar um link público — seus clientes agendam direto, sem WhatsApp.
+            </p>
+          </div>
+        </div>
+        <div className="mt-3">
+          <Link
+            href="/settings/booking"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700 transition-colors"
+          >
+            <CalendarIcon className="size-3.5" />
+            Ativar agendamento online
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -32,7 +62,7 @@ export function BookingLinkCard({ bookingUrl }: Props) {
             Link de agendamento online
           </p>
           <p className="mt-0.5 text-xs text-blue-700 dark:text-blue-400">
-            Compartilhe este link com seus clientes para que agendem direto, sem WhatsApp.
+            Compartilhe com seus clientes — eles agendam direto, sem WhatsApp.
           </p>
         </div>
       </div>

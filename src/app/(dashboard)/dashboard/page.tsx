@@ -211,7 +211,7 @@ export default async function DashboardHome() {
 
       <ReferralCard />
 
-      {bookingEnabled && bookingUrl && <BookingLinkCard bookingUrl={bookingUrl} />}
+      {bookingUrl && <BookingLinkCard bookingUrl={bookingUrl} enabled={bookingEnabled} />}
 
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">
