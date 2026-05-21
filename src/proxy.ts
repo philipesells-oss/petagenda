@@ -1,5 +1,5 @@
 /**
- * Edge Middleware — Auth + Tenant Routing
+ * Edge Proxy — Auth + Tenant Routing
  *
  * Runs on every request (except static assets). Responsibilities:
  *  1. Refresh the Supabase session cookies (required by @supabase/ssr)
@@ -25,7 +25,7 @@ function isPublicRoute(pathname: string): boolean {
   )
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: { headers: request.headers },
   })
