@@ -47,9 +47,9 @@ export async function POST(req: Request) {
 
   const adminClient = createAdminClient()
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://getpetflow.com'
+  const referredByCode = session.metadata?.pf_ref ?? null
 
-  // Create Supabase auth user (triggers handle_new_user → tenant + user rows).
-  // Internal password is never revealed — access is via magic link only.
+  // ── Try to create a new auth user ─────────────────────────────────────────
   const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
     email,
     password: secureRandomPassword(),
@@ -61,33 +61,83 @@ export async function POST(req: Request) {
     },
   })
 
-  if (authError || !authData.user) {
-    console.error('[webhook] createUser error:', authError)
-    return NextResponse.json({ error: 'User creation failed' }, { status: 500 })
-  }
+  const isNewUser = !authError && !!authData?.user
 
-  const userId = authData.user.id
+  // ── Resolve userId (new signup OR returning multi-unit owner) ─────────────
+  let userId: string | null = null
+  let tenantId: string | null = null
 
-  // Mark user in DB to force password change on first login
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (adminClient.from('users') as any)
-    .update({ force_password_change: true })
-    .eq('id', userId)
+  if (isNewUser) {
+    userId = authData!.user.id
 
-  // Store Stripe IDs, plan status, and referral data on tenant
-  const referralCode = generateReferralCode(userId)
-  const referredByCode = session.metadata?.pf_ref ?? null
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: userRow } = await (adminClient.from('users') as any)
-    .select('tenant_id')
-    .eq('id', userId)
-    .maybeSingle() as { data: { tenant_id: string } | null }
-
-  if (userRow?.tenant_id) {
+    // Mark profile for forced password change on first login
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (adminClient.from('tenants') as any)
-      .update({
+    await (adminClient.from('users') as any)
+      .update({ force_password_change: true })
+      .eq('id', userId)
+
+    // handle_new_user trigger already created tenant + user rows — just find them
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: userRow } = await (adminClient.from('users') as any)
+      .select('tenant_id')
+      .eq('id', userId)
+      .maybeSingle() as { data: { tenant_id: string } | null }
+
+    tenantId = userRow?.tenant_id ?? null
+
+    if (tenantId) {
+      const referralCode = generateReferralCode(userId)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (adminClient.from('tenants') as any)
+        .update({
+          stripe_customer_id: (session.customer as string) ?? null,
+          stripe_subscription_id: (session.subscription as string) ?? null,
+          plan: 'starter',
+          plan_status: 'active',
+          referral_code: referralCode,
+          ...(referredByCode ? { referred_by_code: referredByCode } : {}),
+        })
+        .eq('id', tenantId)
+    }
+  } else {
+    // ── Existing user: create a second tenant for their new unit ─────────────
+    // Find the auth user id via the tenants + users tables (email on tenant row)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existingTenant } = await (adminClient.from('tenants') as any)
+      .select('id')
+      .eq('email', email)
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle() as { data: { id: string } | null }
+
+    if (existingTenant) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: ownerRow } = await (adminClient.from('users') as any)
+        .select('id')
+        .eq('tenant_id', existingTenant.id)
+        .eq('role', 'owner')
+        .maybeSingle() as { data: { id: string } | null }
+
+      userId = ownerRow?.id ?? null
+    }
+
+    if (!userId) {
+      console.error('[webhook] existing user but could not resolve userId for email:', email)
+      return NextResponse.json({ error: 'User lookup failed' }, { status: 500 })
+    }
+
+    // Build a unique slug for the new unit
+    const suffix = userId.replace(/-/g, '').slice(0, 8).toLowerCase()
+    const slugSuffix = Date.now().toString(36)
+    const slug = `meu-pet-shop-${suffix}-${slugSuffix}`
+    const referralCode = generateReferralCode(userId + slugSuffix)
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: newTenant, error: tenantError } = await (adminClient.from('tenants') as any)
+      .insert({
+        name: 'Meu Pet Shop',
+        email,
+        slug,
         stripe_customer_id: (session.customer as string) ?? null,
         stripe_subscription_id: (session.subscription as string) ?? null,
         plan: 'starter',
@@ -95,10 +145,23 @@ export async function POST(req: Request) {
         referral_code: referralCode,
         ...(referredByCode ? { referred_by_code: referredByCode } : {}),
       })
-      .eq('id', userRow.tenant_id)
+      .select('id')
+      .single() as { data: { id: string } | null; error: unknown }
+
+    if (tenantError || !newTenant) {
+      console.error('[webhook] failed to create second tenant:', tenantError)
+      return NextResponse.json({ error: 'Tenant creation failed' }, { status: 500 })
+    }
+
+    tenantId = newTenant.id
+
+    // Record the extra membership so future features can list all user tenants
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (adminClient.from('tenant_memberships') as any)
+      .insert({ auth_user_id: userId, tenant_id: tenantId, role: 'owner' })
   }
 
-  // Reward referrer: 1 free month + notification email
+  // ── Referral reward ───────────────────────────────────────────────────────
   if (referredByCode && /^[A-Z0-9]{6,12}$/.test(referredByCode)) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -118,7 +181,6 @@ export async function POST(req: Request) {
           const { data: referrerAuth } = await adminClient.auth.admin.getUserById(referrerUserRow.id)
           const referrerEmail = referrerAuth?.user?.email
 
-          // Apply one free month coupon to referrer subscription
           const coupon = await stripe.coupons.create({
             duration: 'once',
             percent_off: 100,
@@ -129,7 +191,6 @@ export async function POST(req: Request) {
             coupon: coupon.id,
           })
 
-          // Notify referrer
           if (referrerEmail) {
             await getResend().emails.send({
               from: 'PetFlow <noreply@contato.getpetflow.com>',
@@ -161,7 +222,7 @@ export async function POST(req: Request) {
     }
   }
 
-  // Fire server-side Purchase event to Meta Conversions API
+  // ── Meta Conversions API ──────────────────────────────────────────────────
   const purchaseValue = session.amount_total ? session.amount_total / 100 : 29.90
   const purchaseCurrency = (session.currency ?? 'brl').toUpperCase()
   await sendCAPIEvent({
@@ -172,25 +233,28 @@ export async function POST(req: Request) {
     eventSourceUrl: `${appUrl}/login?welcome=1`,
   })
 
-  // Generate a magic link so the user never receives a plain-text password.
+  // ── Generate magic link for access email ─────────────────────────────────
+  const nextPath = isNewUser ? '/first-access' : '/dashboard'
   const { data: linkData, error: linkError } = await adminClient.auth.admin.generateLink({
     type: 'magiclink',
     email,
-    options: { redirectTo: `${appUrl}/auth/callback?next=/first-access` },
+    options: { redirectTo: `${appUrl}/auth/callback?next=${nextPath}` },
   })
 
   if (linkError || !linkData?.properties?.action_link) {
     console.error('[webhook] generateLink error:', linkError)
-    // Fall back gracefully — user can use "forgot password" to gain access.
   }
 
   const accessLink = linkData?.properties?.action_link ?? `${appUrl}/forgot-password`
 
-  await getResend().emails.send({
-    from: 'PetFlow <noreply@contato.getpetflow.com>',
-    to: email,
-    subject: 'Seu acesso ao PetFlow está pronto 🐾',
-    html: `<!DOCTYPE html>
+  // ── Send welcome or new-unit email ────────────────────────────────────────
+  if (isNewUser) {
+    const referralCode = generateReferralCode(userId!)
+    await getResend().emails.send({
+      from: 'PetFlow <noreply@contato.getpetflow.com>',
+      to: email,
+      subject: 'Seu acesso ao PetFlow está pronto 🐾',
+      html: `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
 <body style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 0; color: #1a1a1a;">
@@ -212,7 +276,7 @@ export async function POST(req: Request) {
     <hr style="margin: 32px 0; border-color: #e5e7eb;">
     <div style="background:#f0fdf4; border-radius:12px; padding:20px; margin-bottom:24px;">
       <p style="margin:0 0 8px; font-weight:700; color:#059669;">🎁 Indique e ganhe 1 mês grátis</p>
-      <p style="margin:0 0 12px; font-size:13px; color:#374151;">Compartilhe seu link exclusivo. A cada amigo que assinar, você ganha <strong>1 mês grátis</strong> automaticamente — sem precisar fazer nada.</p>
+      <p style="margin:0 0 12px; font-size:13px; color:#374151;">Compartilhe seu link exclusivo. A cada amigo que assinar, você ganha <strong>1 mês grátis</strong> automaticamente.</p>
       <p style="margin:0; background:#fff; border:1px solid #d1fae5; border-radius:8px; padding:10px 14px; font-family:monospace; font-size:13px; color:#059669; word-break:break-all;">${getReferralUrl(referralCode)}</p>
     </div>
     <p style="font-size: 12px; color: #6b7280; margin: 0;">Se você não criou uma conta, ignore este e-mail.</p>
@@ -222,7 +286,46 @@ export async function POST(req: Request) {
   </div>
 </body>
 </html>`,
-  })
+    })
+  } else {
+    // Existing user — their new unit is ready
+    await getResend().emails.send({
+      from: 'PetFlow <noreply@contato.getpetflow.com>',
+      to: email,
+      subject: 'Nova unidade adicionada ao seu PetFlow 🏪',
+      html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 0; color: #1a1a1a;">
+  <div style="background: #f0fdf4; padding: 24px; text-align: center; border-bottom: 2px solid #d1fae5;">
+    <span style="font-size: 28px; font-weight: 800; color: #059669; letter-spacing: -0.5px;">🐾 PetFlow</span>
+  </div>
+  <div style="padding: 32px 24px;">
+    <h2 style="color: #059669; margin-top: 0; margin-bottom: 8px;">Nova unidade criada com sucesso! 🏪</h2>
+    <p style="margin-top: 0;">Recebemos sua assinatura e criamos uma nova unidade no PetFlow para você.</p>
+    <p style="margin-top: 16px;">Clique no botão abaixo para acessar o sistema e começar a configurar sua nova unidade:</p>
+    <a href="${accessLink}"
+       style="display:inline-block;margin-top:8px;background:#059669;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:16px;">
+      Acessar o PetFlow
+    </a>
+    <p style="margin-top: 20px; font-size: 13px; color: #6b7280;">
+      Este link é válido por 24 horas. Caso expire, acesse normalmente em
+      <a href="${appUrl}/login" style="color:#059669;">getpetflow.com</a>.
+    </p>
+    <div style="background:#fff3cd; border:1px solid #ffc107; border-radius:8px; padding:16px; margin-top:24px;">
+      <p style="margin:0; font-size:13px; color:#856404;">
+        <strong>⚙️ Alternância entre unidades em breve</strong><br>
+        Estamos desenvolvendo a troca de unidades dentro do painel. Por enquanto, entre em contato pelo suporte para configurar sua nova unidade.
+      </p>
+    </div>
+  </div>
+  <div style="background: #f9fafb; padding: 16px; text-align: center; border-top: 1px solid #e5e7eb;">
+    <p style="font-size: 12px; color: #9ca3af; margin: 0;">© ${new Date().getFullYear()} PetFlow · Todos os direitos reservados</p>
+  </div>
+</body>
+</html>`,
+    })
+  }
 
   return NextResponse.json({ received: true })
 }
