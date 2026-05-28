@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { headers } from 'next/headers'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { CheckIcon, StarIcon, ShieldCheckIcon, SmartphoneIcon, ClockIcon, TrendingUpIcon, CheckCircleIcon } from 'lucide-react'
 import { CheckoutButton } from '@/components/landing/checkout-button'
 import { PricingToggle } from '@/components/landing/pricing-toggle'
@@ -404,6 +405,80 @@ const COPY = {
   },
 } as const
 
+// ── SEO helpers ───────────────────────────────────────────────────────────────
+
+function safeJson(data: unknown): string {
+  return JSON.stringify(data)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+}
+
+// ── Metadata (locale-aware) ───────────────────────────────────────────────────
+
+export async function generateMetadata(): Promise<Metadata> {
+  const hdrs = await headers()
+  const { locale } = detectLocale(hdrs)
+
+  if (locale === 'pt-BR') {
+    return {
+      title: 'PetFlow — Sistema para Pet Shop e Clínica Veterinária',
+      description:
+        'Sistema completo para pet shop e clínica vet. Agendamento online com QR Code, agenda por profissional, ficha de clientes e pets, faturamento em tempo real. R$29,90/mês · 7 dias de garantia.',
+      openGraph: {
+        title: 'PetFlow — Sistema para Pet Shop e Clínica Veterinária',
+        description:
+          'Agendamento online com QR Code, agenda por profissional, ficha de clientes e pets, faturamento. R$29,90/mês · 7 dias de garantia · Suporte em português.',
+        locale: 'pt_BR',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'PetFlow — Sistema para Pet Shop | R$29,90/mês',
+        description:
+          'Agendamento online com QR Code para pet shops e clínicas vet. R$29,90/mês · 7 dias de garantia · Sem WhatsApp.',
+      },
+    }
+  }
+
+  if (locale === 'pt-PT') {
+    return {
+      title: 'PetFlow — Sistema de Marcação para Petshop e Clínica Vet',
+      description:
+        'Sistema completo para petshop e clínica veterinária. Marcação online com QR Code, agenda por profissional, ficha de clientes e animais. €19,90/mês · 7 dias de garantia.',
+      openGraph: {
+        title: 'PetFlow — Sistema de Marcação para Petshop',
+        description:
+          'Marcação online com QR Code para petshops. €19,90/mês · 7 dias de garantia.',
+        locale: 'pt_PT',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'PetFlow — Sistema para Petshop | €19,90/mês',
+        description:
+          'Marcação online com QR Code para petshops e clínicas vet. €19,90/mês · 7 dias de garantia.',
+      },
+    }
+  }
+
+  return {
+    title: 'PetFlow — Online Booking System for Pet Shops & Vet Clinics',
+    description:
+      'Complete management system for pet shops and vet clinics. Online booking with QR Code, per-staff scheduling, client & pet profiles, revenue dashboard. From $19.90/mo · 7-day guarantee.',
+    openGraph: {
+      title: 'PetFlow — Online Booking System for Pet Shops',
+      description:
+        'QR Code booking, per-staff scheduling, client profiles, revenue dashboard. $19.90/mo · 7-day guarantee.',
+      locale: 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'PetFlow — Pet Shop Booking System | $19.90/mo',
+      description:
+        'QR Code online booking for pet shops & vet clinics. $19.90/mo · 7-day guarantee.',
+    },
+  }
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function LandingPage() {
@@ -799,6 +874,95 @@ export default async function LandingPage() {
         pricePeriodShort={locale === 'en' ? '/mo · Cancel anytime' : '/mês · Cancele quando quiser'}
         ctaLabel={locale === 'en' ? 'Start now' : 'Começar agora'}
         currency={currency}
+      />
+
+      {/* ── JSON-LD structured data ─────────────────────────────── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeJson({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'PetFlow',
+            url: 'https://getpetflow.com',
+            logo: 'https://getpetflow.com/icon.png',
+            contactPoint: {
+              '@type': 'ContactPoint',
+              email: c.supportEmail,
+              contactType: 'customer support',
+              availableLanguage: ['Portuguese', 'English'],
+              areaServed: locale === 'pt-BR' ? 'BR' : locale === 'pt-PT' ? 'PT' : ['US', 'GB', 'AU'],
+            },
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeJson({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'PetFlow',
+            url: 'https://getpetflow.com',
+            description: locale === 'pt-BR'
+              ? 'Sistema para pet shop e clínica veterinária'
+              : locale === 'pt-PT'
+              ? 'Sistema para petshop e clínica veterinária'
+              : 'Pet shop and vet clinic management system',
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeJson({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'PetFlow',
+            operatingSystem: 'Web',
+            applicationCategory: 'BusinessApplication',
+            applicationSubCategory: locale === 'en' ? 'Pet Shop Management Software' : 'Sistema para Pet Shop',
+            url: 'https://getpetflow.com',
+            description: locale === 'pt-BR'
+              ? 'Sistema completo para pet shop e clínica veterinária com agendamento online via QR Code, agenda por profissional, ficha de clientes e pets, e dashboard de faturamento.'
+              : locale === 'pt-PT'
+              ? 'Sistema completo para petshop e clínica veterinária com marcação online via QR Code, agenda por profissional, ficha de clientes e animais.'
+              : 'Complete management system for pet shops and vet clinics with QR Code online booking, per-staff scheduling, client & pet profiles, and revenue dashboard.',
+            offers: {
+              '@type': 'Offer',
+              price: locale === 'pt-BR' ? '29.90' : '19.90',
+              priceCurrency: locale === 'pt-BR' ? 'BRL' : locale === 'pt-PT' ? 'EUR' : 'USD',
+              priceValidUntil: '2027-12-31',
+              availability: 'https://schema.org/InStock',
+              url: 'https://getpetflow.com',
+            },
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: '5',
+              reviewCount: String(c.testimonials.length),
+              bestRating: '5',
+              worstRating: '1',
+            },
+            featureList: c.features.map(f => f.title),
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeJson({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: c.faqs.map(faq => ({
+              '@type': 'Question',
+              name: faq.q,
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: faq.a,
+              },
+            })),
+          }),
+        }}
       />
     </div>
   )

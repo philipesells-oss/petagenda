@@ -1,10 +1,14 @@
 import { redirect } from 'next/navigation'
-
+import type { Metadata } from 'next'
 import { Sidebar, MobileBottomNav } from '@/components/layout/sidebar'
 import { Topbar } from '@/components/layout/topbar'
 import { Toaster } from '@/components/ui/sonner'
 import { getCurrentUser } from '@/lib/auth/get-current-user'
 import { LanguageProvider } from '@/lib/i18n/language-context'
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+}
 
 /**
  * Dashboard Layout — Server Component.
