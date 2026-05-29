@@ -87,6 +87,9 @@ export const metadata: Metadata = {
       'x-default': 'https://getpetflow.com',
     },
   },
+  verification: {
+    google: 'xLSZM8IHwW-0UHjY39IfbXCzwLw2uJ5MR1ufERPb8RU',
+  },
 };
 
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID
