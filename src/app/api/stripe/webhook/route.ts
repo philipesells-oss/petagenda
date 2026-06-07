@@ -181,14 +181,29 @@ export async function POST(req: Request) {
           const { data: referrerAuth } = await adminClient.auth.admin.getUserById(referrerUserRow.id)
           const referrerEmail = referrerAuth?.user?.email
 
-          const coupon = await stripe.coupons.create({
-            duration: 'once',
-            percent_off: 100,
-            name: 'Mês grátis — indicação PetFlow',
-          })
+          // Credit ONE month to the referrer's account balance.
+          // We use a customer credit balance (not a coupon) so multiple referrals
+          // STACK: every confirmed referral adds another free month, which Stripe
+          // consumes automatically on upcoming invoices. A coupon set on the
+          // subscription would be overwritten by the next referral, capping the
+          // reward at a single month per billing cycle — breaking the
+          // "Sem limite · Acumula" promise on the landing page.
+          const referrerSub = await stripe.subscriptions.retrieve(
+            referrerTenant.stripe_subscription_id,
+          )
+          const subItem = referrerSub.items.data[0]
+          const monthAmount = subItem?.price?.unit_amount ?? 2990
+          const monthCurrency = subItem?.price?.currency ?? 'brl'
+          const referrerCustomerId =
+            typeof referrerSub.customer === 'string'
+              ? referrerSub.customer
+              : referrerSub.customer.id
+          // Negative amount = credit that lowers the amount due on future invoices.
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (stripe.subscriptions as any).update(referrerTenant.stripe_subscription_id, {
-            coupon: coupon.id,
+          await (stripe.customers as any).createBalanceTransaction(referrerCustomerId, {
+            amount: -monthAmount,
+            currency: monthCurrency,
+            description: 'Mês grátis — indicação PetFlow',
           })
 
           if (referrerEmail) {
